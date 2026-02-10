@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat+Alternates&display=swap" rel="stylesheet" />
+    <title>Arizona RP Launcher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --primary-color: rgba(0, 120, 212, 0.8);
+            --secondary-color: rgba(93, 93, 93, 0.3);
+            --text-color: rgba(255, 255, 255, 0.95);
+            --shadow-color: rgba(0, 0, 0, 0.25);
+            --border-radius: 10px;
+            --transition-speed: 0.3s;
+        }
+        
+        body {
+            overflow: hidden;
+            background: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        #container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: #000;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        #main-canvas {
+            z-index: 1;
+        }
+        
+        #bloom-canvas {
+            z-index: 2;
+            opacity: 0;
+            filter: blur(20px);
+            mix-blend-mode: screen;
+            pointer-events: none;
+        }
+
+        /* Основной интерфейс */
+        .interface {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 3;
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .left-panel {
+            flex: 0 0 350px;
+            background: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0px 4px 4px var(--shadow-color);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .right-panel {
+            flex: 1;
+            background: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0px 4px 4px var(--shadow-color);
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: clamp(24px, 3vw, 36px);
+            color: var(--text-color);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: clamp(14px, 1.5vw, 20px);
+            color: rgba(255, 255, 255, 0.7);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        /* Поле ввода никнейма и выбора сервера */
+        .nickname-section {
+            margin-bottom: 15px;
+        }
+
+        .server-section {
+            margin-bottom: 20px;
+        }
+
+        .section-label {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .nickname-input,
+        .server-select {
+            width: 100%;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 14px;
+            padding: 0 15px;
+            outline: none;
+            transition: all var(--transition-speed);
+        }
+
+        .nickname-input:focus,
+        .server-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+        }
+
+        .nickname-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .server-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 20px;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+
+        .server-select option {
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px;
+        }
+
+        /* Кнопка "Начать игру" */
+        .start-btn {
+            width: 100%;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color), rgba(0, 80, 150, 0.8));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            box-shadow: 0 4px 15px rgba(0, 120, 212, 0.3);
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 120, 212, 0.4);
+        }
+
+        .start-btn:active {
+            transform: translateY(0);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .start-btn-loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .start-btn-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Статистика сервера */
+        .server-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-label {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .stat-value {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 16px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .stat-online {
+            color: #4CAF50;
+        }
+
+        .stat-queue {
+            color: #FF9800;
+        }
+
+        .stat-max {
+            color: #2196F3;
+        }
+
+        /* Индикатор загрузки */
+        .loading-indicator {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+        }
+
+        .loading-indicator.active {
+            display: block;
+        }
+
+        .loading-dots {
+            display: inline-block;
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification-success {
+            background: rgba(76, 175, 80, 0.9);
+        }
+
+        .notification-error {
+            background: rgba(244, 67, 54, 0.9);
+        }
+
+        .notification-warning {
+            background: rgba(255, 152, 0, 0.9);
+        }
+
+        .notification-info {
+            background: rgba(33, 150, 243, 0.9);
+        }
+
+        .notification-close {
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: auto;
+            padding: 0 5px;
+        }
+
+        /* Информация о пути */
+        .path-info {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .interface {
+                flex-direction: column;
+                padding: 10px;
+                gap: 15px;
+            }
+            
+            .left-panel {
+                flex: 0 0 auto;
+                max-height: 400px;
+            }
+            
+            .right-panel {
+                flex: 1;
+                min-height: 200px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .interface {
+                padding: 5px;
+            }
+            
+            .left-panel,
+            .right-panel {
+                padding: 15px;
+            }
+        }
+
+        /* Скроллбар */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 120, 212, 0.8);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Новая панель настроек */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .settings-content {
+            background: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80%;
+            overflow-y: auto;
+            box-shadow: 0px 4px 4px var(--shadow-color);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .settings-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 24px;
+            color: var(--text-color);
+        }
+
+        .close-settings {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-label {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .save-settings-btn {
+            width: 100%;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary-color), rgba(0, 80, 150, 0.8));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            box-shadow: 0 4px 15px rgba(0, 120, 212, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .save-settings-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 120, 212, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <canvas id="main-canvas"></canvas>
+        <canvas id="bloom-canvas"></canvas>
+        
+        <div id="notificationsContainer"></div>
+        
+        <div class="interface">
+            <div class="left-panel">
+                <div class="header">
+                    <h1 class="title">🚀 Arizona RP Launcher</h1>
+                    <p class="subtitle">Запуск через командную строку</p>
+                </div>
+                
+                <div class="nickname-section">
+                    <label class="section-label">Ваш никнейм:</label>
+                    <input type="text" class="nickname-input" id="nicknameInput" 
+                           placeholder="Введите ваш никнейм" maxlength="20" autocomplete="off">
+                </div>
+                
+                <div class="server-section">
+                    <label class="section-label">Выберите сервер:</label>
+                    <select class="server-select" id="serverSelect">
+                        <option value="">Загрузка серверов...</option>
+                    </select>
+                    <button onclick="loadServers()" style="margin-top: 8px; padding: 8px 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white; cursor: pointer; font-family: 'Montserrat Alternates'; font-size: 12px; width: 100%;">
+                        🔄 Обновить список серверов
+                    </button>
+                    <div class="loading-indicator" id="serverLoading">
+                        Загрузка данных серверов<span class="loading-dots"></span>
+                    </div>
+                </div>
+                
+                <button class="start-btn" id="startBtn" disabled>
+                    <span>🎮 Начать игру</span>
+                </button>
+                
+                <button onclick="openSettings()" style="width: 100%; height: 45px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; cursor: pointer; font-family: 'Montserrat Alternates'; font-size: 14px;">
+                    ⚙️ Настройки
+                </button>
+                
+                <div class="server-stats" id="serverStats" style="display: none;">
+                    <div class="stat-item">
+                        <span class="stat-label">Сервер:</span>
+                        <span class="stat-value" id="serverName">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Онлайн:</span>
+                        <span class="stat-value stat-online" id="serverOnline">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Очередь:</span>
+                        <span class="stat-value stat-queue" id="serverQueue">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Макс. игроков:</span>
+                        <span class="stat-value stat-max" id="serverMax">-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <div class="header">
+                    <h2 class="title" id="selectedServerTitle">Выберите сервер</h2>
+                    <p class="subtitle" id="selectedServerSubtitle">Данные обновляются автоматически</p>
+                </div>
+                
+                <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
+                    <div id="serverInfoContent">
+                        <p style="text-align: center; color: rgba(255,255,255,0.6); font-family: 'Montserrat Alternates';">
+                            Выберите сервер для отображения информации<br>
+                            <span style="font-size: 14px; color: rgba(255,255,255,0.4);">Данные загружаются с сервера Arizona</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="path-info" id="pathInfo">
+                    Путь к лаунчеру: <span id="launcherPath">Загрузка...</span><br>
+                    <small>Запуск через: ArizonaLauncher6_byAIR.exe -c -h [сервер] -p 7777 -mem 4096 -n [ник] -arizona -x -window -cdn 1,1,1</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Панель настроек -->
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-content">
+                <div class="settings-header">
+                    <h2 class="settings-title">Настройки ArizonaPatches</h2>
+                    <button class="close-settings" onclick="closeSettings()">×</button>
+                </div>
+                
+                <div class="checkbox-group">
+                    <!-- Чекбоксы будут добавлены динамически -->
+                </div>
+                
+                <button class="save-settings-btn" onclick="saveSettings()">Сохранить изменения</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Конфигурация графики
+        const CONFIG = {
+            gfxType: 'smooth',
+            showParticles: true,
+            bloomType: 'none',
+            bloomStrength: 1.1,
+            wavesEnabled: true,
+            wavesBrightness: 0.7,
+            wavesSpeed: 1.0,
+            particlesCount: 150,
+            primaryColor: '#0078d4',
+            darkTheme: true,
+        };
+
+        // DOM элементы
+        const canvas = document.getElementById('main-canvas');
+        const bloomCanvas = document.getElementById('bloom-canvas');
+        const ctx = canvas.getContext('2d');
+        const bloomCtx = bloomCanvas.getContext('2d');
+
+        const startBtn = document.getElementById('startBtn');
+        const nicknameInput = document.getElementById('nicknameInput');
+        const serverSelect = document.getElementById('serverSelect');
+        const serverLoading = document.getElementById('serverLoading');
+        const notificationsContainer = document.getElementById('notificationsContainer');
+        const launcherPathElement = document.getElementById('launcherPath');
+
+        // Элементы статистики сервера
+        const serverStats = document.getElementById('serverStats');
+        const serverName = document.getElementById('serverName');
+        const serverOnline = document.getElementById('serverOnline');
+        const serverQueue = document.getElementById('serverQueue');
+        const serverMax = document.getElementById('serverMax');
+        const selectedServerTitle = document.getElementById('selectedServerTitle');
+        const selectedServerSubtitle = document.getElementById('selectedServerSubtitle');
+        const serverInfoContent = document.getElementById('serverInfoContent');
+        
+        // Элементы панели настроек
+        const settingsPanel = document.getElementById('settingsPanel');
+        const checkboxGroup = document.querySelector('.checkbox-group');
+
+        // Переменные
+        let isLaunching = false;
+        let selectedServer = null;
+        let currentServerNumber = null;
+        let patchesData = null;
+
+        // Словарь переводов
+        const translations = {
+            "UseCustomRenderEffects": "Использовать кастомные эффекты рендеринга",
+            "CCamInteriorFix": "Исправление интовой стрельбы",
+            "COcclusionFix": "Исправление просадки фпс в центре карты",
+            "DontDefaultWindowMode": "Возвращение полноэкранного режима (по дефолту оконный без рамок)",
+            "DontInterfereAntiAFK": "Использовать AntiAFK (если есть)",
+            "DontUseGreenZone": "Удалить зеленые зоны (для LocalDM)",
+            "DontUseScaleRadarMapIcons": "Не использовать увеличенные иконки радара",
+            "DontUseCustomAttachObject": "Использовать стандартное прикрепление объектов",
+            "DontUseCustomChat": "Использовать стандартный чат и 3D текст",
+            "DontUseCustomCarRender": "Использовать стандартный рендеринг машин",
+            "DontUseCustomSync": "Использовать оригинальную синхронизацию SAMP",
+            "DontUseCustomFastConnect": "Использовать FastConnect от AIR (если есть)",
+            "DontUseCustomShadow": "Использовать стандартные тени",
+            "DontUseVoiceChat": "Не использовать голосовой чат",
+            "DontUseSoundSystem": "Не использовать окружающие звуки",
+            "DontUseCustomMarker": "Не рисовать 3D иконки (например в цг сундук)",
+            "DontUseCustomNumberPlate": "Не использовать номерные знаки",
+            "DontUseFadeScreen": "Убрать затемнение экрана",
+            "DontUseFirstPerson": "Не использовать камеру от первого лица",
+            "DontUseCustomVehicleLightsColor": "Использовать стандартный свет фар",
+            "DontPressWOnBike": "Убрать авто W на велосипеде",
+            "CustomObjectForceDistance": "Принудительная дистанция для объектов лаунчера (настройте сами)",
+            "ServerObjectForceDistance": "Принудительная дистанция для серверных объектов (настройте сами)",
+            "ServerAttachObjectForceDistance": "Принудительная дистанция для прикрепленных серверных объектов (настройте сами)"
+        };
+
+        // Инициализация
+        async function init() {
+            initCanvas();
+            initParticles();
+            animate();
+            initEventListeners();
+            
+            try {
+                if (window.pywebview && window.pywebview.api.get_config) {
+                    const config = await window.pywebview.api.get_config();
+                    launcherPathElement.textContent = config.launcher_path;
+                    nicknameInput.value = config.last_nickname || '';
+                    currentServerNumber = config.last_server || null;
+                }
+            } catch (error) {
+                console.error('Ошибка получения конфигурации:', error);
+            }
+            
+            loadServers(); // Автоматическое обновление при запуске
+            updateStartButtonState();
+
+            // Автообновление списка серверов каждые 5 минут
+            setInterval(loadServers, 300000);
+        }
+
+        async function loadServers() {
+            serverLoading.classList.add('active');
+            serverSelect.disabled = true;
+            
+            try {
+                let servers = null;
+                
+                if (window.pywebview && window.pywebview.api.get_servers) {
+                    servers = await window.pywebview.api.get_servers();
+                }
+                
+                if (!servers || servers.length === 0) {
+                    // Демо данные
+                    const demoServers = [
+                        {number: 1, name: "Payson", online: 934, queue: 0, recommended: true, ip: "payson.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 2, name: "Surprise", online: 856, queue: 0, recommended: true, ip: "surprise.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 3, name: "Chandler", online: 789, queue: 0, recommended: false, ip: "chandler.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 4, name: "Gilbert", online: 712, queue: 0, recommended: false, ip: "gilbert.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 5, name: "Glendale", online: 645, queue: 0, recommended: false, ip: "glendale.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 6, name: "Mesa", online: 578, queue: 0, recommended: false, ip: "mesa.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 7, name: "Scottsdale", online: 501, queue: 0, recommended: false, ip: "scottsdale.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 8, name: "Tempe", online: 423, queue: 0, recommended: false, ip: "tempe.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 9, name: "Peoria", online: 356, queue: 0, recommended: false, ip: "peoria.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 10, name: "Tucson", online: 278, queue: 0, recommended: false, ip: "tucson.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 11, name: "Yuma", online: 201, queue: 0, recommended: false, ip: "yuma.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 12, name: "Avondale", online: 123, queue: 0, recommended: false, ip: "avondale.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 13, name: "Goodyear", online: 45, queue: 0, recommended: false, ip: "goodyear.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 14, name: "Buckeye", online: 890, queue: 5, recommended: true, ip: "buckeye.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 15, name: "Casa Grande", online: 767, queue: 0, recommended: false, ip: "casa-grande.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 16, name: "Flagstaff", online: 689, queue: 0, recommended: false, ip: "flagstaff.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 17, name: "Lake Havasu", online: 612, queue: 0, recommended: false, ip: "lake-havasu.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 18, name: "Maricopa", online: 534, queue: 0, recommended: false, ip: "maricopa.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 19, name: "Sierra Vista", online: 456, queue: 0, recommended: false, ip: "sierra-vista.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 20, name: "Apache Junction", online: 378, queue: 0, recommended: false, ip: "apache-junction.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 21, name: "Bullhead City", online: 301, queue: 0, recommended: false, ip: "bullhead-city.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 22, name: "Prescott", online: 223, queue: 0, recommended: false, ip: "prescott.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 23, name: "Oro Valley", online: 145, queue: 0, recommended: false, ip: "oro-valley.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 24, name: "Marana", online: 67, queue: 0, recommended: false, ip: "marana.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 25, name: "Nogales", online: 990, queue: 10, recommended: true, ip: "nogales.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 26, name: "Douglas", online: 912, queue: 0, recommended: true, ip: "douglas.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 27, name: "Page", online: 834, queue: 0, recommended: false, ip: "page.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 28, name: "Sun City", online: 756, queue: 0, recommended: false, ip: "sun-city.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 29, name: "Queen Creek", online: 678, queue: 0, recommended: false, ip: "queen-creek.arizona-rp.com", port: 7777, maxplayers: 1000},
+                        {number: 30, name: "Sedona", online: 601, queue: 0, recommended: false, ip: "sedona.arizona-rp.com", port: 7777, maxplayers: 1000}
+                    ];
+                    servers = demoServers;
+                }
+                
+                populateServerSelect(servers, currentServerNumber);
+            } catch (error) {
+                console.error('Ошибка загрузки серверов:', error);
+                showNotification('Ошибка загрузки серверов', 'error');
+            } finally {
+                serverLoading.classList.remove('active');
+                serverSelect.disabled = false;
+            }
+        }
+
+        function populateServerSelect(servers, restoreServerNumber = null) {
+            serverSelect.innerHTML = '<option value="">Выберите сервер</option>';
+            
+            // Сортируем серверы: сначала рекомендуемые, потом по онлайну
+            const sortedServers = servers.sort((a, b) => {
+                if (a.recommended && !b.recommended) return -1;
+                if (!a.recommended && b.recommended) return 1;
+                return b.online - a.online;
+            });
+            
+            sortedServers.forEach(server => {
+                const option = document.createElement('option');
+                option.value = server.number;
+                
+                let statusIcon = '🟢';
+                if (server.queue > 0) statusIcon = '🟡';
+                if (server.online >= 990) statusIcon = '🔴';
+                
+                const recommendBadge = server.recommended ? ' ⭐' : '';
+                const queueInfo = server.queue > 0 ? ` 🔄${server.queue}` : '';
+                
+                option.textContent = `${statusIcon} ${server.name} [${server.online}/${server.maxplayers || 1000}]${queueInfo}${recommendBadge}`;
+                option.dataset.server = JSON.stringify(server);
+                serverSelect.appendChild(option);
+            });
+            
+            // Восстанавливаем предыдущий выбор или выбираем первый рекомендованный
+            if (restoreServerNumber) {
+                const serverToRestore = servers.find(s => s.number === restoreServerNumber);
+                if (serverToRestore) {
+                    serverSelect.value = serverToRestore.number;
+                    updateServerData(serverToRestore);
+                    console.log('Восстановлен выбор сервера:', serverToRestore.name);
+                } else {
+                    // Если сервера больше нет в списке, выбираем рекомендованный
+                    const recommendedServer = servers.find(s => s.recommended);
+                    if (recommendedServer) {
+                        serverSelect.value = recommendedServer.number;
+                        updateServerData(recommendedServer);
+                    }
+                }
+            } else {
+                // Первая загрузка - автовыбор первого рекомендованного сервера
+                const recommendedServer = servers.find(s => s.recommended);
+                if (recommendedServer) {
+                    serverSelect.value = recommendedServer.number;
+                    updateServerData(recommendedServer);
+                }
+            }
+            
+            updateStartButtonState();
+        }
+
+        function updateServerData(server) {
+            selectedServer = server;
+            
+            serverStats.style.display = 'block';
+            serverName.textContent = server.name;
+            serverOnline.textContent = server.online;
+            serverQueue.textContent = server.queue > 0 ? server.queue : 'Нет';
+            serverMax.textContent = server.maxplayers || '1000';
+            
+            selectedServerTitle.textContent = server.name;
+            selectedServerSubtitle.textContent = `Сервер #${server.number} (${server.ip})`;
+            
+            updateServerInfoContent(server);
+            updateStartButtonState();
+        }
+
+        function updateServerInfoContent(server) {
+            const maxPlayers = server.maxplayers || 1000;
+            const loadPercentage = ((server.online / maxPlayers) * 100).toFixed(1);
+            const queueInfo = server.queue > 0 ? 
+                `<div style="color: #FF9800; margin-top: 10px; background: rgba(255, 152, 0, 0.1); padding: 10px; border-radius: 5px;">
+                    ⚠️ <strong>В очереди: ${server.queue} игроков</strong><br>
+                    <small>Примерное время ожидания: ${Math.ceil(server.queue / 2)} минут</small>
+                </div>` : '';
+            
+            let statusColor = '#4CAF50';
+            let statusText = '🟢 Низкая нагрузка';
+            
+            if (server.online >= maxPlayers * 0.99) {
+                statusColor = '#F44336';
+                statusText = '🔴 Сервер переполнен';
+            } else if (server.online >= maxPlayers * 0.9) {
+                statusColor = '#FF9800';
+                statusText = '🟡 Высокая нагрузка';
+            } else if (server.online >= maxPlayers * 0.7) {
+                statusColor = '#8BC34A';
+                statusText = '🟢 Средняя нагрузка';
+            }
+            
+            const recommendBadge = server.recommended ? 
+                '<div style="background: linear-gradient(135deg, #FFD700, #FF9800); color: black; padding: 5px 10px; border-radius: 5px; display: inline-block; margin-left: 10px; font-size: 12px; font-weight: bold;">⭐ РЕКОМЕНДУЕМ</div>' : '';
+            
+            serverInfoContent.innerHTML = `
+                <div style="text-align: center; color: rgba(255,255,255,0.9); font-family: 'Montserrat Alternates';">
+                    <div style="font-size: 18px; margin-bottom: 20px; color: ${statusColor}; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                        <span>${statusText}</span>
+                        ${recommendBadge}
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <span>Заполненность:</span>
+                            <span><strong>${loadPercentage}%</strong> (${server.online}/${maxPlayers})</span>
+                        </div>
+                        <div style="width: 100%; height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden; margin-bottom: 10px;">
+                            <div style="width: ${loadPercentage}%; height: 100%; background: ${statusColor}; border-radius: 5px;"></div>
+                        </div>
+                    </div>
+                    
+                    ${queueInfo}
+                    
+                    <div style="margin-top: 20px; font-size: 12px; color: rgba(255,255,255,0.5);">
+                        IP: ${server.ip}:${server.port}<br>
+                        ID сервера: #${server.number}
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateStartButtonState() {
+            const hasNickname = nicknameInput.value.trim().length > 0;
+            const hasServer = selectedServer !== null;
+            
+            startBtn.disabled = !(hasNickname && hasServer) || isLaunching;
+            
+            if (isLaunching) {
+                startBtn.classList.add('start-btn-loading');
+                startBtn.innerHTML = '';
+            } else {
+                startBtn.classList.remove('start-btn-loading');
+                if (!startBtn.disabled) {
+                    startBtn.innerHTML = `<span>🎮 Играть на ${selectedServer ? selectedServer.name : ''}</span>`;
+                } else {
+                    startBtn.innerHTML = '<span>🎮 Начать игру</span>';
+                }
+            }
+        }
+
+        async function startGame() {
+            if (isLaunching) return;
+            
+            const nickname = nicknameInput.value.trim();
+            if (!nickname) {
+                showNotification('Введите никнейм', 'warning');
+                nicknameInput.focus();
+                return;
+            }
+            
+            if (!selectedServer) {
+                showNotification('Выберите сервер', 'warning');
+                return;
+            }
+            
+            isLaunching = true;
+            updateStartButtonState();
+            
+            try {
+                if (window.pywebview && window.pywebview.api.start_game) {
+                    const result = await window.pywebview.api.start_game(nickname, selectedServer);
+                    
+                    if (result && result.success) {
+                        showNotification(result.message || 'Игра запускается!', 'success');
+                    } else {
+                        showNotification(result?.message || 'Ошибка запуска', 'error');
+                    }
+                } else {
+                    console.warn('API не доступно. Демо режим.');
+                    setTimeout(() => {
+                        console.log(`Демо: запуск игры для ${nickname} на ${selectedServer.ip}`);
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('Ошибка запуска игры:', error);
+                showNotification('Ошибка при запуске игры', 'error');
+            } finally {
+                setTimeout(() => {
+                    isLaunching = false;
+                    updateStartButtonState();
+                }, 3000);
+            }
+        }
+
+        function showNotification(message, type = 'info', duration = 5000) {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = message + '<button class="notification-close" onclick="this.parentElement.remove()">×</button>';
+            
+            notificationsContainer.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, duration);
+        }
+
+        function initEventListeners() {
+            // Выбор сервера
+            serverSelect.addEventListener('change', function() {
+                const serverNumber = this.value;
+                if (serverNumber) {
+                    const server = JSON.parse(this.options[this.selectedIndex].dataset.server);
+                    updateServerData(server);
+                } else {
+                    resetServerInfo();
+                }
+            });
+
+            // Ввод никнейма
+            nicknameInput.addEventListener('input', debounce(saveNickname, 500));
+            nicknameInput.addEventListener('input', updateStartButtonState);
+
+            // Кнопка старта
+            startBtn.addEventListener('click', startGame);
+
+            // Enter для быстрого запуска
+            nicknameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !startBtn.disabled) {
+                    startGame();
+                }
+            });
+
+            // Ресайз окна
+            window.addEventListener('resize', function() {
+                canvasWidth = window.innerWidth;
+                canvasHeight = window.innerHeight;
+                canvas.width = canvasWidth;
+                canvas.height = canvasHeight;
+                bloomCanvas.width = canvasWidth;
+                bloomCanvas.height = canvasHeight;
+                initParticles();
+            });
+        }
+
+        function resetServerInfo() {
+            serverStats.style.display = 'none';
+            selectedServerTitle.textContent = 'Выберите сервер';
+            selectedServerSubtitle.textContent = 'Данные обновляются автоматически';
+            serverInfoContent.innerHTML = `
+                <p style="text-align: center; color: rgba(255,255,255,0.6); font-family: 'Montserrat Alternates';">
+                    Выберите сервер для отображения информации<br>
+                    <span style="font-size: 14px; color: rgba(255,255,255,0.4);">Данные загружаются с сервера Arizona</span>
+                </p>
+            `;
+            selectedServer = null;
+            updateStartButtonState();
+        }
+
+        // Функции для панели настроек
+        async function openSettings() {
+            try {
+                if (window.pywebview && window.pywebview.api.read_patches) {
+                    patchesData = await window.pywebview.api.read_patches();
+                } else {
+                    // Демо данные, если API недоступно
+                    patchesData = {
+                        "UseCustomRenderEffects": false,
+                        "CCamInteriorFix": true,
+                        "COcclusionFix": true,
+                        "DontDefaultWindowMode": true,
+                        "DontInterfereAntiAFK": false,
+                        "DontUseGreenZone": true,
+                        "DontUseScaleRadarMapIcons": true,
+                        "DontUseCustomAttachObject": true,
+                        "DontUseCustomChat": true,
+                        "DontUseCustomCarRender": true,
+                        "DontUseCustomSync": true,
+                        "DontUseCustomFastConnect": true,
+                        "DontUseCustomShadow": true,
+                        "DontUseVoiceChat": false,
+                        "DontUseSoundSystem": true,
+                        "DontUseCustomMarker": true,
+                        "DontUseCustomNumberPlate": true,
+                        "DontUseFadeScreen": true,
+                        "DontUseFirstPerson": true,
+                        "DontUseCustomVehicleLightsColor": true,
+                        "DontPressWOnBike": false,
+                        "CustomObjectForceDistance": false,
+                        "ServerObjectForceDistance": false,
+                        "ServerAttachObjectForceDistance": false
+                    };
+                }
+
+                renderCheckboxes();
+                settingsPanel.style.display = 'flex';
+            } catch (error) {
+                console.error('Ошибка загрузки настроек:', error);
+                showNotification('Ошибка загрузки настроек', 'error');
+            }
+        }
+
+        function closeSettings() {
+            settingsPanel.style.display = 'none';
+            checkboxGroup.innerHTML = '';
+        }
+
+        function renderCheckboxes() {
+            checkboxGroup.innerHTML = '';
+            const boolKeys = Object.keys(patchesData).filter(key => typeof patchesData[key] === 'boolean');
+
+            boolKeys.forEach(key => {
+                const item = document.createElement('div');
+                item.className = 'checkbox-item';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = key;
+                checkbox.checked = patchesData[key];
+                
+                const label = document.createElement('label');
+                label.className = 'checkbox-label';
+                label.htmlFor = key;
+                // Используем перевод если есть, иначе оригинал
+                const englishLabel = key.replace(/([A-Z])/g, ' $1').trim();
+                label.textContent = translations[key] || englishLabel;
+                
+                item.appendChild(checkbox);
+                item.appendChild(label);
+                checkboxGroup.appendChild(item);
+            });
+        }
+
+        async function saveSettings() {
+            const boolKeys = Object.keys(patchesData).filter(key => typeof patchesData[key] === 'boolean');
+            
+            boolKeys.forEach(key => {
+                const checkbox = document.getElementById(key);
+                if (checkbox) {
+                    patchesData[key] = checkbox.checked;
+                }
+            });
+
+            try {
+                if (window.pywebview && window.pywebview.api.write_patches) {
+                    const result = await window.pywebview.api.write_patches(patchesData);
+                    if (result.success) {
+                        showNotification('Настройки сохранены', 'success');
+                        closeSettings();
+                    } else {
+                        showNotification('Ошибка сохранения: ' + result.message, 'error');
+                    }
+                } else {
+                    console.log('Демо: настройки сохранены', patchesData);
+                    showNotification('Настройки сохранены (демо)', 'success');
+                    closeSettings();
+                }
+            } catch (error) {
+                console.error('Ошибка сохранения настроек:', error);
+                showNotification('Ошибка сохранения настроек', 'error');
+            }
+        }
+
+        // Графические функции
+        let canvasWidth, canvasHeight;
+        let particles = [];
+        let time = 0;
+        let animationId;
+
+        function initCanvas() {
+            canvasWidth = window.innerWidth;
+            canvasHeight = window.innerHeight;
+            
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            bloomCanvas.width = canvasWidth;
+            bloomCanvas.height = canvasHeight;
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = CONFIG.particlesCount * (canvasWidth * canvasHeight) / (800 * 480);
+            for(let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * canvasWidth,
+                    y: Math.random() * canvasHeight,
+                    size: Math.random() * 2 + 0.5,
+                    speedX: (Math.random() - 0.5) * 0.5,
+                    speedY: (Math.random() - 0.5) * 0.5,
+                    alpha: Math.random() * 0.3 + 0.1,
+                    waveInfluence: Math.random() * 0.02
+                });
+            }
+        }
+
+        function renderWaves() {
+            if (!CONFIG.wavesEnabled) return;
+            
+            time += 0.01 * CONFIG.wavesSpeed;
+            
+            const waveCount = 5;
+            for(let i = 0; i < waveCount; i++) {
+                const waveY = (i / waveCount) * canvasHeight;
+                const amplitude = 20 + i * 5;
+                const frequency = 0.005 + i * 0.001;
+                const width = 1 + i * 0.3;
+                const alpha = 0.05 + i * 0.05;
+                
+                ctx.beginPath();
+                ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * CONFIG.wavesBrightness})`;
+                ctx.lineWidth = width;
+                ctx.lineCap = 'round';
+                
+                for(let x = 0; x <= canvasWidth; x += 2) {
+                    const y = waveY + 
+                             Math.sin(x * frequency + time) * amplitude +
+                             Math.sin(x * frequency * 0.5 + time * 1.3) * amplitude * 0.3;
+                    
+                    if(x === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                
+                ctx.stroke();
+            }
+        }
+
+        function renderParticles() {
+            if (!CONFIG.showParticles) return;
+            
+            for(const p of particles) {
+                p.x += p.speedX + Math.sin(time * 2 + p.x * 0.01) * p.waveInfluence;
+                p.y += p.speedY + Math.cos(time * 2 + p.y * 0.01) * p.waveInfluence;
+                
+                if(p.x < 0 || p.x > canvasWidth) p.speedX *= -1;
+                if(p.y < 0 || p.y > canvasHeight) p.speedY *= -1;
+                
+                ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function applyBloom() {
+            if (CONFIG.bloomType === 'none' || CONFIG.bloomStrength <= 0) {
+                bloomCanvas.style.opacity = '0';
+                return;
+            }
+
+            bloomCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+            bloomCtx.drawImage(canvas, 0, 0);
+
+            bloomCanvas.style.opacity = CONFIG.bloomStrength.toString();
+            bloomCanvas.style.filter = `blur(${20}px) brightness(${1 + CONFIG.bloomStrength})`;
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            renderWaves();
+            renderParticles();
+            applyBloom();
+            
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Функция debounce для отложенного сохранения
+        function debounce(func, delay) {
+            let timeoutId;
+            return function (...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        // Сохранение ника
+        async function saveNickname() {
+            const nickname = nicknameInput.value.trim();
+            if (window.pywebview && window.pywebview.api.update_nickname) {
+                try {
+                    await window.pywebview.api.update_nickname(nickname);
+                } catch (error) {
+                    console.error('Ошибка сохранения ника:', error);
+                }
+            }
+        }
+
+        // Запуск при загрузке
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
