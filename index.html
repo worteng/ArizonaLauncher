@@ -230,232 +230,179 @@
         }
 
         .start-btn-loading::after {
-            content: '';
+            content: "";
             position: absolute;
             top: 50%;
             left: 50%;
             width: 20px;
             height: 20px;
-            margin: -10px 0 0 -10px;
+            margin-top: -10px;
+            margin-left: -10px;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        /* Статистика сервера */
-        .server-stats {
+        /* Вкладки новостей */
+        .news-tabs {
             display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: auto;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 10px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .stat-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .stat-label {
+        .news-tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
             font-family: 'Montserrat Alternates', sans-serif;
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            border-bottom: 2px solid transparent;
         }
 
-        .stat-value {
-            font-family: 'Montserrat Alternates', sans-serif;
-            font-size: 16px;
+        .news-tab.active {
             color: var(--primary-color);
-            font-weight: bold;
+            border-bottom-color: var(--primary-color);
         }
 
-        .stat-online {
-            color: #4CAF50;
+        .news-tab:hover {
+            color: rgba(255, 255, 255, 0.9);
         }
 
-        .stat-queue {
-            color: #FF9800;
+        /* Секция новостей */
+        .news-section {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 5px;
         }
 
-        .stat-max {
-            color: #2196F3;
+        .news-section::-webkit-scrollbar {
+            width: 8px;
         }
 
-        /* Индикатор загрузки */
-        .loading-indicator {
+        .news-section::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .news-section::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .news-section::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .news-tab-content {
             display: none;
-            text-align: center;
-            padding: 10px;
-            color: rgba(255, 255, 255, 0.7);
-            font-family: 'Montserrat Alternates', sans-serif;
-            font-size: 12px;
         }
 
-        .loading-indicator.active {
+        .news-tab-content.active {
             display: block;
         }
 
-        .loading-dots {
-            display: inline-block;
-            animation: dots 1.5s infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60%, 100% { content: '...'; }
-        }
-
-        /* Уведомления */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
+        .news-item {
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all var(--transition-speed);
+        }
+
+        .news-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+        }
+
+        .news-item-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 16px;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .news-item-content {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .news-item-date {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 8px;
+        }
+
+        .news-loading {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Нижняя панель с кнопками */
+        .bottom-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .icon-btn {
+            flex: 1;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            color: white;
             font-family: 'Montserrat Alternates', sans-serif;
             font-size: 14px;
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            max-width: 400px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-
-        .notification-success {
-            background: rgba(76, 175, 80, 0.9);
-        }
-
-        .notification-error {
-            background: rgba(244, 67, 54, 0.9);
-        }
-
-        .notification-warning {
-            background: rgba(255, 152, 0, 0.9);
-        }
-
-        .notification-info {
-            background: rgba(33, 150, 243, 0.9);
-        }
-
-        .notification-close {
-            background: transparent;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 16px;
-            margin-left: auto;
-            padding: 0 5px;
-        }
-
-        /* Информация о пути */
-        .path-info {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.6);
-            font-family: monospace;
-            word-break: break-all;
-        }
-
-        /* Адаптивность */
-        @media (max-width: 768px) {
-            .interface {
-                flex-direction: column;
-                padding: 10px;
-                gap: 15px;
-            }
-            
-            .left-panel {
-                flex: 0 0 auto;
-                max-height: 400px;
-            }
-            
-            .right-panel {
-                flex: 1;
-                min-height: 200px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .interface {
-                padding: 5px;
-            }
-            
-            .left-panel,
-            .right-panel {
-                padding: 15px;
-            }
-        }
-
-        /* Скроллбар */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-color);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 120, 212, 0.8);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        /* Новая панель настроек */
-        .settings-panel {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
             justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            gap: 8px;
         }
 
-        .settings-content {
-            background: var(--secondary-color);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            width: 80%;
-            max-width: 800px;
-            max-height: 80%;
-            overflow-y: auto;
-            box-shadow: 0px 4px 4px var(--shadow-color);
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .icon-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Модальное окно настроек */
+        .settings-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            background: rgba(30, 30, 30, 0.98);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex-direction: column;
         }
 
         .settings-header {
@@ -463,6 +410,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .settings-title {
@@ -471,53 +420,256 @@
             color: var(--text-color);
         }
 
-        .close-settings {
-            background: transparent;
+        .close-btn {
+            background: none;
             border: none;
             color: white;
-            font-size: 24px;
+            font-size: 28px;
             cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all var(--transition-speed);
         }
 
-        .checkbox-group {
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Вкладки настроек */
+        .settings-tabs {
             display: flex;
-            flex-direction: column;
             gap: 10px;
             margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .settings-tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            border-bottom: 2px solid transparent;
+        }
+
+        .settings-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .settings-tab:hover {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .settings-tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            max-height: 50vh;
+            padding-right: 10px;
+        }
+
+        .settings-tab-content.active {
+            display: flex;
+        }
+
+        .settings-tab-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .settings-tab-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .settings-tab-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
         }
 
         .checkbox-item {
             display: flex;
             align-items: center;
             gap: 10px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            transition: all var(--transition-speed);
+        }
+
+        .checkbox-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
         }
 
         .checkbox-label {
+            color: rgba(255, 255, 255, 0.9);
             font-family: 'Montserrat Alternates', sans-serif;
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            flex: 1;
         }
 
-        .save-settings-btn {
+        .save-btn {
             width: 100%;
             height: 45px;
-            background: linear-gradient(135deg, var(--primary-color), rgba(0, 80, 150, 0.8));
+            background: var(--primary-color);
             border: none;
             border-radius: 8px;
             color: white;
             font-family: 'Montserrat Alternates', sans-serif;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             transition: all var(--transition-speed);
-            box-shadow: 0 4px 15px rgba(0, 120, 212, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            margin-top: 20px;
         }
 
-        .save-settings-btn:hover {
+        .save-btn:hover {
+            background: rgba(0, 120, 212, 1);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 120, 212, 0.4);
+        }
+
+        /* Модальное окно выбора папки */
+        .folder-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 400px;
+            background: rgba(30, 30, 30, 0.98);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .folder-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .folder-modal-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 20px;
+            color: var(--text-color);
+        }
+
+        .folder-option-btn {
+            width: 100%;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            color: white;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .folder-option-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: rgba(0, 120, 212, 0.95);
+            color: white;
+            border-radius: 8px;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .notification.error {
+            background: rgba(212, 0, 0, 0.95);
+        }
+
+        .notification.success {
+            background: rgba(0, 170, 0, 0.95);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .interface {
+                flex-direction: column;
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .left-panel {
+                flex: 0 0 auto;
+            }
+
+            .right-panel {
+                flex: 1;
+                min-height: 300px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .interface {
+                padding: 10px;
+            }
+
+            .settings-panel, .folder-modal {
+                width: 95%;
+                max-height: 90vh;
+                padding: 20px;
+            }
+
+            .bottom-buttons {
+                flex-wrap: wrap;
+            }
+
+            .icon-btn {
+                flex: 1 1 calc(50% - 5px);
+            }
         }
     </style>
 </head>
@@ -525,151 +677,278 @@
     <div id="container">
         <canvas id="main-canvas"></canvas>
         <canvas id="bloom-canvas"></canvas>
-        
-        <div id="notificationsContainer"></div>
-        
+
         <div class="interface">
             <div class="left-panel">
                 <div class="header">
-                    <h1 class="title">🚀 Arizona RP Launcher</h1>
-                    <p class="subtitle">Запуск через командную строку</p>
+                    <div class="title">Arizona RP</div>
+                    <div class="subtitle">Launcher v0.0.3</div>
                 </div>
-                
+
                 <div class="nickname-section">
-                    <label class="section-label">Ваш никнейм:</label>
-                    <input type="text" class="nickname-input" id="nicknameInput" 
-                           placeholder="Введите ваш никнейм" maxlength="20" autocomplete="off">
+                    <label class="section-label">Ваш никнейм</label>
+                    <input type="text" 
+                           class="nickname-input" 
+                           id="nicknameInput" 
+                           placeholder="Введите ваш никнейм"
+                           maxlength="24">
                 </div>
-                
+
                 <div class="server-section">
-                    <label class="section-label">Выберите сервер:</label>
+                    <label class="section-label">Выбор сервера</label>
                     <select class="server-select" id="serverSelect">
-                        <option value="">Загрузка серверов...</option>
+                        <option value="">Загрузка...</option>
                     </select>
-                    <button onclick="loadServers()" style="margin-top: 8px; padding: 8px 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white; cursor: pointer; font-family: 'Montserrat Alternates'; font-size: 12px; width: 100%;">
-                        🔄 Обновить список серверов
-                    </button>
-                    <div class="loading-indicator" id="serverLoading">
-                        Загрузка данных серверов<span class="loading-dots"></span>
-                    </div>
                 </div>
-                
-                <button class="start-btn" id="startBtn" disabled>
-                    <span>🎮 Начать игру</span>
+
+                <button class="start-btn" id="startBtn">
+                    Начать игру
                 </button>
-                
-                <button onclick="openSettings()" style="width: 100%; height: 45px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; cursor: pointer; font-family: 'Montserrat Alternates'; font-size: 14px;">
-                    ⚙️ Настройки
-                </button>
-                
-                <div class="server-stats" id="serverStats" style="display: none;">
-                    <div class="stat-item">
-                        <span class="stat-label">Сервер:</span>
-                        <span class="stat-value" id="serverName">-</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Онлайн:</span>
-                        <span class="stat-value stat-online" id="serverOnline">-</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Очередь:</span>
-                        <span class="stat-value stat-queue" id="serverQueue">-</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Макс. игроков:</span>
-                        <span class="stat-value stat-max" id="serverMax">-</span>
-                    </div>
+
+                <div class="bottom-buttons">
+                    <button class="icon-btn" id="settingsBtn" title="Настройки">
+                        ⚙️ Настройки
+                    </button>
+                    <button class="icon-btn" id="folderBtn" title="Управление папками">
+                        📁 Папка
+                    </button>
+
                 </div>
             </div>
-            
+
             <div class="right-panel">
                 <div class="header">
-                    <h2 class="title" id="selectedServerTitle">Выберите сервер</h2>
-                    <p class="subtitle" id="selectedServerSubtitle">Данные обновляются автоматически</p>
+                    <div class="title">Новости</div>
                 </div>
                 
-                <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
-                    <div id="serverInfoContent">
-                        <p style="text-align: center; color: rgba(255,255,255,0.6); font-family: 'Montserrat Alternates';">
-                            Выберите сервер для отображения информации<br>
-                            <span style="font-size: 14px; color: rgba(255,255,255,0.4);">Данные загружаются с сервера Arizona</span>
-                        </p>
+                <div class="news-tabs">
+                    <button class="news-tab active" onclick="switchNewsTab('launcher')">Лаунчер</button>
+                    <button class="news-tab" onclick="switchNewsTab('arizona')">Arizona RP</button>
+                </div>
+
+                <div class="news-section">
+                    <div id="launcherNews" class="news-tab-content active">
+                        <div class="news-loading">Загрузка новостей лаунчера...</div>
                     </div>
-                </div>
-                
-                <div class="path-info" id="pathInfo">
-                    Путь к лаунчеру: <span id="launcherPath">Загрузка...</span><br>
-                    <small>Запуск через: ArizonaLauncher6_byAIR.exe -c -h [сервер] -p 7777 -mem 4096 -n [ник] -arizona -x -window -cdn 1,1,1</small>
+                    <div id="arizonaNews" class="news-tab-content">
+                        <div class="news-loading">Скоро...</div>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Панель настроек -->
+
+        <!-- Модальное окно настроек -->
         <div class="settings-panel" id="settingsPanel">
-            <div class="settings-content">
-                <div class="settings-header">
-                    <h2 class="settings-title">Настройки ArizonaPatches</h2>
-                    <button class="close-settings" onclick="closeSettings()">×</button>
-                </div>
-                
-                <div class="checkbox-group">
-                    <!-- Чекбоксы будут добавлены динамически -->
-                </div>
-                
-                <button class="save-settings-btn" onclick="saveSettings()">Сохранить изменения</button>
+            <div class="settings-header">
+                <div class="settings-title">Настройки</div>
+                <button class="close-btn" onclick="closeSettings()">×</button>
             </div>
+
+            <div class="settings-tabs">
+                <button id="tabBtnPatches" class="settings-tab active" onclick="switchTab('patches')">Патчи</button>
+                <button id="tabBtnLaunch" class="settings-tab" onclick="switchTab('launch')">Запуск</button>
+                <button id="tabBtnImport" class="settings-tab" onclick="switchTab('import')">Импорт / Экспорт</button>
+                <button id="tabBtnLauncher" class="settings-tab" onclick="switchTab('launcher')">Лаунчер</button>
+            </div>
+
+            <div id="patchesTab" class="settings-tab-content active">
+                <div id="checkboxGroup"></div>
+            </div>
+
+            <div id="launchTab" class="settings-tab-content">
+
+                <div class="checkbox-item">
+                    <input type="checkbox" id="windowModeCheck">
+                    <label class="checkbox-label" for="windowModeCheck">Оконный режим (-window)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="widescreenCheck">
+                    <label class="checkbox-label" for="widescreenCheck">Широкоэкранный режим (-widescreen)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="graphicsCheck">
+                    <label class="checkbox-label" for="graphicsCheck">Графический режим (-graphics)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="authCefCheck">
+                    <label class="checkbox-label" for="authCefCheck">Авторизация через CEF (-auth_cef_enable)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="textureModeCheck">
+                    <label class="checkbox-label" for="textureModeCheck">Текстурный режим (-t)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="colorDepth16Check">
+                    <label class="checkbox-label" for="colorDepth16Check">16-битная глубина цвета (-16bpp)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="allowHdrCheck">
+                    <label class="checkbox-label" for="allowHdrCheck">HDR (-allow_hdr)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="enableGrassCheck">
+                    <label class="checkbox-label" for="enableGrassCheck">Трава (-enable_grass)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="ldoCheck">
+                    <label class="checkbox-label" for="ldoCheck">LDO оптимизация (-ldo)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="seasonsCheck">
+                    <label class="checkbox-label" for="seasonsCheck">Сезоны (-seasons)</label>
+                </div>
+
+                <div class="checkbox-item" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                    <label class="checkbox-label">Память (МБ) — -mem</label>
+                    <input type="number" id="memoryInput" min="512" max="16384" step="512"
+                           style="width:100%; height:38px; background:rgba(255,255,255,0.1);
+                                  border:1px solid rgba(255,255,255,0.2); border-radius:6px;
+                                  color:white; font-family:'Montserrat Alternates'; font-size:14px;
+                                  padding:0 12px; outline:none;">
+                </div>
+
+                <div class="checkbox-item" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                    <label class="checkbox-label">CDN (-cdn)</label>
+                    <input type="text" id="cdnInput" placeholder="1,1,1"
+                           style="width:100%; height:38px; background:rgba(255,255,255,0.1);
+                                  border:1px solid rgba(255,255,255,0.2); border-radius:6px;
+                                  color:white; font-family:'Montserrat Alternates'; font-size:14px;
+                                  padding:0 12px; outline:none;">
+                </div>
+
+            </div>
+
+            <div id="importTab" class="settings-tab-content">
+
+                <!-- Экспорт -->
+                <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:16px;">
+                    <div style="font-family:'Montserrat Alternates';font-size:15px;color:rgba(255,255,255,0.9);margin-bottom:8px;">📤 Экспорт настроек</div>
+                    <div style="font-family:'Montserrat Alternates';font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:12px;">Сохранить текущие настройки патчей в .json файл и поделиться с другом</div>
+                    <button onclick="doExport()" class="save-btn" style="margin-top:0;height:42px;font-size:14px;">
+                        📤 Сохранить файл настроек
+                    </button>
+                </div>
+
+                <!-- Импорт -->
+                <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:16px;">
+                    <div style="font-family:'Montserrat Alternates';font-size:15px;color:rgba(255,255,255,0.9);margin-bottom:8px;">📥 Импорт настроек</div>
+                    <div style="font-family:'Montserrat Alternates';font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:12px;">Загрузить файл настроек от друга и применить</div>
+                    <div style="display:flex;gap:8px;">
+                        <button onclick="doImport()" class="save-btn" style="margin-top:0;flex:1;height:42px;font-size:14px;background:rgba(0,120,212,0.8);">
+                            📥 Выбрать файл и применить
+                        </button>
+                        <button onclick="doRollback()" id="rollbackBtn" class="save-btn"
+                                style="margin-top:0;flex:1;height:42px;font-size:14px;background:rgba(180,50,50,0.8);display:none;">
+                            ↩️ Откатить
+                        </button>
+                    </div>
+                    <div id="importStatus" style="margin-top:10px;font-family:'Montserrat Alternates';font-size:12px;min-height:18px;"></div>
+                </div>
+
+            </div>
+
+            <div id="launcherTab" class="settings-tab-content">
+
+                <!-- Живые обои -->
+                <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;">
+                    <div style="font-family:'Montserrat Alternates';font-size:15px;color:rgba(255,255,255,0.9);">🎨 Фон лаунчера</div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="liveWallpaperCheck" onchange="applyLauncherSettings()">
+                        <label class="checkbox-label" for="liveWallpaperCheck">Живые обои (волны и частицы)</label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="wavesCheck" onchange="applyLauncherSettings()">
+                        <label class="checkbox-label" for="wavesCheck">Волны</label>
+                    </div>
+
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="particlesCheck" onchange="applyLauncherSettings()">
+                        <label class="checkbox-label" for="particlesCheck">Частицы</label>
+                    </div>
+                </div>
+
+                <!-- Кастомный фон -->
+                <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;">
+                    <div style="font-family:'Montserrat Alternates';font-size:15px;color:rgba(255,255,255,0.9);">🖼️ Кастомный фон</div>
+                    <div style="font-family:'Montserrat Alternates';font-size:12px;color:rgba(255,255,255,0.45);">PNG, JPG, WEBP</div>
+
+                    <!-- Превью -->
+                    <div id="bgPreview" style="
+                        width:100%;height:90px;border-radius:8px;
+                        background:rgba(0,0,0,0.3);
+                        border:1px solid rgba(255,255,255,0.1);
+                        display:flex;align-items:center;justify-content:center;
+                        font-family:'Montserrat Alternates';font-size:12px;color:rgba(255,255,255,0.4);
+                        background-size:cover;background-position:center;overflow:hidden;
+                    ">Фон не выбран</div>
+
+                    <div style="display:flex;gap:8px;">
+                        <button onclick="selectBgImage()" class="save-btn" style="margin-top:0;flex:1;height:38px;font-size:13px;">
+                            📂 Выбрать картинку
+                        </button>
+                        <button onclick="clearBgImage()" class="save-btn" style="margin-top:0;flex:1;height:38px;font-size:13px;background:rgba(150,50,50,0.7);">
+                            🗑️ Убрать
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <button class="save-btn" onclick="saveSettings()">Сохранить настройки</button>
+        </div>
+
+        <!-- Модальное окно выбора действия с папкой -->
+        <div class="folder-modal" id="folderModal">
+            <div class="folder-modal-header">
+                <div class="folder-modal-title">Управление папками</div>
+                <button class="close-btn" onclick="closeFolderModal()">×</button>
+            </div>
+            <button class="folder-option-btn" onclick="setGamePath()">
+                📂 Указать путь к игре
+            </button>
+            <button class="folder-option-btn" onclick="openGameFolder()">
+                📁 Открыть папку игры
+            </button>
         </div>
     </div>
 
     <script>
-        // Конфигурация графики
-        const CONFIG = {
-            gfxType: 'smooth',
-            showParticles: true,
-            bloomType: 'none',
-            bloomStrength: 1.1,
-            wavesEnabled: true,
-            wavesBrightness: 0.7,
-            wavesSpeed: 1.0,
-            particlesCount: 150,
-            primaryColor: '#0078d4',
-            darkTheme: true,
-        };
-
-        // DOM элементы
+        // Глобальные переменные
         const canvas = document.getElementById('main-canvas');
+        const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
         const bloomCanvas = document.getElementById('bloom-canvas');
-        const ctx = canvas.getContext('2d');
-        const bloomCtx = bloomCanvas.getContext('2d');
+        const bloomCtx = bloomCanvas.getContext('2d', { alpha: true });
 
-        const startBtn = document.getElementById('startBtn');
         const nicknameInput = document.getElementById('nicknameInput');
         const serverSelect = document.getElementById('serverSelect');
-        const serverLoading = document.getElementById('serverLoading');
-        const notificationsContainer = document.getElementById('notificationsContainer');
-        const launcherPathElement = document.getElementById('launcherPath');
-
-        // Элементы статистики сервера
-        const serverStats = document.getElementById('serverStats');
-        const serverName = document.getElementById('serverName');
-        const serverOnline = document.getElementById('serverOnline');
-        const serverQueue = document.getElementById('serverQueue');
-        const serverMax = document.getElementById('serverMax');
-        const selectedServerTitle = document.getElementById('selectedServerTitle');
-        const selectedServerSubtitle = document.getElementById('selectedServerSubtitle');
-        const serverInfoContent = document.getElementById('serverInfoContent');
-        
-        // Элементы панели настроек
+        const startBtn = document.getElementById('startBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const folderBtn = document.getElementById('folderBtn');
         const settingsPanel = document.getElementById('settingsPanel');
-        const checkboxGroup = document.querySelector('.checkbox-group');
+        const folderModal = document.getElementById('folderModal');
+        const checkboxGroup = document.getElementById('checkboxGroup');
 
-        // Переменные
-        let isLaunching = false;
-        let selectedServer = null;
-        let currentServerNumber = null;
-        let patchesData = null;
+        let patchesData = {};
+        let currentNickname = '';
+        let currentServer = '';
+        let serversData = [];
 
-        // Словарь переводов
+        // ОПТИМИЗИРОВАННАЯ КОНФИГУРАЦИЯ ГРАФИКИ (БЕЗ НАСТРОЕК)
+        const CONFIG = {
+            particlesCount: 30,
+            wavesEnabled: true,
+            showParticles: true,
+            wavesSpeed: 1,
+            wavesBrightness: 1,
+            bloomStrength: 0.3,
+            bloomType: 'light',
+            targetFPS: 30,
+            waveStep: 4
+        };
+
+        // Переводы для патчей
         const translations = {
             "UseCustomRenderEffects": "Использовать кастомные эффекты рендеринга",
             "CCamInteriorFix": "Исправление интовой стрельбы",
@@ -701,342 +980,317 @@
         async function init() {
             initCanvas();
             initParticles();
+            await initLauncherSettings(); // применяем сохранённые настройки фона/анимации
             animate();
-            initEventListeners();
             
-            try {
-                if (window.pywebview && window.pywebview.api.get_config) {
-                    const config = await window.pywebview.api.get_config();
-                    launcherPathElement.textContent = config.launcher_path;
-                    nicknameInput.value = config.last_nickname || '';
-                    currentServerNumber = config.last_server || null;
-                }
-            } catch (error) {
-                console.error('Ошибка получения конфигурации:', error);
-            }
-            
-            loadServers(); // Автоматическое обновление при запуске
-            updateStartButtonState();
+            // Загрузка данных
+            await loadServers();
+            await loadLauncherNews();
+            await loadSavedData();
 
-            // Автообновление списка серверов каждые 5 минут
-            setInterval(loadServers, 300000);
+            // События
+            startBtn.addEventListener('click', handleStartGame);
+            settingsBtn.addEventListener('click', openSettings);
+            folderBtn.addEventListener('click', openFolderModal);
+            nicknameInput.addEventListener('input', debounce(saveNickname, 500));
+            serverSelect.addEventListener('change', handleServerChange);
+            window.addEventListener('resize', debounce(handleResize, 250));
+
+            // Автообновление серверов каждые 30 секунд
+            setInterval(loadServers, 30000);
         }
 
+        // Загрузка серверов
         async function loadServers() {
-            serverLoading.classList.add('active');
-            serverSelect.disabled = true;
-            
             try {
-                let servers = null;
-                
                 if (window.pywebview && window.pywebview.api.get_servers) {
-                    servers = await window.pywebview.api.get_servers();
-                }
-                
-                if (!servers || servers.length === 0) {
+                    const servers = await window.pywebview.api.get_servers();
+                    if (servers && servers.length > 0) {
+                        serversData = servers;
+                        updateServerSelect();
+                    }
+                } else {
                     // Демо данные
-                    const demoServers = [
-                        {number: 1, name: "Payson", online: 934, queue: 0, recommended: true, ip: "payson.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 2, name: "Surprise", online: 856, queue: 0, recommended: true, ip: "surprise.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 3, name: "Chandler", online: 789, queue: 0, recommended: false, ip: "chandler.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 4, name: "Gilbert", online: 712, queue: 0, recommended: false, ip: "gilbert.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 5, name: "Glendale", online: 645, queue: 0, recommended: false, ip: "glendale.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 6, name: "Mesa", online: 578, queue: 0, recommended: false, ip: "mesa.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 7, name: "Scottsdale", online: 501, queue: 0, recommended: false, ip: "scottsdale.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 8, name: "Tempe", online: 423, queue: 0, recommended: false, ip: "tempe.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 9, name: "Peoria", online: 356, queue: 0, recommended: false, ip: "peoria.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 10, name: "Tucson", online: 278, queue: 0, recommended: false, ip: "tucson.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 11, name: "Yuma", online: 201, queue: 0, recommended: false, ip: "yuma.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 12, name: "Avondale", online: 123, queue: 0, recommended: false, ip: "avondale.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 13, name: "Goodyear", online: 45, queue: 0, recommended: false, ip: "goodyear.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 14, name: "Buckeye", online: 890, queue: 5, recommended: true, ip: "buckeye.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 15, name: "Casa Grande", online: 767, queue: 0, recommended: false, ip: "casa-grande.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 16, name: "Flagstaff", online: 689, queue: 0, recommended: false, ip: "flagstaff.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 17, name: "Lake Havasu", online: 612, queue: 0, recommended: false, ip: "lake-havasu.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 18, name: "Maricopa", online: 534, queue: 0, recommended: false, ip: "maricopa.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 19, name: "Sierra Vista", online: 456, queue: 0, recommended: false, ip: "sierra-vista.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 20, name: "Apache Junction", online: 378, queue: 0, recommended: false, ip: "apache-junction.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 21, name: "Bullhead City", online: 301, queue: 0, recommended: false, ip: "bullhead-city.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 22, name: "Prescott", online: 223, queue: 0, recommended: false, ip: "prescott.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 23, name: "Oro Valley", online: 145, queue: 0, recommended: false, ip: "oro-valley.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 24, name: "Marana", online: 67, queue: 0, recommended: false, ip: "marana.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 25, name: "Nogales", online: 990, queue: 10, recommended: true, ip: "nogales.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 26, name: "Douglas", online: 912, queue: 0, recommended: true, ip: "douglas.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 27, name: "Page", online: 834, queue: 0, recommended: false, ip: "page.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 28, name: "Sun City", online: 756, queue: 0, recommended: false, ip: "sun-city.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 29, name: "Queen Creek", online: 678, queue: 0, recommended: false, ip: "queen-creek.arizona-rp.com", port: 7777, maxplayers: 1000},
-                        {number: 30, name: "Sedona", online: 601, queue: 0, recommended: false, ip: "sedona.arizona-rp.com", port: 7777, maxplayers: 1000}
+                    serversData = [
+                        { number: 1, name: 'Phoenix', online: 1250, maxplayers: 2000, ip: 'phoenix.arizona-rp.com', port: 7777 },
+                        { number: 2, name: 'Tucson', online: 980, maxplayers: 2000, ip: 'tucson.arizona-rp.com', port: 7777 },
+                        { number: 3, name: 'Scottdale', online: 1450, maxplayers: 2000, ip: 'scottdale.arizona-rp.com', port: 7777 },
+                        { number: 4, name: 'Chandler', online: 1100, maxplayers: 2000, ip: 'chandler.arizona-rp.com', port: 7777 },
+                        { number: 5, name: 'Brainburg', online: 890, maxplayers: 2000, ip: 'brainburg.arizona-rp.com', port: 7777 }
                     ];
-                    servers = demoServers;
+                    updateServerSelect();
                 }
-                
-                populateServerSelect(servers, currentServerNumber);
             } catch (error) {
                 console.error('Ошибка загрузки серверов:', error);
-                showNotification('Ошибка загрузки серверов', 'error');
-            } finally {
-                serverLoading.classList.remove('active');
-                serverSelect.disabled = false;
             }
         }
 
-        function populateServerSelect(servers, restoreServerNumber = null) {
-            serverSelect.innerHTML = '<option value="">Выберите сервер</option>';
+        function updateServerSelect() {
+            const savedServer = currentServer || serverSelect.value;
+            serverSelect.innerHTML = '';
             
-            // Сортируем серверы: сначала рекомендуемые, потом по онлайну
-            const sortedServers = servers.sort((a, b) => {
-                if (a.recommended && !b.recommended) return -1;
-                if (!a.recommended && b.recommended) return 1;
-                return b.online - a.online;
-            });
-            
-            sortedServers.forEach(server => {
+            serversData.forEach(server => {
                 const option = document.createElement('option');
                 option.value = server.number;
-                
-                let statusIcon = '🟢';
-                if (server.queue > 0) statusIcon = '🟡';
-                if (server.online >= 990) statusIcon = '🔴';
-                
-                const recommendBadge = server.recommended ? ' ⭐' : '';
-                const queueInfo = server.queue > 0 ? ` 🔄${server.queue}` : '';
-                
-                option.textContent = `${statusIcon} ${server.name} [${server.online}/${server.maxplayers || 1000}]${queueInfo}${recommendBadge}`;
-                option.dataset.server = JSON.stringify(server);
+                option.textContent = `${server.name} (${server.online}/${server.maxplayers})`;
                 serverSelect.appendChild(option);
             });
-            
-            // Восстанавливаем предыдущий выбор или выбираем первый рекомендованный
-            if (restoreServerNumber) {
-                const serverToRestore = servers.find(s => s.number === restoreServerNumber);
-                if (serverToRestore) {
-                    serverSelect.value = serverToRestore.number;
-                    updateServerData(serverToRestore);
-                    console.log('Восстановлен выбор сервера:', serverToRestore.name);
+
+            // Восстанавливаем выбранный сервер
+            if (savedServer) {
+                serverSelect.value = savedServer;
+            }
+        }
+
+        // Загрузка новостей лаунчера с GitHub
+        async function loadLauncherNews() {
+            const launcherNewsDiv = document.getElementById('launcherNews');
+            launcherNewsDiv.innerHTML = '<div class="news-loading">Загрузка новостей...</div>';
+
+            try {
+                if (!window.pywebview || !window.pywebview.api || !window.pywebview.api.get_launcher_news) {
+                    throw new Error("Python API недоступен");
+                }
+
+                const result = await window.pywebview.api.get_launcher_news();
+
+                if (!result.success) {
+                    throw new Error(result.message || "Ошибка загрузки");
+                }
+
+                const text = result.text;
+                const newsBlocks = parseNewsFromText(text);
+
+                launcherNewsDiv.innerHTML = '';
+
+                if (newsBlocks.length > 0) {
+                    newsBlocks.forEach(news => {
+                        const newsItem = document.createElement('div');
+                        newsItem.className = 'news-item';
+                        newsItem.innerHTML = `
+                            <div class="news-item-title">${news.title}</div>
+                            <div class="news-item-content">${news.content}</div>
+                            ${news.date ? `<div class="news-item-date">${news.date}</div>` : ''}
+                        `;
+                        launcherNewsDiv.appendChild(newsItem);
+                    });
                 } else {
-                    // Если сервера больше нет в списке, выбираем рекомендованный
-                    const recommendedServer = servers.find(s => s.recommended);
-                    if (recommendedServer) {
-                        serverSelect.value = recommendedServer.number;
-                        updateServerData(recommendedServer);
+                    launcherNewsDiv.innerHTML = '<div class="news-loading">Нет новостей</div>';
+                }
+
+            } catch (error) {
+                console.error("Ошибка загрузки новостей:", error);
+                launcherNewsDiv.innerHTML = `
+                    <div class="news-loading">
+                        Не удалось загрузить новости<br>
+                        <small>${error.message}</small>
+                    </div>
+                `;
+            }
+        }
+
+
+        // Парсинг новостей из текста
+        function parseNewsFromText(text) {
+            const lines = text.split('\n').filter(line => line.trim());
+            const news = [];
+            let currentNews = null;
+
+            for (let line of lines) {
+                line = line.trim();
+                
+                // Проверяем, является ли строка заголовком (обычно начинается с #, *, или просто жирный текст)
+                if (line.startsWith('#') || line.startsWith('**') || line.match(/^\d{2}\.\d{2}\.\d{4}/)) {
+                    // Сохраняем предыдущую новость
+                    if (currentNews && currentNews.content) {
+                        news.push(currentNews);
+                    }
+                    
+                    // Начинаем новую новость
+                    currentNews = {
+                        title: line.replace(/^[#*\s]+/, '').replace(/\*\*$/, ''),
+                        content: '',
+                        date: ''
+                    };
+                    
+                    // Пытаемся найти дату в заголовке
+                    const dateMatch = line.match(/(\d{2}\.\d{2}\.\d{4})/);
+                    if (dateMatch) {
+                        currentNews.date = dateMatch[1];
+                        currentNews.title = line.replace(dateMatch[0], '').trim();
+                    }
+                } else if (currentNews && line) {
+                    // Добавляем строку к содержимому текущей новости
+                    currentNews.content += (currentNews.content ? '\n' : '') + line;
+                }
+            }
+
+            // Добавляем последнюю новость
+            if (currentNews && currentNews.content) {
+                news.push(currentNews);
+            }
+
+            // Если парсинг не дал результатов, возвращаем весь текст как одну новость
+            if (news.length === 0 && text.trim()) {
+                news.push({
+                    title: 'Обновления лаунчера',
+                    content: text.trim(),
+                    date: ''
+                });
+            }
+
+            return news;
+        }
+
+        // Переключение вкладок новостей
+        function switchNewsTab(tab) {
+            document.querySelectorAll('.news-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.news-tab-content').forEach(c => c.classList.remove('active'));
+
+            if (tab === 'launcher') {
+                document.querySelector('.news-tab:nth-child(1)').classList.add('active');
+                document.getElementById('launcherNews').classList.add('active');
+            } else if (tab === 'arizona') {
+                document.querySelector('.news-tab:nth-child(2)').classList.add('active');
+                document.getElementById('arizonaNews').classList.add('active');
+            }
+        }
+
+        // Загрузка сохраненных данных
+        async function loadSavedData() {
+            try {
+                if (window.pywebview && window.pywebview.api.get_saved_data) {
+                    const result = await window.pywebview.api.get_saved_data();
+                    if (result.success) {
+                        if (result.nickname) {
+                            nicknameInput.value = result.nickname;
+                            currentNickname = result.nickname;
+                        }
+                        if (result.server) {
+                            currentServer = result.server;
+                            serverSelect.value = result.server;
+                        }
                     }
                 }
-            } else {
-                // Первая загрузка - автовыбор первого рекомендованного сервера
-                const recommendedServer = servers.find(s => s.recommended);
-                if (recommendedServer) {
-                    serverSelect.value = recommendedServer.number;
-                    updateServerData(recommendedServer);
-                }
-            }
-            
-            updateStartButtonState();
-        }
-
-        function updateServerData(server) {
-            selectedServer = server;
-            
-            serverStats.style.display = 'block';
-            serverName.textContent = server.name;
-            serverOnline.textContent = server.online;
-            serverQueue.textContent = server.queue > 0 ? server.queue : 'Нет';
-            serverMax.textContent = server.maxplayers || '1000';
-            
-            selectedServerTitle.textContent = server.name;
-            selectedServerSubtitle.textContent = `Сервер #${server.number} (${server.ip})`;
-            
-            updateServerInfoContent(server);
-            updateStartButtonState();
-        }
-
-        function updateServerInfoContent(server) {
-            const maxPlayers = server.maxplayers || 1000;
-            const loadPercentage = ((server.online / maxPlayers) * 100).toFixed(1);
-            const queueInfo = server.queue > 0 ? 
-                `<div style="color: #FF9800; margin-top: 10px; background: rgba(255, 152, 0, 0.1); padding: 10px; border-radius: 5px;">
-                    ⚠️ <strong>В очереди: ${server.queue} игроков</strong><br>
-                    <small>Примерное время ожидания: ${Math.ceil(server.queue / 2)} минут</small>
-                </div>` : '';
-            
-            let statusColor = '#4CAF50';
-            let statusText = '🟢 Низкая нагрузка';
-            
-            if (server.online >= maxPlayers * 0.99) {
-                statusColor = '#F44336';
-                statusText = '🔴 Сервер переполнен';
-            } else if (server.online >= maxPlayers * 0.9) {
-                statusColor = '#FF9800';
-                statusText = '🟡 Высокая нагрузка';
-            } else if (server.online >= maxPlayers * 0.7) {
-                statusColor = '#8BC34A';
-                statusText = '🟢 Средняя нагрузка';
-            }
-            
-            const recommendBadge = server.recommended ? 
-                '<div style="background: linear-gradient(135deg, #FFD700, #FF9800); color: black; padding: 5px 10px; border-radius: 5px; display: inline-block; margin-left: 10px; font-size: 12px; font-weight: bold;">⭐ РЕКОМЕНДУЕМ</div>' : '';
-            
-            serverInfoContent.innerHTML = `
-                <div style="text-align: center; color: rgba(255,255,255,0.9); font-family: 'Montserrat Alternates';">
-                    <div style="font-size: 18px; margin-bottom: 20px; color: ${statusColor}; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                        <span>${statusText}</span>
-                        ${recommendBadge}
-                    </div>
-                    
-                    <div style="margin-top: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <span>Заполненность:</span>
-                            <span><strong>${loadPercentage}%</strong> (${server.online}/${maxPlayers})</span>
-                        </div>
-                        <div style="width: 100%; height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden; margin-bottom: 10px;">
-                            <div style="width: ${loadPercentage}%; height: 100%; background: ${statusColor}; border-radius: 5px;"></div>
-                        </div>
-                    </div>
-                    
-                    ${queueInfo}
-                    
-                    <div style="margin-top: 20px; font-size: 12px; color: rgba(255,255,255,0.5);">
-                        IP: ${server.ip}:${server.port}<br>
-                        ID сервера: #${server.number}
-                    </div>
-                </div>
-            `;
-        }
-
-        function updateStartButtonState() {
-            const hasNickname = nicknameInput.value.trim().length > 0;
-            const hasServer = selectedServer !== null;
-            
-            startBtn.disabled = !(hasNickname && hasServer) || isLaunching;
-            
-            if (isLaunching) {
-                startBtn.classList.add('start-btn-loading');
-                startBtn.innerHTML = '';
-            } else {
-                startBtn.classList.remove('start-btn-loading');
-                if (!startBtn.disabled) {
-                    startBtn.innerHTML = `<span>🎮 Играть на ${selectedServer ? selectedServer.name : ''}</span>`;
-                } else {
-                    startBtn.innerHTML = '<span>🎮 Начать игру</span>';
-                }
+            } catch (error) {
+                console.error('Ошибка загрузки сохраненных данных:', error);
             }
         }
 
-        async function startGame() {
-            if (isLaunching) return;
-            
+        function handleServerChange() {
+            currentServer = serverSelect.value;
+        }
+
+        // Запуск игры
+        async function handleStartGame() {
             const nickname = nicknameInput.value.trim();
+            const serverNumber = serverSelect.value;
+
             if (!nickname) {
-                showNotification('Введите никнейм', 'warning');
-                nicknameInput.focus();
+                showNotification('Введите никнейм', 'error');
                 return;
             }
-            
-            if (!selectedServer) {
-                showNotification('Выберите сервер', 'warning');
+
+            if (!serverNumber) {
+                showNotification('Выберите сервер', 'error');
                 return;
             }
-            
-            isLaunching = true;
-            updateStartButtonState();
-            
+
+            const serverData = serversData.find(s => s.number == serverNumber);
+            if (!serverData) {
+                showNotification('Сервер не найден', 'error');
+                return;
+            }
+
+            startBtn.disabled = true;
+            startBtn.classList.add('start-btn-loading');
+
             try {
                 if (window.pywebview && window.pywebview.api.start_game) {
-                    const result = await window.pywebview.api.start_game(nickname, selectedServer);
-                    
-                    if (result && result.success) {
-                        showNotification(result.message || 'Игра запускается!', 'success');
+                    const result = await window.pywebview.api.start_game(nickname, serverData, null);
+                    if (result.success) {
+                        showNotification('Игра запускается!', 'success');
                     } else {
-                        showNotification(result?.message || 'Ошибка запуска', 'error');
+                        showNotification('Ошибка: ' + result.message, 'error');
                     }
                 } else {
-                    console.warn('API не доступно. Демо режим.');
-                    setTimeout(() => {
-                        console.log(`Демо: запуск игры для ${nickname} на ${selectedServer.ip}`);
-                    }, 2000);
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    showNotification('Игра запущена (демо режим)', 'success');
                 }
             } catch (error) {
                 console.error('Ошибка запуска игры:', error);
-                showNotification('Ошибка при запуске игры', 'error');
+                showNotification('Ошибка запуска игры', 'error');
             } finally {
-                setTimeout(() => {
-                    isLaunching = false;
-                    updateStartButtonState();
-                }, 3000);
+                startBtn.disabled = false;
+                startBtn.classList.remove('start-btn-loading');
             }
         }
 
-        function showNotification(message, type = 'info', duration = 5000) {
-            const notification = document.createElement('div');
-            notification.className = `notification notification-${type}`;
-            notification.innerHTML = message + '<button class="notification-close" onclick="this.parentElement.remove()">×</button>';
-            
-            notificationsContainer.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, duration);
+        // Модальное окно папки
+        function openFolderModal() {
+            folderModal.style.display = 'flex';
         }
 
-        function initEventListeners() {
-            // Выбор сервера
-            serverSelect.addEventListener('change', function() {
-                const serverNumber = this.value;
-                if (serverNumber) {
-                    const server = JSON.parse(this.options[this.selectedIndex].dataset.server);
-                    updateServerData(server);
-                } else {
-                    resetServerInfo();
-                }
-            });
-
-            // Ввод никнейма
-            nicknameInput.addEventListener('input', debounce(saveNickname, 500));
-            nicknameInput.addEventListener('input', updateStartButtonState);
-
-            // Кнопка старта
-            startBtn.addEventListener('click', startGame);
-
-            // Enter для быстрого запуска
-            nicknameInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && !startBtn.disabled) {
-                    startGame();
-                }
-            });
-
-            // Ресайз окна
-            window.addEventListener('resize', function() {
-                canvasWidth = window.innerWidth;
-                canvasHeight = window.innerHeight;
-                canvas.width = canvasWidth;
-                canvas.height = canvasHeight;
-                bloomCanvas.width = canvasWidth;
-                bloomCanvas.height = canvasHeight;
-                initParticles();
-            });
+        function closeFolderModal() {
+            folderModal.style.display = 'none';
         }
 
-        function resetServerInfo() {
-            serverStats.style.display = 'none';
-            selectedServerTitle.textContent = 'Выберите сервер';
-            selectedServerSubtitle.textContent = 'Данные обновляются автоматически';
-            serverInfoContent.innerHTML = `
-                <p style="text-align: center; color: rgba(255,255,255,0.6); font-family: 'Montserrat Alternates';">
-                    Выберите сервер для отображения информации<br>
-                    <span style="font-size: 14px; color: rgba(255,255,255,0.4);">Данные загружаются с сервера Arizona</span>
-                </p>
-            `;
-            selectedServer = null;
-            updateStartButtonState();
-        }
-
-        // Функции для панели настроек
-        async function openSettings() {
+        async function setGamePath() {
             try {
-                if (window.pywebview && window.pywebview.api.read_patches) {
-                    patchesData = await window.pywebview.api.read_patches();
+                if (window.pywebview && window.pywebview.api.select_game_path) {
+                    const result = await window.pywebview.api.select_game_path();
+                    if (result.success) {
+                        showNotification('Путь к игре установлен', 'success');
+                        closeFolderModal();
+                    } else {
+                        showNotification(result.message || 'Отменено', 'error');
+                    }
                 } else {
-                    // Демо данные, если API недоступно
-                    patchesData = {
+                    showNotification('Функция доступна только в приложении', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка установки пути:', error);
+                showNotification('Ошибка установки пути', 'error');
+            }
+        }
+
+        async function openGameFolder() {
+            try {
+                if (window.pywebview && window.pywebview.api.open_game_folder) {
+                    const result = await window.pywebview.api.open_game_folder();
+                    if (!result.success) {
+                        showNotification(result.message, 'error');
+                    }
+                    closeFolderModal();
+                } else {
+                    showNotification('Функция доступна только в приложении', 'error');
+                }
+            } catch (error) {
+                console.error('Ошибка открытия папки:', error);
+                showNotification('Ошибка открытия папки', 'error');
+            }
+        }
+
+        // Уведомления
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function handleResize() {
+            initCanvas();
+            initParticles();
+        }
+
+        // Дефолтные данные патчей (используются как fallback)
+        const defaultPatchesData = {
                         "UseCustomRenderEffects": false,
                         "CCamInteriorFix": true,
                         "COcclusionFix": true,
@@ -1062,14 +1316,281 @@
                         "ServerObjectForceDistance": false,
                         "ServerAttachObjectForceDistance": false
                     };
-                }
 
-                renderCheckboxes();
-                settingsPanel.style.display = 'flex';
-            } catch (error) {
-                console.error('Ошибка загрузки настроек:', error);
-                showNotification('Ошибка загрузки настроек', 'error');
+
+        // ---- НАСТРОЙКИ ----
+
+        // Переключение вкладок
+        function switchTab(tabName) {
+            document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.settings-tab-content').forEach(c => c.classList.remove('active'));
+            if (tabName === 'patches') {
+                document.getElementById('tabBtnPatches').classList.add('active');
+                document.getElementById('patchesTab').classList.add('active');
+            } else if (tabName === 'launch') {
+                document.getElementById('tabBtnLaunch').classList.add('active');
+                document.getElementById('launchTab').classList.add('active');
+            } else if (tabName === 'import') {
+                document.getElementById('tabBtnImport').classList.add('active');
+                document.getElementById('importTab').classList.add('active');
+            } else if (tabName === 'launcher') {
+                document.getElementById('tabBtnLauncher').classList.add('active');
+                document.getElementById('launcherTab').classList.add('active');
+                loadLauncherSettings();
             }
+        }
+
+        // ---- ИМПОРТ / ЭКСПОРТ ----
+        let patchesBackup = null; // для отката
+
+        async function doExport() {
+            try {
+                if (window.pywebview && window.pywebview.api.export_patches) {
+                    const result = await window.pywebview.api.export_patches(patchesData);
+                    if (result.success) {
+                        setImportStatus('✅ ' + result.message, '#0f0');
+                    } else {
+                        setImportStatus(result.message === 'Отменено' ? '' : '❌ ' + result.message, '#f44');
+                    }
+                } else {
+                    setImportStatus('⚠️ Функция доступна только в приложении', '#ff0');
+                }
+            } catch (e) {
+                setImportStatus('❌ Ошибка: ' + e.message, '#f44');
+            }
+        }
+
+        async function doImport() {
+            try {
+                if (window.pywebview && window.pywebview.api.import_patches) {
+                    const result = await window.pywebview.api.import_patches();
+                    if (!result.success) {
+                        setImportStatus(result.message === 'Отменено' ? '' : '❌ ' + result.message, '#f44');
+                        return;
+                    }
+                    // Сохраняем бекап для отката
+                    patchesBackup = Object.assign({}, patchesData);
+                    // Применяем
+                    patchesData = result.data;
+                    renderCheckboxes();
+                    switchTab('patches');
+                    document.getElementById('rollbackBtn').style.display = '';
+                    setImportStatus('✅ Загружено ' + result.keys_count + ' настроек. Нажми "Сохранить" чтобы записать на диск.', '#0f0');
+                } else {
+                    setImportStatus('⚠️ Функция доступна только в приложении', '#ff0');
+                }
+            } catch (e) {
+                setImportStatus('❌ Ошибка: ' + e.message, '#f44');
+            }
+        }
+
+        function doRollback() {
+            if (!patchesBackup) return;
+            patchesData = Object.assign({}, patchesBackup);
+            patchesBackup = null;
+            renderCheckboxes();
+            switchTab('patches');
+            document.getElementById('rollbackBtn').style.display = 'none';
+            setImportStatus('↩️ Настройки откачены к предыдущим значениям', '#ff0');
+        }
+
+        function setImportStatus(msg, color) {
+            const el = document.getElementById('importStatus');
+            if (el) { el.textContent = msg; el.style.color = color || 'white'; }
+        }
+
+        // ---- НАСТРОЙКИ ЛАУНЧЕРА ----
+        // Текущие настройки в памяти (загружаются из Python при старте)
+        let launcherSettings = { live_wallpaper: true, waves: true, particles: true, bg_image: null };
+
+        // Применяет настройки из объекта launcherSettings к canvas и фону
+        function applyLauncherSettingsFromObj(s) {
+            CONFIG.wavesEnabled  = s.live_wallpaper && s.waves;
+            CONFIG.showParticles = s.live_wallpaper && s.particles;
+
+            if (!s.live_wallpaper) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+                bloomCanvas.style.opacity = '0';
+            } else {
+                if (!animationId) animate(0);
+            }
+
+            applyBgImage(s.bg_image || null);
+        }
+
+        // Вызывается при открытии вкладки — загружает актуальные значения в чекбоксы
+        async function loadLauncherSettings() {
+            try {
+                if (window.pywebview && window.pywebview.api.get_launcher_settings) {
+                    const result = await window.pywebview.api.get_launcher_settings();
+                    if (result.success) launcherSettings = Object.assign(launcherSettings, result.data);
+                }
+            } catch(e) {}
+
+            document.getElementById('liveWallpaperCheck').checked = launcherSettings.live_wallpaper !== false;
+            document.getElementById('wavesCheck').checked         = launcherSettings.waves !== false;
+            document.getElementById('particlesCheck').checked     = launcherSettings.particles !== false;
+
+            const preview = document.getElementById('bgPreview');
+            if (launcherSettings.bg_image) {
+                preview.style.backgroundImage = `url('${launcherSettings.bg_image}')`;
+                preview.textContent = '';
+            } else {
+                preview.style.backgroundImage = '';
+                preview.textContent = 'Фон не выбран';
+            }
+        }
+
+        // Вызывается при изменении чекбоксов — применяет сразу, сохраняет через Python
+        async function applyLauncherSettings() {
+            launcherSettings.live_wallpaper = document.getElementById('liveWallpaperCheck').checked;
+            launcherSettings.waves          = document.getElementById('wavesCheck').checked;
+            launcherSettings.particles      = document.getElementById('particlesCheck').checked;
+
+            applyLauncherSettingsFromObj(launcherSettings);
+
+            try {
+                if (window.pywebview && window.pywebview.api.save_launcher_settings) {
+                    await window.pywebview.api.save_launcher_settings(launcherSettings);
+                }
+            } catch(e) {}
+        }
+
+        async function selectBgImage() {
+            try {
+                if (window.pywebview && window.pywebview.api.select_bg_image) {
+                    const result = await window.pywebview.api.select_bg_image();
+                    if (result.success) {
+                        launcherSettings.bg_image = result.data_url;
+                        applyBgImage(result.data_url);
+                        const preview = document.getElementById('bgPreview');
+                        preview.style.backgroundImage = `url('${result.data_url}')`;
+                        preview.textContent = '';
+                        if (window.pywebview && window.pywebview.api.save_launcher_settings) {
+                            await window.pywebview.api.save_launcher_settings(launcherSettings);
+                        }
+                    } else if (result.message !== 'Отменено') {
+                        showNotification('Ошибка: ' + result.message, 'error');
+                    }
+                } else {
+                    showNotification('Функция доступна только в приложении', 'error');
+                }
+            } catch(e) {
+                showNotification('Ошибка выбора картинки', 'error');
+            }
+        }
+
+        async function clearBgImage() {
+            launcherSettings.bg_image = null;
+            applyBgImage(null);
+            const preview = document.getElementById('bgPreview');
+            preview.style.backgroundImage = '';
+            preview.textContent = 'Фон не выбран';
+            try {
+                if (window.pywebview && window.pywebview.api.save_launcher_settings) {
+                    await window.pywebview.api.save_launcher_settings(launcherSettings);
+                }
+            } catch(e) {}
+        }
+
+        function applyBgImage(dataUrl) {
+            const container = document.getElementById('container');
+            if (dataUrl) {
+                container.style.backgroundImage = `url('${dataUrl}')`;
+                container.style.backgroundSize = 'cover';
+                container.style.backgroundPosition = 'center';
+            } else {
+                container.style.backgroundImage = '';
+            }
+        }
+
+        // Вызывается один раз при старте — загружает настройки из Python и применяет
+        async function initLauncherSettings() {
+            try {
+                if (window.pywebview && window.pywebview.api.get_launcher_settings) {
+                    const result = await window.pywebview.api.get_launcher_settings();
+                    if (result.success) launcherSettings = Object.assign(launcherSettings, result.data);
+                }
+            } catch(e) {}
+            applyLauncherSettingsFromObj(launcherSettings);
+        }
+
+        // Отрисовка чекбоксов патчей
+        function renderCheckboxes() {
+            checkboxGroup.innerHTML = '';
+            const keys = Object.keys(patchesData).filter(k => typeof patchesData[k] === 'boolean');
+            if (keys.length === 0) {
+            }
+            keys.forEach(key => {
+                const item = document.createElement('div');
+                item.className = 'checkbox-item';
+
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.id = 'patch_' + key;
+                cb.checked = patchesData[key];
+
+                const lbl = document.createElement('label');
+                lbl.className = 'checkbox-label';
+                lbl.htmlFor = 'patch_' + key;
+                lbl.textContent = translations[key] || key.replace(/([A-Z])/g, ' $1').trim();
+
+                item.appendChild(cb);
+                item.appendChild(lbl);
+                checkboxGroup.appendChild(item);
+            });
+        }
+
+        // Открыть настройки
+        async function openSettings() {
+
+            // 1. Дефолтные данные — используются только если файл не найден или нет pywebview
+            patchesData = Object.assign({}, defaultPatchesData);
+
+            // 2. Грузим патчи
+            try {
+                if (window.pywebview && window.pywebview.api && window.pywebview.api.read_patches) {
+                    const result = await window.pywebview.api.read_patches();
+                    if (result && result.success === true) {
+                        // Файл найден — берём содержимое как есть, даже если {}
+                        // Дефолты НЕ подставляем — иначе очищенный файл будет казаться непустым
+                        patchesData = result.data;
+                    }
+                    // success === false — файл не найден, остаются дефолты
+                }
+                // нет pywebview — остаются дефолты (демо режим)
+            } catch (e) {
+            }
+
+            // 4. Грузим параметры запуска
+            try {
+                if (window.pywebview && window.pywebview.api && window.pywebview.api.read_launch_params) {
+                    const params = await window.pywebview.api.read_launch_params();
+                    if (params && typeof params === 'object') {
+                        document.getElementById('windowModeCheck').checked  = params.window_mode !== false;
+                        document.getElementById('widescreenCheck').checked  = !!params.widescreen;
+                        document.getElementById('graphicsCheck').checked    = !!params.graphics;
+                        document.getElementById('authCefCheck').checked     = !!params.auth_cef_enable;
+                        document.getElementById('textureModeCheck').checked = !!params.texture_mode;
+                        document.getElementById('colorDepth16Check').checked = !!params.color_depth_16;
+                        document.getElementById('allowHdrCheck').checked    = !!params.allow_hdr;
+                        document.getElementById('enableGrassCheck').checked = !!params.enable_grass;
+                        document.getElementById('ldoCheck').checked         = !!params.ldo;
+                        document.getElementById('seasonsCheck').checked     = !!params.seasons;
+                        document.getElementById('memoryInput').value        = params.memory || 4096;
+                        document.getElementById('cdnInput').value           = params.cdn || '1,1,1';
+                    }
+                } else {
+                }
+            } catch (e) {
+            }
+
+            // 5. Рендер и показ — ВСЕГДА
+            switchTab('patches');
+            renderCheckboxes();
+            settingsPanel.style.display = 'flex';
         }
 
         function closeSettings() {
@@ -1077,53 +1598,63 @@
             checkboxGroup.innerHTML = '';
         }
 
-        function renderCheckboxes() {
-            checkboxGroup.innerHTML = '';
-            const boolKeys = Object.keys(patchesData).filter(key => typeof patchesData[key] === 'boolean');
-
-            boolKeys.forEach(key => {
-                const item = document.createElement('div');
-                item.className = 'checkbox-item';
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = key;
-                checkbox.checked = patchesData[key];
-                
-                const label = document.createElement('label');
-                label.className = 'checkbox-label';
-                label.htmlFor = key;
-                // Используем перевод если есть, иначе оригинал
-                const englishLabel = key.replace(/([A-Z])/g, ' $1').trim();
-                label.textContent = translations[key] || englishLabel;
-                
-                item.appendChild(checkbox);
-                item.appendChild(label);
-                checkboxGroup.appendChild(item);
-            });
-        }
-
         async function saveSettings() {
+            // Читаем значения чекбоксов патчей (id = 'patch_' + key)
             const boolKeys = Object.keys(patchesData).filter(key => typeof patchesData[key] === 'boolean');
-            
             boolKeys.forEach(key => {
-                const checkbox = document.getElementById(key);
+                const checkbox = document.getElementById('patch_' + key);
                 if (checkbox) {
                     patchesData[key] = checkbox.checked;
                 }
             });
 
+            // Собираем параметры запуска игры
+            const launchParams = {
+                window_mode:    document.getElementById('windowModeCheck').checked,
+                widescreen:     document.getElementById('widescreenCheck').checked,
+                graphics:       document.getElementById('graphicsCheck').checked,
+                auth_cef_enable: document.getElementById('authCefCheck').checked,
+                texture_mode:   document.getElementById('textureModeCheck').checked,
+                color_depth_16: document.getElementById('colorDepth16Check').checked,
+                allow_hdr:      document.getElementById('allowHdrCheck').checked,
+                enable_grass:   document.getElementById('enableGrassCheck').checked,
+                ldo:            document.getElementById('ldoCheck').checked,
+                seasons:        document.getElementById('seasonsCheck').checked,
+                memory:         parseInt(document.getElementById('memoryInput').value) || 4096,
+                cdn:            document.getElementById('cdnInput').value || '1,1,1'
+            };
+
             try {
-                if (window.pywebview && window.pywebview.api.write_patches) {
-                    const result = await window.pywebview.api.write_patches(patchesData);
-                    if (result.success) {
+                if (window.pywebview) {
+                    let patchesOk = true;
+                    let paramsOk = true;
+
+                    // Сохраняем ArizonaPatches
+                    if (window.pywebview.api.write_patches) {
+                        const result = await window.pywebview.api.write_patches(patchesData);
+                        patchesOk = result.success;
+                        if (!result.success) {
+                            showNotification('Ошибка сохранения патчей: ' + result.message, 'error');
+                        }
+                    }
+
+                    // Сохраняем настройки запуска игры
+                    if (window.pywebview.api.update_launch_params) {
+                        const result = await window.pywebview.api.update_launch_params(launchParams);
+                        paramsOk = result.success;
+                        if (!result.success) {
+                            showNotification('Ошибка сохранения настроек запуска', 'error');
+                        }
+                    }
+
+                    if (patchesOk && paramsOk) {
                         showNotification('Настройки сохранены', 'success');
                         closeSettings();
-                    } else {
-                        showNotification('Ошибка сохранения: ' + result.message, 'error');
                     }
                 } else {
-                    console.log('Демо: настройки сохранены', patchesData);
+                    // Демо режим
+                    console.log('Демо: патчи сохранены', patchesData);
+                    console.log('Демо: параметры запуска сохранены', launchParams);
                     showNotification('Настройки сохранены (демо)', 'success');
                     closeSettings();
                 }
@@ -1133,11 +1664,13 @@
             }
         }
 
-        // Графические функции
+        // ОПТИМИЗИРОВАННЫЕ ГРАФИЧЕСКИЕ ФУНКЦИИ
         let canvasWidth, canvasHeight;
         let particles = [];
         let time = 0;
         let animationId;
+        let lastFrameTime = 0;
+        const frameInterval = 1000 / CONFIG.targetFPS;
 
         function initCanvas() {
             canvasWidth = window.innerWidth;
@@ -1151,16 +1684,16 @@
 
         function initParticles() {
             particles = [];
-            const count = CONFIG.particlesCount * (canvasWidth * canvasHeight) / (800 * 480);
+            const count = CONFIG.particlesCount * (canvasWidth * canvasHeight) / (1920 * 1080);
             for(let i = 0; i < count; i++) {
                 particles.push({
                     x: Math.random() * canvasWidth,
                     y: Math.random() * canvasHeight,
                     size: Math.random() * 2 + 0.5,
-                    speedX: (Math.random() - 0.5) * 0.5,
-                    speedY: (Math.random() - 0.5) * 0.5,
-                    alpha: Math.random() * 0.3 + 0.1,
-                    waveInfluence: Math.random() * 0.02
+                    speedX: (Math.random() - 0.5) * 0.3,
+                    speedY: (Math.random() - 0.5) * 0.3,
+                    alpha: Math.random() * 0.25 + 0.1,
+                    waveInfluence: Math.random() * 0.015
                 });
             }
         }
@@ -1168,25 +1701,25 @@
         function renderWaves() {
             if (!CONFIG.wavesEnabled) return;
             
-            time += 0.01 * CONFIG.wavesSpeed;
+            time += 0.008 * CONFIG.wavesSpeed;
             
-            const waveCount = 5;
+            const waveCount = 4;
             for(let i = 0; i < waveCount; i++) {
                 const waveY = (i / waveCount) * canvasHeight;
-                const amplitude = 20 + i * 5;
-                const frequency = 0.005 + i * 0.001;
-                const width = 1 + i * 0.3;
-                const alpha = 0.05 + i * 0.05;
+                const amplitude = 15 + i * 4;
+                const frequency = 0.004 + i * 0.0008;
+                const width = 1 + i * 0.25;
+                const alpha = 0.04 + i * 0.04;
                 
                 ctx.beginPath();
                 ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * CONFIG.wavesBrightness})`;
                 ctx.lineWidth = width;
                 ctx.lineCap = 'round';
                 
-                for(let x = 0; x <= canvasWidth; x += 2) {
+                for(let x = 0; x <= canvasWidth; x += CONFIG.waveStep) {
                     const y = waveY + 
                              Math.sin(x * frequency + time) * amplitude +
-                             Math.sin(x * frequency * 0.5 + time * 1.3) * amplitude * 0.3;
+                             Math.sin(x * frequency * 0.5 + time * 1.2) * amplitude * 0.25;
                     
                     if(x === 0) {
                         ctx.moveTo(x, y);
@@ -1202,9 +1735,11 @@
         function renderParticles() {
             if (!CONFIG.showParticles) return;
             
+            const timeOffset = time * 2;
+            
             for(const p of particles) {
-                p.x += p.speedX + Math.sin(time * 2 + p.x * 0.01) * p.waveInfluence;
-                p.y += p.speedY + Math.cos(time * 2 + p.y * 0.01) * p.waveInfluence;
+                p.x += p.speedX + Math.sin(timeOffset + p.x * 0.008) * p.waveInfluence;
+                p.y += p.speedY + Math.cos(timeOffset + p.y * 0.008) * p.waveInfluence;
                 
                 if(p.x < 0 || p.x > canvasWidth) p.speedX *= -1;
                 if(p.y < 0 || p.y > canvasHeight) p.speedY *= -1;
@@ -1225,16 +1760,22 @@
             bloomCtx.clearRect(0, 0, canvasWidth, canvasHeight);
             bloomCtx.drawImage(canvas, 0, 0);
 
-            bloomCanvas.style.opacity = CONFIG.bloomStrength.toString();
-            bloomCanvas.style.filter = `blur(${20}px) brightness(${1 + CONFIG.bloomStrength})`;
+            bloomCanvas.style.opacity = (CONFIG.bloomStrength * 0.8).toString();
+            bloomCanvas.style.filter = `blur(${16}px) brightness(${1 + CONFIG.bloomStrength * 0.5})`;
         }
 
-        function animate() {
-            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        function animate(currentTime) {
+            const elapsed = currentTime - lastFrameTime;
             
-            renderWaves();
-            renderParticles();
-            applyBloom();
+            if (elapsed >= frameInterval) {
+                lastFrameTime = currentTime - (elapsed % frameInterval);
+                
+                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+                
+                renderWaves();
+                renderParticles();
+                applyBloom();
+            }
             
             animationId = requestAnimationFrame(animate);
         }
@@ -1261,7 +1802,10 @@
         }
 
         // Запуск при загрузке
-        window.addEventListener('load', init);
+        window.addEventListener('pywebviewready', function() {
+            console.log("PyWebView готов");
+            init();
+        });
     </script>
 </body>
 </html>
