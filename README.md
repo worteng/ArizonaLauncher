@@ -75,7 +75,7 @@ python main.py
 
 **Halfik**
 - Email: sergeybires@gmail.com
-- Telegram: [@HalfikForEveryone](https://t.me/HalfikForEveryone)
+- Telegram: [@HalfikForEveryone](https://t.me/HalfikForEveryone) в директ
 
 ## 🙏 Благодарности
 
