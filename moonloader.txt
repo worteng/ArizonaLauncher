@@ -12,28 +12,11 @@
 # Пустые строки и строки начинающиеся с # — игнорируются.
 
 [script]
-name = SAMPFUNCS
-author = FYP
-description = Расширение API для SAMP. Необходимо для большинства Lua-скриптов.
-tag = Ядро
-icon = ⚙️
-file = SAMPFUNCS.lua
-url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader/SAMPFUNCS.lua
+name = ARZMarket Loader
+author = ARZMarket
+description = Загружает ARZMarket для вас
+tag = Помощник
+icon = 🛍️
+file = ArzMarket_Loader.lua
+url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader/ArzMarket_Loader.lua
 
-[script]
-name = Arizona HUD
-author = worteng
-description = Кастомный HUD для Arizona RP. Показывает здоровье, броню, деньги.
-tag = HUD
-icon = 🎨
-file = arizona_hud.lua
-url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader/arizona_hud.lua
-
-[script]
-name = Arizona Chat
-author = worteng
-description = Улучшенный чат с историей и поиском по сообщениям.
-tag = Чат
-icon = 💬
-file = arizona_chat.lua
-url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader/arizona_chat.lua
