@@ -1,0 +1,39 @@
+# ArizonaLauncher — каталог скриптов Moonloader
+# Формат блока:
+#   [script]
+#   name = Название скрипта
+#   author = Автор
+#   description = Описание (одна строка)
+#   tag = Тег (Утилиты / HUD / Карта / Чат / и т.д.)
+#   icon = Эмодзи-иконка
+#   file = имя_файла.lua  (как будет называться файл в moonloader/)
+#   url = https://raw.githubusercontent.com/.../script.lua
+#
+# Пустые строки и строки начинающиеся с # — игнорируются.
+
+[script]
+name = SAMPFUNCS
+author = FYP
+description = Расширение API для SAMP. Необходимо для большинства Lua-скриптов.
+tag = Ядро
+icon = ⚙️
+file = SAMPFUNCS.lua
+url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader/SAMPFUNCS.lua
+
+[script]
+name = Arizona HUD
+author = worteng
+description = Кастомный HUD для Arizona RP. Показывает здоровье, броню, деньги.
+tag = HUD
+icon = 🎨
+file = arizona_hud.lua
+url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader/arizona_hud.lua
+
+[script]
+name = Arizona Chat
+author = worteng
+description = Улучшенный чат с историей и поиском по сообщениям.
+tag = Чат
+icon = 💬
+file = arizona_chat.lua
+url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader/arizona_chat.lua
