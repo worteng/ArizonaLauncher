@@ -600,7 +600,317 @@
             transform: translateY(-2px);
         }
 
-        /* Уведомления */
+        /* ---- MODS MODAL (fullscreen) ---- */
+        .mods-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(12, 12, 18, 0.97);
+            backdrop-filter: blur(18px);
+            z-index: 500;
+            flex-direction: column;
+            overflow: hidden;
+            animation: modsFadeIn 0.25s ease;
+        }
+
+        @keyframes modsFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        .mods-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 22px 32px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            flex-shrink: 0;
+        }
+
+        .mods-modal-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 22px;
+            color: var(--text-color);
+            letter-spacing: 0.5px;
+        }
+
+        .mods-modal-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 16px 32px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            flex-shrink: 0;
+        }
+
+        .mods-tab {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            padding: 9px 20px;
+            border-radius: 10px 10px 0 0;
+            border: none;
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.45);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mods-tab:hover {
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.8);
+        }
+
+        .mods-tab.active {
+            background: rgba(255,255,255,0.10);
+            color: white;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .mods-tab-content {
+            display: none;
+            padding: 24px 32px;
+            overflow-y: auto;
+            flex: 1;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .mods-tab-content.active {
+            display: flex;
+        }
+
+        .mods-tab-content::-webkit-scrollbar { width: 5px; }
+        .mods-tab-content::-webkit-scrollbar-track { background: transparent; }
+        .mods-tab-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
+        /* Сетка карточек модов */
+        .mods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 14px;
+        }
+
+        .mods-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .mods-card:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.14);
+        }
+
+        .mods-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .mods-card-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .mods-card-meta { flex: 1; min-width: 0; }
+
+        .mods-card-name {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 14px;
+            color: rgba(255,255,255,0.95);
+            font-weight: 600;
+        }
+
+        .mods-card-author {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+            margin-top: 2px;
+        }
+
+        .mods-card-desc {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.6;
+        }
+
+        .mods-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 4px;
+        }
+
+        .mods-card-tag {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.06);
+            border-radius: 5px;
+            padding: 3px 8px;
+        }
+
+        .mods-install-btn {
+            height: 32px;
+            padding: 0 16px;
+            background: rgba(0, 140, 255, 0.25);
+            border: 1px solid rgba(0, 140, 255, 0.4);
+            border-radius: 7px;
+            color: rgba(140, 200, 255, 0.95);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .mods-install-btn:hover:not(:disabled) {
+            background: rgba(0, 140, 255, 0.4);
+            border-color: rgba(0, 140, 255, 0.7);
+            transform: translateY(-1px);
+        }
+
+        .mods-install-btn:disabled {
+            cursor: default;
+            opacity: 0.75;
+        }
+
+        .mods-install-btn.downloading {
+            background: rgba(255, 160, 0, 0.2);
+            border-color: rgba(255, 160, 0, 0.4);
+            color: rgba(255, 200, 100, 0.95);
+        }
+
+        .mods-install-btn.installing {
+            background: rgba(180, 0, 255, 0.2);
+            border-color: rgba(180, 0, 255, 0.4);
+            color: rgba(210, 150, 255, 0.95);
+        }
+
+        .mods-install-btn.done {
+            background: rgba(0, 180, 80, 0.2);
+            border-color: rgba(0, 180, 80, 0.4);
+            color: rgba(100, 220, 140, 0.95);
+        }
+
+        .mods-section {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+
+        .mods-section-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 6px;
+        }
+
+        .mods-section-desc {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .mods-empty {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.25);
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .mods-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 7px;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .mods-item-icon { font-size: 16px; flex-shrink: 0; }
+        .mods-item-info { flex: 1; min-width: 0; }
+        .mods-item-name { color: rgba(255,255,255,0.9); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mods-item-sub { color: rgba(255,255,255,0.35); font-size: 10px; margin-top: 2px; }
+
+        .mods-item-toggle {
+            width: 34px; height: 18px;
+            background: rgba(255,255,255,0.1);
+            border: none; border-radius: 9px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+        .mods-item-toggle::after {
+            content: '';
+            position: absolute;
+            width: 12px; height: 12px;
+            background: white;
+            border-radius: 50%;
+            top: 3px; left: 3px;
+            transition: transform 0.2s;
+        }
+        .mods-item-toggle.on { background: rgba(0, 180, 100, 0.7); }
+        .mods-item-toggle.on::after { transform: translateX(16px); }
+
+        .ml-sub-tab {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            padding: 5px 12px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.4);
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+        .ml-sub-tab:hover { color: rgba(255,255,255,0.7); }
+        .ml-sub-tab.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .mods-action-btn {
+            width: 100%;
+            height: 38px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 7px;
+            color: rgba(255,255,255,0.8);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .mods-action-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
+            transform: translateY(-1px);
+        }
+
+
         .notification {
             position: fixed;
             top: 20px;
@@ -682,7 +992,7 @@
             <div class="left-panel">
                 <div class="header">
                     <div class="title">Arizona RP</div>
-                    <div class="subtitle">Launcher v0.0.3</div>
+                    <div class="subtitle">Launcher v0.0.4</div>
                 </div>
 
                 <div class="nickname-section">
@@ -711,6 +1021,9 @@
                     </button>
                     <button class="icon-btn" id="folderBtn" title="Управление папками">
                         📁 Папка
+                    </button>
+                    <button class="icon-btn" id="modsBtn" title="Моды" onclick="openModsModal()">
+                        🧩 Моды
                     </button>
 
                 </div>
@@ -912,6 +1225,80 @@
                 📁 Открыть папку игры
             </button>
         </div>
+        <!-- Модальное окно модов (на весь экран) -->
+        <div class="mods-modal" id="modsModal">
+            <div class="mods-modal-header">
+                <div class="mods-modal-title">🧩 Моды</div>
+                <button class="close-btn" onclick="closeModsModal()">×</button>
+            </div>
+
+            <div class="mods-modal-tabs">
+                <button class="mods-tab active" onclick="switchModsTab('moonloader')">🌙 Moonloader</button>
+                <button class="mods-tab" onclick="switchModsTab('patches')">🛡️ ArizonaPatches</button>
+                <button class="mods-tab" onclick="switchModsTab('other')">📦 Другое</button>
+            </div>
+
+            <!-- Moonloader скрипты -->
+            <div id="modsTabMoonloader" class="mods-tab-content active">
+                <!-- Подвкладки -->
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px;">
+                    <div style="display:flex;gap:4px;background:rgba(255,255,255,0.04);border-radius:8px;padding:3px;">
+                        <button id="mlSubInstalled" class="ml-sub-tab active" onclick="switchMlSub('installed')">📋 Установленные</button>
+                        <button id="mlSubCatalog"   class="ml-sub-tab"        onclick="switchMlSub('catalog')">🌐 Каталог</button>
+                    </div>
+                    <div style="display:flex;gap:6px;">
+                        <button class="mods-action-btn" style="width:auto;padding:0 12px;height:30px;font-size:11px;" onclick="openMoonloaderFolder()">📂 Папка</button>
+                        <button class="mods-action-btn" style="width:auto;padding:0 12px;height:30px;font-size:11px;" id="mlRefreshBtn" onclick="refreshMlActive()">🔄</button>
+                    </div>
+                </div>
+
+                <div id="moonloaderStatus" style="font-family:'Montserrat Alternates';font-size:11px;color:rgba(255,255,255,0.3);min-height:14px;"></div>
+
+                <!-- Установленные скрипты -->
+                <div id="mlPaneInstalled" style="display:flex;flex-direction:column;gap:6px;">
+                    <div class="mods-empty">Загрузка...</div>
+                </div>
+
+                <!-- Каталог с GitHub -->
+                <div id="mlPaneCatalog" style="display:none;flex-direction:column;gap:6px;">
+                    <div class="mods-empty">Загрузка каталога...</div>
+                </div>
+            </div>
+
+            <!-- ArizonaPatches конфиги -->
+            <div id="modsTabPatches" class="mods-tab-content">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+                    <div style="font-family:'Montserrat Alternates';font-size:13px;color:rgba(255,255,255,0.5);">
+                        Готовые конфиги ArizonaPatches от сообщества
+                    </div>
+                    <button class="mods-action-btn" style="width:auto;padding:0 14px;height:32px;font-size:11px;" onclick="loadPatchPresets()">
+                        🔄 Обновить
+                    </button>
+                </div>
+                <div id="patchPresetsStatus" style="font-family:'Montserrat Alternates';font-size:12px;color:rgba(255,255,255,0.35);min-height:16px;"></div>
+                <div id="patchPresetsGrid" class="mods-grid">
+                    <!-- Заполняется через JS -->
+                </div>
+            </div>
+
+            <!-- Другие моды -->
+            <div id="modsTabOther" class="mods-tab-content">
+                <div class="mods-section">
+                    <div class="mods-section-title">🎨 ASI Моды</div>
+                    <div class="mods-section-desc">Моды в формате .asi — загружаются автоматически при старте игры.</div>
+                    <div class="mods-empty">ASI моды не обнаружены</div>
+                </div>
+                <div class="mods-section">
+                    <div class="mods-section-title">📦 CLEO Скрипты</div>
+                    <div class="mods-section-desc">Скрипты в папке CLEO/ игры.</div>
+                    <div class="mods-empty">CLEO скрипты не обнаружены</div>
+                </div>
+                <button class="mods-action-btn">
+                    📂 Открыть папку с игрой
+                </button>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -1235,6 +1622,398 @@
             folderModal.style.display = 'none';
         }
 
+        // ---- МОДЫ (fullscreen) ----
+        function openModsModal() {
+            document.querySelector('.interface').style.display = 'none';
+            const modal = document.getElementById('modsModal');
+            modal.style.display = 'flex';
+            if (document.getElementById('modsTabPatches').classList.contains('active')) {
+                loadPatchPresets();
+            } else if (document.getElementById('modsTabMoonloader').classList.contains('active')) {
+                loadMoonloaderScripts();
+            }
+        }
+
+        function closeModsModal() {
+            document.getElementById('modsModal').style.display = 'none';
+            document.querySelector('.interface').style.display = 'flex';
+        }
+
+        function switchModsTab(tab) {
+            document.querySelectorAll('.mods-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.mods-tab-content').forEach(c => c.classList.remove('active'));
+            const tabMap = {
+                'moonloader': 'modsTabMoonloader',
+                'patches':    'modsTabPatches',
+                'other':      'modsTabOther'
+            };
+            if (tabMap[tab]) {
+                document.getElementById(tabMap[tab]).classList.add('active');
+            }
+            const tabs = document.querySelectorAll('.mods-tab');
+            const idx = Object.keys(tabMap).indexOf(tab);
+            if (idx >= 0 && tabs[idx]) tabs[idx].classList.add('active');
+
+            if (tab === 'patches')    loadPatchPresets();
+            if (tab === 'moonloader') loadMoonloaderScripts();
+        }
+
+        // ---- MOONLOADER ----
+        const EXT_ICONS = { lua: '🌙', cs: '📜', asi: '🔧', luac: '🌙' };
+        let mlActiveSub = 'installed';
+
+        function switchMlSub(sub) {
+            mlActiveSub = sub;
+            document.getElementById('mlSubInstalled').classList.toggle('active', sub === 'installed');
+            document.getElementById('mlSubCatalog').classList.toggle('active', sub === 'catalog');
+            document.getElementById('mlPaneInstalled').style.display = sub === 'installed' ? 'flex' : 'none';
+            document.getElementById('mlPaneCatalog').style.display   = sub === 'catalog'   ? 'flex' : 'none';
+            if (sub === 'installed') loadMoonloaderScripts();
+            if (sub === 'catalog')   loadMoonloaderCatalog();
+        }
+
+        function refreshMlActive() {
+            if (mlActiveSub === 'installed') loadMoonloaderScripts();
+            else loadMoonloaderCatalog();
+        }
+
+        function setMlStatus(msg) {
+            const el = document.getElementById('moonloaderStatus');
+            if (el) el.textContent = msg;
+        }
+
+        // -- Установленные --
+        async function loadMoonloaderScripts() {
+            const pane = document.getElementById('mlPaneInstalled');
+            if (!pane) return;
+            pane.innerHTML = '<div class="mods-empty">⏳ Сканирование...</div>';
+            setMlStatus('');
+
+            if (!window.pywebview || !window.pywebview.api.get_moonloader_scripts) {
+                pane.innerHTML = '<div class="mods-empty">Доступно только в приложении</div>';
+                return;
+            }
+            try {
+                const result = await window.pywebview.api.get_moonloader_scripts();
+                if (!result.success) {
+                    pane.innerHTML = '<div class="mods-empty">❌ ' + result.message + '</div>';
+                    return;
+                }
+                if (result.scripts.length === 0) {
+                    pane.innerHTML = '<div class="mods-empty">Скриптов нет — папка moonloader пуста</div>';
+                    setMlStatus('0 скриптов');
+                    return;
+                }
+                setMlStatus(`Скриптов: ${result.scripts.length}`);
+                pane.innerHTML = '';
+                result.scripts.forEach(script => {
+                    const icon = EXT_ICONS[script.ext] || '📄';
+                    const item = document.createElement('div');
+                    item.className = 'mods-item';
+                    item.innerHTML = `
+                        <span class="mods-item-icon">${icon}</span>
+                        <div class="mods-item-info">
+                            <div class="mods-item-name">${script.name}</div>
+                            <div class="mods-item-sub">.${script.ext} · ${script.enabled ? 'Активен' : 'Отключён'}</div>
+                        </div>
+                        <button class="mods-item-toggle ${script.enabled ? 'on' : ''}"
+                                data-script="${script.name}"
+                                data-enabled="${script.enabled}"
+                                title="${script.enabled ? 'Выключить' : 'Включить'}"
+                                onclick="toggleMoonloaderScript(this)">
+                        </button>
+                    `;
+                    pane.appendChild(item);
+                });
+            } catch(e) {
+                pane.innerHTML = '<div class="mods-empty">❌ ' + e.message + '</div>';
+            }
+        }
+
+        async function toggleMoonloaderScript(btn) {
+            const name    = btn.dataset.script;
+            const enabled = btn.dataset.enabled === 'true';
+            const newState = !enabled;
+
+            btn.disabled = true;
+            btn.classList.toggle('on', newState);
+            btn.dataset.enabled = String(newState);
+            const sub = btn.closest('.mods-item').querySelector('.mods-item-sub');
+            if (sub) sub.textContent = sub.textContent.replace(enabled ? 'Активен' : 'Отключён', newState ? 'Активен' : 'Отключён');
+            btn.title = newState ? 'Выключить' : 'Включить';
+
+            try {
+                const result = await window.pywebview.api.toggle_moonloader_script(name, newState);
+                if (!result.success) {
+                    btn.classList.toggle('on', enabled);
+                    btn.dataset.enabled = String(enabled);
+                    showNotification('Ошибка: ' + result.message, 'error');
+                }
+            } catch(e) {
+                btn.classList.toggle('on', enabled);
+                btn.dataset.enabled = String(enabled);
+                showNotification('Ошибка: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function openMoonloaderFolder() {
+            if (!window.pywebview) return;
+            const result = await window.pywebview.api.open_moonloader_folder();
+            if (!result.success) showNotification(result.message, 'error');
+        }
+
+        // -- Каталог с GitHub --
+        async function loadMoonloaderCatalog() {
+            const pane = document.getElementById('mlPaneCatalog');
+            if (!pane) return;
+            pane.innerHTML = '<div class="mods-empty">⏳ Загрузка каталога с GitHub...</div>';
+            setMlStatus('');
+
+            let catalog = null;
+
+            try {
+                if (window.pywebview && window.pywebview.api.fetch_moonloader_catalog) {
+                    const result = await window.pywebview.api.fetch_moonloader_catalog();
+                    if (result && result.success && result.data.length > 0) catalog = result.data;
+                }
+            } catch(e) {}
+
+            // Fallback — прямой fetch (браузер / разработка)
+            if (!catalog) {
+                try {
+                    const resp = await fetch('https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader.txt', { cache: 'no-store' });
+                    if (resp.ok) catalog = parsConfigsTxt(await resp.text());
+                } catch(e) {}
+            }
+
+            if (!catalog || catalog.length === 0) {
+                pane.innerHTML = '<div class="mods-empty">❌ Нет соединения с GitHub</div>';
+                return;
+            }
+
+            setMlStatus(`В каталоге: ${catalog.length} скриптов`);
+            pane.innerHTML = '';
+            window._mlCatalog = catalog;
+
+            catalog.forEach((item, idx) => {
+                const card = document.createElement('div');
+                card.className = 'mods-item';
+                card.style.alignItems = 'flex-start';
+                card.style.gap = '10px';
+                card.innerHTML = `
+                    <span class="mods-item-icon" style="font-size:20px;margin-top:2px;">${item.icon || '🌙'}</span>
+                    <div class="mods-item-info">
+                        <div class="mods-item-name">${item.name}</div>
+                        <div class="mods-item-sub" style="margin-bottom:4px;">от ${item.author || '?'} · ${item.tag || ''}</div>
+                        <div style="font-family:'Montserrat Alternates';font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">${item.description || ''}</div>
+                        <div id="mlInstStatus_${idx}" style="font-family:'Montserrat Alternates';font-size:11px;min-height:14px;margin-top:4px;"></div>
+                    </div>
+                    <button class="mods-install-btn" id="mlInstBtn_${idx}" onclick="installMlScript(${idx}, this)" style="flex-shrink:0;margin-top:2px;">
+                        📥 Установить
+                    </button>
+                `;
+                pane.appendChild(card);
+            });
+        }
+
+        async function installMlScript(idx, btn) {
+            const item = window._mlCatalog?.[idx];
+            if (!item) return;
+            const status = document.getElementById(`mlInstStatus_${idx}`);
+
+            const setState = (cls, text, color) => {
+                btn.disabled = true;
+                btn.className = `mods-install-btn ${cls}`;
+                btn.textContent = text;
+                if (status) { status.textContent = text; status.style.color = color; }
+            };
+
+            if (!item.url || !item.file) {
+                if (status) { status.textContent = '❌ Нет ссылки или имени файла'; status.style.color = 'rgba(255,100,100,0.9)'; }
+                return;
+            }
+
+            try {
+                setState('downloading', '⏳ Скачивается...', 'rgba(255,200,100,0.9)');
+
+                if (window.pywebview && window.pywebview.api.install_moonloader_script) {
+                    setState('installing', '⚙️ Устанавливается...', 'rgba(210,150,255,0.9)');
+                    const result = await window.pywebview.api.install_moonloader_script(item.url, item.file);
+                    if (result.success) {
+                        setState('done', '✅ Готово', 'rgba(100,220,140,0.9)');
+                        if (status) { status.textContent = '✅ ' + result.message; status.style.color = 'rgba(100,220,140,0.9)'; }
+                    } else {
+                        throw new Error(result.message);
+                    }
+                } else {
+                    await new Promise(r => setTimeout(r, 600));
+                    setState('installing', '⚙️ Устанавливается...', 'rgba(210,150,255,0.9)');
+                    await new Promise(r => setTimeout(r, 400));
+                    setState('done', '✅ Готово', 'rgba(100,220,140,0.9)');
+                    if (status) { status.textContent = '✅ (демо)'; status.style.color = 'rgba(100,220,140,0.9)'; }
+                }
+            } catch(e) {
+                btn.disabled = false;
+                btn.className = 'mods-install-btn';
+                btn.textContent = '📥 Установить';
+                if (status) { status.textContent = '❌ ' + e.message; status.style.color = 'rgba(255,100,100,0.9)'; }
+            }
+        }
+
+        // ---- ПРЕСЕТЫ ARIZONAPATCHES ----
+        const CONFIGS_TXT_URL = 'https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/configs.txt';
+
+        function parsConfigsTxt(text) {
+            const presets = [];
+            let current = null;
+            for (const rawLine of text.split('\n')) {
+                const line = rawLine.trim();
+                if (!line || line.startsWith('#')) continue;
+                if (line === '[config]') {
+                    if (current) presets.push(current);
+                    current = {};
+                    continue;
+                }
+                if (current !== null && line.includes('=')) {
+                    const eqIdx = line.indexOf('=');
+                    const key = line.slice(0, eqIdx).trim();
+                    const val = line.slice(eqIdx + 1).trim();
+                    current[key] = val;
+                }
+            }
+            if (current) presets.push(current);
+            return presets;
+        }
+
+        async function loadPatchPresets() {
+            const grid = document.getElementById('patchPresetsGrid');
+            const status = document.getElementById('patchPresetsStatus');
+            if (!grid) return;
+
+            status.textContent = '⏳ Загрузка конфигов с GitHub...';
+            grid.innerHTML = '';
+
+            let presets = null;
+
+            // Через Python (основной способ, обходит CORS)
+            try {
+                if (window.pywebview && window.pywebview.api.fetch_patch_presets) {
+                    const result = await window.pywebview.api.fetch_patch_presets();
+                    if (result && result.success && result.data.length > 0) {
+                        presets = result.data;
+                    }
+                }
+            } catch(e) { console.warn('pywebview fetch failed:', e); }
+
+            // Fallback: прямой fetch (работает в браузере при разработке)
+            if (!presets) {
+                try {
+                    const resp = await fetch(CONFIGS_TXT_URL, { cache: 'no-store' });
+                    if (resp.ok) {
+                        const text = await resp.text();
+                        presets = parsConfigsTxt(text);
+                    }
+                } catch(e) { console.warn('fetch fallback failed:', e); }
+            }
+
+            if (!presets || presets.length === 0) {
+                status.textContent = '❌ Не удалось загрузить конфиги. Проверь подключение к интернету.';
+                grid.innerHTML = '<div class="mods-empty">Нет соединения с GitHub</div>';
+                return;
+            }
+
+            status.textContent = `Найдено ${presets.length} конфигов`;
+            renderPatchPresets(presets);
+        }
+
+        function renderPatchPresets(presets) {
+            const grid = document.getElementById('patchPresetsGrid');
+            grid.innerHTML = '';
+
+            if (!presets || presets.length === 0) {
+                grid.innerHTML = '<div class="mods-empty">Конфиги не найдены</div>';
+                return;
+            }
+
+            presets.forEach((preset, idx) => {
+                const card = document.createElement('div');
+                card.className = 'mods-card';
+                card.innerHTML = `
+                    <div class="mods-card-header">
+                        <span class="mods-card-icon">${preset.icon || '🛡️'}</span>
+                        <div class="mods-card-meta">
+                            <div class="mods-card-name">${preset.name}</div>
+                            <div class="mods-card-author">от ${preset.author || 'Community'}</div>
+                        </div>
+                    </div>
+                    <div class="mods-card-desc">${preset.description}</div>
+                    <div class="mods-card-footer">
+                        <span class="mods-card-tag">${preset.tag || 'Конфиг'}</span>
+                        <button class="mods-install-btn" id="installBtn_${idx}" onclick="installPatchPreset(${idx}, this)">
+                            📥 Установить
+                        </button>
+                    </div>
+                    <div id="installStatus_${idx}" style="font-family:'Montserrat Alternates';font-size:11px;color:rgba(255,255,255,0.45);min-height:14px;margin-top:2px;"></div>
+                `;
+                grid.appendChild(card);
+            });
+
+            // Сохраняем список для использования в installPatchPreset
+            window._patchPresets = presets;
+        }
+
+        async function installPatchPreset(idx, btn) {
+            const presets = window._patchPresets;
+            if (!presets || !presets[idx]) return;
+            const preset = presets[idx];
+            const status = document.getElementById(`installStatus_${idx}`);
+
+            const setState = (state, msg, color) => {
+                btn.disabled = true;
+                btn.className = `mods-install-btn ${state}`;
+                btn.textContent = msg;
+                if (status) { status.textContent = msg; status.style.color = color; }
+            };
+
+            if (!preset.url) {
+                if (status) { status.textContent = '❌ Ссылка не указана в конфиге'; status.style.color = 'rgba(255,100,100,0.9)'; }
+                return;
+            }
+
+            try {
+                setState('downloading', '⏳ Скачивается...', 'rgba(255,200,100,0.9)');
+
+                if (window.pywebview && window.pywebview.api.install_patch_preset) {
+                    setState('installing', '⚙️ Устанавливается...', 'rgba(210,150,255,0.9)');
+                    const result = await window.pywebview.api.install_patch_preset(preset.url);
+                    if (result && result.success) {
+                        setState('done', '✅ Готово', 'rgba(100,220,140,0.9)');
+                        if (status) { status.textContent = `✅ ${result.message}`; status.style.color = 'rgba(100,220,140,0.9)'; }
+                    } else {
+                        throw new Error(result?.message || 'Неизвестная ошибка');
+                    }
+                } else {
+                    // Браузер без pywebview — скачиваем и парсим сами
+                    const resp = await fetch(preset.url);
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    setState('installing', '⚙️ Устанавливается...', 'rgba(210,150,255,0.9)');
+                    // В браузере без pywebview — нет доступа к файлу, просто показываем успех
+                    await new Promise(r => setTimeout(r, 500));
+                    setState('done', '✅ Готово', 'rgba(100,220,140,0.9)');
+                    if (status) { status.textContent = '✅ (демо: в приложении запишет на диск)'; status.style.color = 'rgba(100,220,140,0.9)'; }
+                }
+            } catch(e) {
+                btn.disabled = false;
+                btn.className = 'mods-install-btn';
+                btn.textContent = '📥 Установить';
+                if (status) { status.textContent = '❌ ' + e.message; status.style.color = 'rgba(255,100,100,0.9)'; }
+            }
+        }
+
+
+
         async function setGamePath() {
             try {
                 if (window.pywebview && window.pywebview.api.select_game_path) {
@@ -1369,13 +2148,19 @@
                         return;
                     }
                     // Сохраняем бекап для отката
-                    patchesBackup = Object.assign({}, patchesData);
-                    // Применяем
-                    patchesData = result.data;
+                    patchesBackup = JSON.parse(JSON.stringify(patchesData));
+                    // Полностью заменяем данные (deep copy)
+                    patchesData = JSON.parse(JSON.stringify(result.data));
+                    // Сразу пишем на диск — полная замена, не ждём "Сохранить"
+                    const saveResult = await window.pywebview.api.write_patches(patchesData);
+                    if (!saveResult.success) {
+                        setImportStatus('❌ Ошибка записи: ' + saveResult.message, '#f44');
+                        return;
+                    }
                     renderCheckboxes();
                     switchTab('patches');
                     document.getElementById('rollbackBtn').style.display = '';
-                    setImportStatus('✅ Загружено ' + result.keys_count + ' настроек. Нажми "Сохранить" чтобы записать на диск.', '#0f0');
+                    setImportStatus('✅ Загружено и записано ' + result.keys_count + ' настроек.', '#0f0');
                 } else {
                     setImportStatus('⚠️ Функция доступна только в приложении', '#ff0');
                 }
@@ -1384,10 +2169,13 @@
             }
         }
 
-        function doRollback() {
+        async function doRollback() {
             if (!patchesBackup) return;
-            patchesData = Object.assign({}, patchesBackup);
+            patchesData = JSON.parse(JSON.stringify(patchesBackup));
             patchesBackup = null;
+            if (window.pywebview && window.pywebview.api.write_patches) {
+                await window.pywebview.api.write_patches(patchesData);
+            }
             renderCheckboxes();
             switchTab('patches');
             document.getElementById('rollbackBtn').style.display = 'none';

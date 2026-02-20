@@ -189,30 +189,30 @@ class WebViewApp:
         return {"success": success, "message": "Found" if success else "Not found",
                 "game_path": self.launcher.game_path, "launcher_path": self.launcher.launcher_path}
 
+    def _qt_app(self):
+        """Возвращает существующий QApplication или создаёт новый"""
+        from PyQt5.QtWidgets import QApplication
+        return QApplication.instance() or QApplication([])
+
     def select_game_path(self):
         """Открыть диалог выбора папки с игрой"""
         try:
-            import tkinter as tk
-            from tkinter import filedialog
-
-            root = tk.Tk()
-            root.withdraw()
-            root.attributes('-topmost', True)
-
-            folder_path = filedialog.askdirectory(
-                title="Выберите папку с игрой (где находится gta_sa.exe)"
+            from PyQt5.QtWidgets import QFileDialog
+            app = self._qt_app()
+            folder_path = QFileDialog.getExistingDirectory(
+                None,
+                "Выберите папку с игрой (где находится gta_sa.exe)",
+                "",
+                QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
             )
-            root.destroy()
-
             if not folder_path:
                 return {"success": False, "message": "Папка не выбрана"}
 
-            game_exe = os.path.join(folder_path, "gta_sa.exe")
+            game_exe    = os.path.join(folder_path, "gta_sa.exe")
             launcher_exe = os.path.join(folder_path, "ArizonaLauncher6_byAIR.exe")
 
             if not os.path.exists(game_exe):
                 return {"success": False, "message": "gta_sa.exe не найден в выбранной папке"}
-
             if not os.path.exists(launcher_exe):
                 return {"success": False, "message": "ArizonaLauncher6_byAIR.exe не найден в выбранной папке"}
 
@@ -225,27 +225,21 @@ class WebViewApp:
     def select_bg_image(self):
         """Выбрать картинку для фона лаунчера, вернуть base64 data URL"""
         try:
-            import tkinter as tk
-            from tkinter import filedialog
             import base64, mimetypes
-            root = tk.Tk()
-            root.withdraw()
-            root.attributes('-topmost', True)
-            file_path = filedialog.askopenfilename(
-                title="Выбрать картинку для фона",
-                filetypes=[
-                    ("Изображения", "*.png *.jpg *.jpeg *.webp *.bmp"),
-                    ("Все файлы", "*.*")
-                ]
+            from PyQt5.QtWidgets import QFileDialog
+            app = self._qt_app()
+            file_path, _ = QFileDialog.getOpenFileName(
+                None,
+                "Выбрать картинку для фона",
+                "",
+                "Изображения (*.png *.jpg *.jpeg *.webp *.bmp);;Все файлы (*)"
             )
-            root.destroy()
             if not file_path:
                 return {"success": False, "message": "Отменено"}
             mime = mimetypes.guess_type(file_path)[0] or "image/jpeg"
             with open(file_path, 'rb') as f:
                 data = base64.b64encode(f.read()).decode('utf-8')
-            data_url = f"data:{mime};base64,{data}"
-            return {"success": True, "data_url": data_url}
+            return {"success": True, "data_url": f"data:{mime};base64,{data}"}
         except Exception as e:
             logger.error(f"select_bg_image error: {e}")
             return {"success": False, "message": str(e)}
@@ -253,18 +247,14 @@ class WebViewApp:
     def export_patches(self, data):
         """Сохранить настройки патчей в файл через диалог"""
         try:
-            import tkinter as tk
-            from tkinter import filedialog
-            root = tk.Tk()
-            root.withdraw()
-            root.attributes('-topmost', True)
-            file_path = filedialog.asksaveasfilename(
-                title="Сохранить настройки патчей",
-                defaultextension=".json",
-                initialfile="ArizonaPatches_settings.json",
-                filetypes=[("JSON файл", "*.json"), ("Все файлы", "*.*")]
+            from PyQt5.QtWidgets import QFileDialog
+            app = self._qt_app()
+            file_path, _ = QFileDialog.getSaveFileName(
+                None,
+                "Сохранить настройки патчей",
+                "ArizonaPatches_settings.json",
+                "JSON файл (*.json);;Все файлы (*)"
             )
-            root.destroy()
             if not file_path:
                 return {"success": False, "message": "Отменено"}
             with open(file_path, 'w', encoding='utf-8') as f:
@@ -277,16 +267,14 @@ class WebViewApp:
     def import_patches(self):
         """Загрузить настройки патчей из файла через диалог"""
         try:
-            import tkinter as tk
-            from tkinter import filedialog
-            root = tk.Tk()
-            root.withdraw()
-            root.attributes('-topmost', True)
-            file_path = filedialog.askopenfilename(
-                title="Открыть файл настроек патчей",
-                filetypes=[("JSON файл", "*.json"), ("Все файлы", "*.*")]
+            from PyQt5.QtWidgets import QFileDialog
+            app = self._qt_app()
+            file_path, _ = QFileDialog.getOpenFileName(
+                None,
+                "Открыть файл настроек патчей",
+                "",
+                "JSON файл (*.json);;Все файлы (*)"
             )
-            root.destroy()
             if not file_path:
                 return {"success": False, "message": "Отменено"}
             with open(file_path, 'r', encoding='utf-8') as f:
@@ -406,9 +394,218 @@ class WebViewApp:
 
     def read_patches(self): return self.launcher.read_patches()
     def write_patches(self, data): return self.launcher.write_patches(data)
-    
+
+    def fetch_patch_presets(self):
+        """Загружает configs.txt с GitHub и парсит список пресетов"""
+        CONFIGS_URL = "https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/configs.txt"
+        try:
+            logger.info(f"fetch_patch_presets: запрос {CONFIGS_URL}")
+            resp = requests.get(CONFIGS_URL, timeout=10, headers={"Cache-Control": "no-cache"}, verify=False)
+            logger.info(f"fetch_patch_presets: статус {resp.status_code}, размер {len(resp.text)} байт")
+            if resp.status_code == 404:
+                return {"success": False, "message": "Файл configs.txt не найден на GitHub (404). Создай его в репозитории."}
+            if resp.status_code != 200:
+                return {"success": False, "message": f"GitHub вернул HTTP {resp.status_code}"}
+            presets = self._parse_catalog_txt(resp.text)
+            logger.info(f"fetch_patch_presets: распарсено {len(presets)} конфигов")
+            if len(presets) == 0:
+                return {"success": False, "message": "configs.txt найден, но не содержит блоков [config]"}
+            return {"success": True, "data": presets}
+        except requests.exceptions.ConnectionError:
+            return {"success": False, "message": "Нет подключения к интернету"}
+        except requests.exceptions.Timeout:
+            return {"success": False, "message": "Превышено время ожидания (GitHub не отвечает)"}
+        except Exception as e:
+            logger.error(f"fetch_patch_presets error: {e}")
+            return {"success": False, "message": str(e)}
+
+    def _parse_catalog_txt(self, text):
+        """Парсит configs.txt / moonloader.txt — любые блоки [секция]"""
+        presets = []
+        current = None
+        for raw_line in text.splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+            # Любой заголовок блока вида [что-угодно]
+            if line.startswith("[") and line.endswith("]"):
+                if current is not None:
+                    presets.append(current)
+                current = {}
+                continue
+            if current is not None and "=" in line:
+                key, _, val = line.partition("=")
+                current[key.strip()] = val.strip()
+        if current is not None:
+            presets.append(current)
+        return presets
+
+    # Оставляем старое имя как алиас — на случай если где-то ещё используется
+    def _parse_configs_txt(self, text):
+        return self._parse_catalog_txt(text)
+
+    def install_patch_preset(self, url):
+        """Скачивает JSON-конфиг по ссылке и записывает в #ArizonaPatches.json"""
+        if not self.launcher.patches_path:
+            return {"success": False, "message": "Путь к патчам не установлен. Сначала укажи путь к игре."}
+        try:
+            resp = requests.get(url, timeout=15, verify=False)
+            if resp.status_code != 200:
+                return {"success": False, "message": f"Ошибка загрузки: HTTP {resp.status_code}", "stage": "downloading"}
+
+            raw = resp.text
+            cleaned = re.sub(r"^\s*//.*$", "", raw, flags=re.MULTILINE)
+            cleaned = "\n".join(l for l in cleaned.split("\n") if l.strip())
+            data = json.loads(cleaned)
+
+            bool_count = sum(1 for v in data.values() if isinstance(v, bool))
+            if bool_count == 0:
+                return {"success": False, "message": "Файл не содержит настроек патчей", "stage": "installing"}
+
+            result = self.launcher.write_patches(data)
+            if not result["success"]:
+                return {"success": False, "message": result["message"], "stage": "installing"}
+
+            return {"success": True, "message": f"Установлено {bool_count} настроек", "keys_count": bool_count}
+        except json.JSONDecodeError as e:
+            return {"success": False, "message": f"Неверный формат JSON: {e}", "stage": "installing"}
+        except Exception as e:
+            logger.error(f"install_patch_preset error: {e}")
+            return {"success": False, "message": str(e), "stage": "downloading"}
+
+    # ---- MOONLOADER ----
+
+    def _get_moonloader_dir(self):
+        """Путь к папке moonloader/ рядом с gta_sa.exe"""
+        if not self.launcher.game_path:
+            return None
+        ml_dir = os.path.join(os.path.dirname(self.launcher.game_path), "moonloader")
+        return ml_dir if os.path.isdir(ml_dir) else None
+
+    def get_moonloader_scripts(self):
+        """Возвращает список скриптов в moonloader/ (без подпапок)"""
+        ml_dir = self._get_moonloader_dir()
+        if not ml_dir:
+            return {"success": False, "message": "Папка moonloader не найдена"}
+        try:
+            scripts = []
+            for entry in os.scandir(ml_dir):
+                if not entry.is_file():
+                    continue
+                name = entry.name
+                # Считаем файл активным если он НЕ заканчивается на .disabled
+                if name.endswith(".disabled"):
+                    real_name = name[:-len(".disabled")]
+                    enabled = False
+                else:
+                    real_name = name
+                    enabled = True
+                # Берём только скриптовые расширения (и их .disabled варианты)
+                base, ext = os.path.splitext(real_name)
+                if ext.lower() not in (".lua", ".cs", ".asi", ".luac"):
+                    continue
+                scripts.append({
+                    "name": real_name,
+                    "ext": ext.lower().lstrip("."),
+                    "enabled": enabled,
+                    "full_path": entry.path
+                })
+            scripts.sort(key=lambda s: s["name"].lower())
+            return {"success": True, "scripts": scripts, "dir": ml_dir}
+        except Exception as e:
+            logger.error(f"get_moonloader_scripts error: {e}")
+            return {"success": False, "message": str(e)}
+
+    def toggle_moonloader_script(self, script_name, enable):
+        """Включает или выключает скрипт добавлением/удалением .disabled"""
+        ml_dir = self._get_moonloader_dir()
+        if not ml_dir:
+            return {"success": False, "message": "Папка moonloader не найдена"}
+        try:
+            enabled_path  = os.path.join(ml_dir, script_name)
+            disabled_path = os.path.join(ml_dir, script_name + ".disabled")
+
+            if enable:
+                # Включить: убрать .disabled
+                if os.path.exists(disabled_path):
+                    os.rename(disabled_path, enabled_path)
+                elif not os.path.exists(enabled_path):
+                    return {"success": False, "message": f"Файл не найден: {script_name}"}
+            else:
+                # Выключить: добавить .disabled
+                if os.path.exists(enabled_path):
+                    os.rename(enabled_path, disabled_path)
+                elif not os.path.exists(disabled_path):
+                    return {"success": False, "message": f"Файл не найден: {script_name}"}
+
+            return {"success": True}
+        except Exception as e:
+            logger.error(f"toggle_moonloader_script error: {e}")
+            return {"success": False, "message": str(e)}
+
+    def open_moonloader_folder(self):
+        """Открыть папку moonloader в проводнике"""
+        ml_dir = self._get_moonloader_dir()
+        if not ml_dir:
+            return {"success": False, "message": "Папка moonloader не найдена"}
+        try:
+            if sys.platform == 'win32':
+                os.startfile(ml_dir)
+            elif sys.platform == 'darwin':
+                subprocess.Popen(['open', ml_dir])
+            else:
+                subprocess.Popen(['xdg-open', ml_dir])
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+
+    def fetch_moonloader_catalog(self):
+        """Загружает moonloader.txt с GitHub и парсит список скриптов"""
+        MOONLOADER_URL = "https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader.txt"
+        try:
+            logger.info(f"fetch_moonloader_catalog: запрос {MOONLOADER_URL}")
+            resp = requests.get(MOONLOADER_URL, timeout=10, headers={"Cache-Control": "no-cache"}, verify=False)
+            logger.info(f"fetch_moonloader_catalog: статус {resp.status_code}, размер {len(resp.text)} байт")
+            if resp.status_code == 404:
+                return {"success": False, "message": "Файл moonloader.txt не найден на GitHub (404). Создай его в репозитории."}
+            if resp.status_code != 200:
+                return {"success": False, "message": f"GitHub вернул HTTP {resp.status_code}"}
+            scripts = self._parse_catalog_txt(resp.text)
+            logger.info(f"fetch_moonloader_catalog: распарсено {len(scripts)} скриптов")
+            if len(scripts) == 0:
+                return {"success": False, "message": "moonloader.txt найден, но не содержит блоков [script]"}
+            return {"success": True, "data": scripts}
+        except requests.exceptions.ConnectionError:
+            return {"success": False, "message": "Нет подключения к интернету"}
+        except requests.exceptions.Timeout:
+            return {"success": False, "message": "Превышено время ожидания (GitHub не отвечает)"}
+        except Exception as e:
+            logger.error(f"fetch_moonloader_catalog error: {e}")
+            return {"success": False, "message": str(e)}
+
+    def install_moonloader_script(self, url, filename):
+        """Скачивает скрипт и кладёт в moonloader/"""
+        ml_dir = self._get_moonloader_dir()
+        if not ml_dir:
+            return {"success": False, "message": "Папка moonloader не найдена. Сначала укажи путь к игре."}
+        try:
+            resp = requests.get(url, timeout=30, verify=False)
+            if resp.status_code != 200:
+                return {"success": False, "message": f"Ошибка загрузки: HTTP {resp.status_code}"}
+            dest = os.path.join(ml_dir, filename)
+            with open(dest, 'wb') as f:
+                f.write(resp.content)
+            return {"success": True, "message": f"Установлен: {filename}"}
+        except Exception as e:
+            logger.error(f"install_moonloader_script error: {e}")
+            return {"success": False, "message": str(e)}
+
 
 def main():
+    import os
+    # Принудительно используем PyQt5 — WinForms требует .NET который может отсутствовать
+    os.environ.setdefault("PYWEBVIEW_GUI", "pyqt5")
+
     app = WebViewApp()
     try:
         window = webview.create_window('Arizona RP Launcher', 'index.html', js_api=app, width=1200, height=800,
@@ -416,7 +613,9 @@ def main():
         webview.start(debug=False)
     except Exception as e:
         logger.error(f"Error: {e}")
-        input("Press Enter to exit...")
+        import sys
+        if sys.stdin and sys.stdin.isatty():
+            input("Press Enter to exit...")
 
 if __name__ == '__main__':
     main()
