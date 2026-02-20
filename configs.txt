@@ -1,0 +1,35 @@
+# ArizonaLauncher — каталог конфигов ArizonaPatches
+# Формат блока:
+#   [config]
+#   name = Название конфига
+#   author = Автор
+#   description = Описание (одна строка)
+#   tag = Тег (Производительность / Графика / Баланс / Стиль / и т.д.)
+#   icon = Эмодзи-иконка
+#   url = https://raw.githubusercontent.com/.../file.json
+#
+# Пустые строки и строки начинающиеся с # — игнорируются.
+
+[config]
+name = Максимальная производительность
+author = worteng
+description = Все тяжёлые эффекты отключены. Максимальный FPS на слабых ПК.
+tag = Производительность
+icon = ⚡
+url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/presets/performance.json
+
+[config]
+name = Визуальный баланс
+author = worteng
+description = Золотая середина — красиво и без просадок FPS. Рекомендуется большинству.
+tag = Баланс
+icon = 🎯
+url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/presets/balanced.json
+
+[config]
+name = Максимальная графика
+author = worteng
+description = Все визуальные патчи включены. Для мощных ПК с хорошей видеокартой.
+tag = Графика
+icon = ✨
+url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/presets/highquality.json
