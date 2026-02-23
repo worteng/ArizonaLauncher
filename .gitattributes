@@ -1,3 +1,5 @@
 presets/ export-ignore
 configs.txt export-ignore
 updatenews.txt export-ignore
+others.txt export-ignore
+others/ export-ignore
