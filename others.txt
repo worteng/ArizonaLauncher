@@ -1,0 +1,11 @@
+[file]
+name = DxVk
+author = doitsujin
+description = Преобразует DirectX 9 в Vulkan, если по проще то местный фпс ап.
+tag = ФПСАП
+icon = 🔧
+file = d3d9.dll
+url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/refs/heads/main/others/d3d9.dll
+destination = root
+image = none
+usage = Просто установи — работает автоматически
