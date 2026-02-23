@@ -1,16 +1,3 @@
-# ArizonaLauncher — каталог скриптов Moonloader
-# Формат блока:
-#   [script]
-#   name = Название скрипта
-#   author = Автор
-#   description = Описание (одна строка)
-#   tag = Тег (Утилиты / HUD / Карта / Чат / и т.д.)
-#   icon = Эмодзи-иконка
-#   file = имя_файла.lua  (как будет называться файл в moonloader/)
-#   url = https://raw.githubusercontent.com/.../script.lua
-#
-# Пустые строки и строки начинающиеся с # — игнорируются.
-
 [script]
 name = ARZMarket Loader
 author = ARZMarket
@@ -19,4 +6,5 @@ tag = Помощник
 icon = 🛍️
 file = ArzMarket_Loader.lua
 url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader/ArzMarket_Loader.lua
-
+usage = 1. Установи скрипт\n2. Зайди в игру\n3. Нажми F5 чтобы открыть меню
+image = https://ссылка-на-твоё-изображение.png
