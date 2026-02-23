@@ -8,3 +8,25 @@ file = ArzMarket_Loader.lua
 url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader/ArzMarket_Loader.lua
 usage = 1. Установи скрипт\n2. Зайди в игру\n3. Он начнет качать библиотеки или сразу основной скрипт.
 image = https://i.imgur.com/0TQnVZ6.jpeg
+
+[script]
+name = BattlePass Helper
+author = White Pride
+description = Скрипт помогает отслеживать выполнение ежедневных заданий BattlePass. Удобный оверлей показывает прогресс, награды, премиум-задачи и позволяет скрывать выполненные или неактивные квесты. Подходит тем, кто хочет быстро и эффективно закрывать БП без лишней траты времени.
+tag = Помощник
+icon = 🧾
+file = BP_Helper.lua
+url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader/BP_Helper.lua
+usage = Используйте через /bph
+image = https://i.imgur.com/1rNWsjt.jpeg
+
+[script]
+name = Mimgui ScoreBoard
+author = MTG MODS
+description = Этот скрипт изменяет обычный самповский Sroreboard (TAB) на новый. Добавляет кнопки вызова моментально.
+tag = Замена
+icon = 🧾
+file = Mimgui_ScoreBoard.lua
+url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader/Mimgui_ScoreBoard.lua
+usage = Используйте TAB.
+image = https://i.imgur.com/BG9bEc6.png
