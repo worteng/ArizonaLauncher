@@ -6,5 +6,5 @@ tag = Помощник
 icon = 🛍️
 file = ArzMarket_Loader.lua
 url = https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader/ArzMarket_Loader.lua
-usage = 1. Установи скрипт\n2. Зайди в игру\n3. Нажми F5 чтобы открыть меню
-image = https://ссылка-на-твоё-изображение.png
+usage = 1. Установи скрипт\n2. Зайди в игру\n3. Он начнет качать библиотеки или сразу основной скрипт.
+image = https://i.imgur.com/0TQnVZ6.jpeg
