@@ -583,6 +583,27 @@ class WebViewApp:
             logger.error(f"fetch_moonloader_catalog error: {e}")
             return {"success": False, "message": str(e)}
 
+    def fetch_image_as_base64(self, url):
+        """Скачивает изображение по URL и возвращает data URL в base64 (обход CORS в PyQt5)"""
+        try:
+            resp = requests.get(url, timeout=10, verify=False,
+                                headers={"User-Agent": "Mozilla/5.0"})
+            if resp.status_code != 200:
+                return {"success": False, "message": f"HTTP {resp.status_code}"}
+            import base64, mimetypes
+            content_type = resp.headers.get("Content-Type", "").split(";")[0].strip()
+            if not content_type.startswith("image/"):
+                # определяем по расширению URL
+                ext = url.rsplit(".", 1)[-1].lower()
+                content_type = {"jpg": "image/jpeg", "jpeg": "image/jpeg",
+                                "png": "image/png", "gif": "image/gif",
+                                "webp": "image/webp"}.get(ext, "image/jpeg")
+            b64 = base64.b64encode(resp.content).decode("utf-8")
+            return {"success": True, "data_url": f"data:{content_type};base64,{b64}"}
+        except Exception as e:
+            logger.error(f"fetch_image_as_base64 error: {e}")
+            return {"success": False, "message": str(e)}
+
     def install_moonloader_script(self, url, filename):
         """Скачивает скрипт и кладёт в moonloader/"""
         ml_dir = self._get_moonloader_dir()
@@ -599,6 +620,94 @@ class WebViewApp:
         except Exception as e:
             logger.error(f"install_moonloader_script error: {e}")
             return {"success": False, "message": str(e)}
+
+    # ---- ДРУГОЕ (others.txt) ----
+
+    DEST_MAP = {
+        "root":       lambda self: os.path.dirname(self.launcher.game_path) if self.launcher.game_path else None,
+        "cleo":       lambda self: os.path.join(os.path.dirname(self.launcher.game_path), "CLEO") if self.launcher.game_path else None,
+        "moonloader": lambda self: self._get_moonloader_dir(),
+        "plugins":    lambda self: os.path.join(os.path.dirname(self.launcher.game_path), "plugins") if self.launcher.game_path else None,
+        "asi":        lambda self: os.path.dirname(self.launcher.game_path) if self.launcher.game_path else None,
+    }
+
+    def _resolve_dest(self, destination):
+        """Возвращает абсолютный путь к папке назначения"""
+        fn = self.DEST_MAP.get(destination.lower())
+        if not fn:
+            return None, f"Неизвестное назначение: {destination}"
+        path = fn(self)
+        if not path:
+            return None, "Путь к игре не установлен — укажи его в настройках"
+        if not os.path.isdir(path):
+            try:
+                os.makedirs(path, exist_ok=True)
+            except Exception as e:
+                return None, f"Не удалось создать папку {path}: {e}"
+        return path, None
+
+    def fetch_others_catalog(self):
+        """Загружает others.txt с GitHub"""
+        OTHERS_URL = "https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/others.txt"
+        try:
+            resp = requests.get(OTHERS_URL, timeout=10,
+                                headers={"Cache-Control": "no-cache"}, verify=False)
+            if resp.status_code == 404:
+                return {"success": False, "message": "Файл others.txt не найден на GitHub (404)"}
+            if resp.status_code != 200:
+                return {"success": False, "message": f"GitHub вернул HTTP {resp.status_code}"}
+            items = self._parse_catalog_txt(resp.text)
+            logger.info(f"fetch_others_catalog: {len(items)} файлов")
+            return {"success": True, "data": items}
+        except requests.exceptions.ConnectionError:
+            return {"success": False, "message": "Нет подключения к интернету"}
+        except requests.exceptions.Timeout:
+            return {"success": False, "message": "Тайм-аут (GitHub не отвечает)"}
+        except Exception as e:
+            logger.error(f"fetch_others_catalog error: {e}")
+            return {"success": False, "message": str(e)}
+
+    def install_other_file(self, url, filename, destination):
+        """Скачивает файл и кладёт его в нужную папку"""
+        dest_dir, err = self._resolve_dest(destination)
+        if err:
+            return {"success": False, "message": err}
+        try:
+            resp = requests.get(url, timeout=30, verify=False)
+            if resp.status_code != 200:
+                return {"success": False, "message": f"Ошибка загрузки: HTTP {resp.status_code}"}
+            out_path = os.path.join(dest_dir, filename)
+            with open(out_path, 'wb') as f:
+                f.write(resp.content)
+            logger.info(f"install_other_file: {out_path}")
+            return {"success": True, "message": f"Установлен в {dest_dir}", "path": out_path}
+        except Exception as e:
+            logger.error(f"install_other_file error: {e}")
+            return {"success": False, "message": str(e)}
+
+    def remove_other_file(self, filename, destination):
+        """Удаляет файл из папки назначения"""
+        dest_dir, err = self._resolve_dest(destination)
+        if err:
+            return {"success": False, "message": err}
+        try:
+            file_path = os.path.join(dest_dir, filename)
+            if not os.path.exists(file_path):
+                return {"success": False, "message": f"Файл не найден: {file_path}"}
+            os.remove(file_path)
+            logger.info(f"remove_other_file: {file_path}")
+            return {"success": True, "message": f"Удалён: {filename}"}
+        except Exception as e:
+            logger.error(f"remove_other_file error: {e}")
+            return {"success": False, "message": str(e)}
+
+    def check_other_installed(self, filename, destination):
+        """Проверяет установлен ли файл"""
+        dest_dir, err = self._resolve_dest(destination)
+        if err:
+            return {"installed": False}
+        file_path = os.path.join(dest_dir, filename)
+        return {"installed": os.path.exists(file_path), "path": file_path}
 
 
 def main():

@@ -981,6 +981,221 @@
                 flex: 1 1 calc(50% - 5px);
             }
         }
+
+        /* ---- SCRIPT DETAIL MODAL ---- */
+        .script-detail-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(6px);
+            z-index: 900;
+            align-items: center;
+            justify-content: center;
+            animation: modsFadeIn 0.2s ease;
+        }
+        .script-detail-overlay.open {
+            display: flex;
+        }
+
+        .script-detail-panel {
+            width: 90%;
+            max-width: 640px;
+            max-height: 88vh;
+            background: rgba(18, 18, 26, 0.98);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 18px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .script-detail-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            flex-shrink: 0;
+        }
+
+        .script-detail-header-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 15px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .script-detail-body {
+            display: flex;
+            gap: 20px;
+            padding: 22px;
+            flex-shrink: 0;
+        }
+
+        .script-detail-left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .script-detail-icon-wrap {
+            width: 72px;
+            height: 72px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        .script-detail-name {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.95);
+            text-align: center;
+            max-width: 90px;
+        }
+
+        .script-detail-author {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+            text-align: center;
+        }
+
+        .script-detail-tag {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.07);
+            border-radius: 5px;
+            padding: 3px 8px;
+        }
+
+        .script-detail-right {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .script-detail-image {
+            width: 100%;
+            height: 150px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            object-fit: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.2);
+            overflow: hidden;
+        }
+
+        .script-detail-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .script-detail-info {
+            padding: 0 22px 18px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .script-detail-info::-webkit-scrollbar { width: 4px; }
+        .script-detail-info::-webkit-scrollbar-track { background: transparent; }
+        .script-detail-info::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+        .script-detail-section-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.45);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+            margin-top: 14px;
+        }
+
+        .script-detail-section-title:first-child { margin-top: 0; }
+
+        .script-detail-text {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .script-detail-footer {
+            padding: 16px 22px;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .script-detail-install-btn {
+            flex: 1;
+            height: 44px;
+            background: rgba(0, 140, 255, 0.3);
+            border: 1px solid rgba(0, 140, 255, 0.5);
+            border-radius: 10px;
+            color: rgba(140, 210, 255, 0.95);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .script-detail-install-btn:hover:not(:disabled) {
+            background: rgba(0, 140, 255, 0.5);
+            border-color: rgba(0, 140, 255, 0.8);
+            transform: translateY(-1px);
+        }
+
+        .script-detail-install-btn:disabled {
+            background: rgba(80, 80, 90, 0.4);
+            border-color: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.4);
+            cursor: default;
+        }
+
+        .script-detail-install-btn.progress {
+            background: rgba(255, 160, 0, 0.2);
+            border-color: rgba(255, 160, 0, 0.4);
+            color: rgba(255, 200, 100, 0.95);
+        }
+
+        .script-detail-uninstall-btn {
+            height: 44px;
+            padding: 0 18px;
+            background: rgba(200, 50, 50, 0.25);
+            border: 1px solid rgba(200, 50, 50, 0.4);
+            border-radius: 10px;
+            color: rgba(255, 140, 140, 0.9);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: none;
+        }
+
+        .script-detail-uninstall-btn:hover {
+            background: rgba(200, 50, 50, 0.4);
+            border-color: rgba(200, 50, 50, 0.7);
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body>
@@ -992,7 +1207,7 @@
             <div class="left-panel">
                 <div class="header">
                     <div class="title">Arizona RP</div>
-                    <div class="subtitle">Launcher v0.0.4</div>
+                    <div class="subtitle">Launcher v0.0.5</div>
                 </div>
 
                 <div class="nickname-section">
@@ -1283,19 +1498,59 @@
 
             <!-- Другие моды -->
             <div id="modsTabOther" class="mods-tab-content">
-                <div class="mods-section">
-                    <div class="mods-section-title">🎨 ASI Моды</div>
-                    <div class="mods-section-desc">Моды в формате .asi — загружаются автоматически при старте игры.</div>
-                    <div class="mods-empty">ASI моды не обнаружены</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:12px;">
+                    <div style="font-family:'Montserrat Alternates';font-size:13px;color:rgba(255,255,255,0.5);">
+                        ASI моды, CLEO скрипты и другие файлы
+                    </div>
+                    <button class="mods-action-btn" style="width:auto;padding:0 14px;height:32px;font-size:11px;" onclick="loadOthersCatalog()">
+                        🔄 Обновить
+                    </button>
                 </div>
-                <div class="mods-section">
-                    <div class="mods-section-title">📦 CLEO Скрипты</div>
-                    <div class="mods-section-desc">Скрипты в папке CLEO/ игры.</div>
-                    <div class="mods-empty">CLEO скрипты не обнаружены</div>
+                <div id="othersStatus" style="font-family:'Montserrat Alternates';font-size:12px;color:rgba(255,255,255,0.35);min-height:16px;"></div>
+                <div id="othersGrid" style="display:flex;flex-direction:column;gap:6px;">
+                    <div class="mods-empty">Загрузка...</div>
                 </div>
-                <button class="mods-action-btn">
-                    📂 Открыть папку с игрой
-                </button>
+            </div>
+        </div>
+        <!-- Детальное окно скрипта из каталога -->
+        <div class="script-detail-overlay" id="scriptDetailOverlay" onclick="closeScriptDetail(event)">
+            <div class="script-detail-panel">
+                <div class="script-detail-header">
+                    <div class="script-detail-header-title" id="sdHeaderTitle">🌙 Moonloader · Каталог</div>
+                    <button class="close-btn" onclick="closeScriptDetail(null, true)">×</button>
+                </div>
+
+                <div class="script-detail-body">
+                    <div class="script-detail-left">
+                        <div class="script-detail-icon-wrap" id="sdIcon">🌙</div>
+                        <div class="script-detail-name" id="sdName">—</div>
+                        <div class="script-detail-author" id="sdAuthor">—</div>
+                        <div class="script-detail-tag" id="sdTag"></div>
+                    </div>
+                    <div class="script-detail-right">
+                        <div class="script-detail-image" id="sdImageWrap">
+                            <span>Нет изображения</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="script-detail-info">
+                    <div class="script-detail-section-title">О скрипте</div>
+                    <div class="script-detail-text" id="sdDesc">—</div>
+                    <div id="sdUsageBlock" style="display:none;">
+                        <div class="script-detail-section-title">Как пользоваться</div>
+                        <div class="script-detail-text" id="sdUsage"></div>
+                    </div>
+                    <div id="sdFileBlock" style="margin-top:10px;">
+                        <div class="script-detail-section-title">Файл</div>
+                        <div class="script-detail-text" id="sdFile" style="color:rgba(255,255,255,0.35);font-size:11px;"></div>
+                    </div>
+                </div>
+
+                <div class="script-detail-footer">
+                    <button class="script-detail-install-btn" id="sdInstallBtn" onclick="installFromDetail()">📥 Установить</button>
+                    <button class="script-detail-uninstall-btn" id="sdUninstallBtn" onclick="uninstallFromDetail()">🗑️ Удалить</button>
+                </div>
             </div>
         </div>
 
@@ -1321,6 +1576,7 @@
         let currentNickname = '';
         let currentServer = '';
         let serversData = [];
+        window._installedScriptFiles = new Set(); // имена файлов установленных скриптов
 
         // ОПТИМИЗИРОВАННАЯ КОНФИГУРАЦИЯ ГРАФИКИ (БЕЗ НАСТРОЕК)
         const CONFIG = {
@@ -1656,6 +1912,7 @@
 
             if (tab === 'patches')    loadPatchPresets();
             if (tab === 'moonloader') loadMoonloaderScripts();
+            if (tab === 'other' && !window._othersCatalog) loadOthersCatalog();
         }
 
         // ---- MOONLOADER ----
@@ -1706,7 +1963,9 @@
                 }
                 setMlStatus(`Скриптов: ${result.scripts.length}`);
                 pane.innerHTML = '';
+                window._installedScriptFiles.clear();
                 result.scripts.forEach(script => {
+                    window._installedScriptFiles.add(script.name.toLowerCase());
                     const icon = EXT_ICONS[script.ext] || '📄';
                     const item = document.createElement('div');
                     item.className = 'mods-item';
@@ -1798,22 +2057,33 @@
             window._mlCatalog = catalog;
 
             catalog.forEach((item, idx) => {
+                const isInstalled = item.file && window._installedScriptFiles.has(item.file.toLowerCase().replace(/\\/g, '/').split('/').pop().toLowerCase());
                 const card = document.createElement('div');
                 card.className = 'mods-item';
-                card.style.alignItems = 'flex-start';
-                card.style.gap = '10px';
+                card.style.cssText = 'align-items:flex-start;gap:10px;cursor:pointer;transition:background 0.2s,border-color 0.2s;';
+                card.addEventListener('mouseenter', () => card.style.background = 'rgba(255,255,255,0.06)');
+                card.addEventListener('mouseleave', () => card.style.background = '');
                 card.innerHTML = `
                     <span class="mods-item-icon" style="font-size:20px;margin-top:2px;">${item.icon || '🌙'}</span>
                     <div class="mods-item-info">
                         <div class="mods-item-name">${item.name}</div>
                         <div class="mods-item-sub" style="margin-bottom:4px;">от ${item.author || '?'} · ${item.tag || ''}</div>
                         <div style="font-family:'Montserrat Alternates';font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">${item.description || ''}</div>
-                        <div id="mlInstStatus_${idx}" style="font-family:'Montserrat Alternates';font-size:11px;min-height:14px;margin-top:4px;"></div>
+                        <div id="mlInstStatus_${idx}" style="font-family:'Montserrat Alternates';font-size:11px;min-height:14px;margin-top:4px;${isInstalled ? 'color:rgba(100,220,140,0.8)' : ''}">
+                            ${isInstalled ? '✅ Установлено' : ''}
+                        </div>
                     </div>
-                    <button class="mods-install-btn" id="mlInstBtn_${idx}" onclick="installMlScript(${idx}, this)" style="flex-shrink:0;margin-top:2px;">
-                        📥 Установить
-                    </button>
+                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;margin-top:2px;">
+                        <button class="mods-install-btn ${isInstalled ? 'done' : ''}" id="mlInstBtn_${idx}"
+                                style="${isInstalled ? 'opacity:0.65;cursor:default;' : ''}"
+                                ${isInstalled ? 'disabled' : ''}
+                                onclick="event.stopPropagation(); installMlScript(${idx}, this)">
+                            ${isInstalled ? '✅ Установлено' : '📥 Установить'}
+                        </button>
+                        <span style="font-family:'Montserrat Alternates';font-size:10px;color:rgba(255,255,255,0.25);">Нажми для подробностей</span>
+                    </div>
                 `;
+                card.addEventListener('click', () => openScriptDetail(idx, 'moonloader'));
                 pane.appendChild(card);
             });
         }
@@ -1862,16 +2132,343 @@
             }
         }
 
+        // ---- ДЕТАЛЬНОЕ ОКНО СКРИПТА ----
+        let _sdCurrentIdx  = null;
+        let _sdCatalogType = 'moonloader'; // 'moonloader' | 'other'
+
+        window._othersCatalog      = null;
+        window._installedOtherFiles = new Set();
+
+        const DEST_LABELS = {
+            root:       '📁 Папка с игрой',
+            asi:        '📁 Папка с игрой (ASI)',
+            cleo:       '📁 CLEO/',
+            moonloader: '📁 moonloader/',
+            plugins:    '📁 plugins/',
+        };
+
+        function _othersInstalledKey(item) {
+            return ((item.destination || 'root') + '/' + (item.file || '')).toLowerCase();
+        }
+
+        function _syncCatalogCard(btnId, statusId, installed) {
+            const b = document.getElementById(btnId);
+            const s = document.getElementById(statusId);
+            if (b) {
+                b.disabled = installed;
+                b.className = installed ? 'mods-install-btn done' : 'mods-install-btn';
+                b.textContent = installed ? '✅ Установлено' : '📥 Установить';
+                b.style.opacity = installed ? '0.65' : '';
+                b.style.cursor  = installed ? 'default' : '';
+            }
+            if (s) {
+                s.textContent = installed ? '✅ Установлено' : '';
+                s.style.color = installed ? 'rgba(100,220,140,0.8)' : '';
+            }
+        }
+
+        async function _loadDetailImage(url, wrap) {
+            try {
+                if (window.pywebview && window.pywebview.api.fetch_image_as_base64) {
+                    const result = await window.pywebview.api.fetch_image_as_base64(url);
+                    if (result && result.success) {
+                        wrap.innerHTML = `<img src="${result.data_url}" alt="preview">`;
+                        return;
+                    }
+                }
+                wrap.innerHTML = `<img src="${url}" alt="preview" onerror="this.parentElement.innerHTML='<span>Нет изображения</span>'">`;
+            } catch(e) {
+                wrap.innerHTML = '<span>Нет изображения</span>';
+            }
+        }
+
+        function openScriptDetail(idx, catalogType) {
+            _sdCatalogType = catalogType || 'moonloader';
+            const catalog = _sdCatalogType === 'other' ? window._othersCatalog : window._mlCatalog;
+            const item = catalog?.[idx];
+            if (!item) return;
+            _sdCurrentIdx = idx;
+
+            document.getElementById('sdHeaderTitle').textContent =
+                _sdCatalogType === 'other' ? '📦 Другое · Каталог' : '🌙 Moonloader · Каталог';
+
+            document.getElementById('sdIcon').textContent   = item.icon || (_sdCatalogType === 'other' ? '📦' : '🌙');
+            document.getElementById('sdName').textContent   = item.name || '—';
+            document.getElementById('sdAuthor').textContent = 'от ' + (item.author || '?');
+            document.getElementById('sdTag').textContent    = item.tag || '';
+            document.getElementById('sdDesc').textContent   = item.description || 'Нет описания';
+
+            let fileText = item.file || '—';
+            if (_sdCatalogType === 'other' && item.destination)
+                fileText += '  →  ' + (DEST_LABELS[item.destination.toLowerCase()] || item.destination);
+            document.getElementById('sdFile').textContent = fileText;
+
+            const usageBlock = document.getElementById('sdUsageBlock');
+            if (item.usage) {
+                document.getElementById('sdUsage').textContent = item.usage.replace(/\\n/g, '\n');
+                usageBlock.style.display = '';
+            } else {
+                usageBlock.style.display = 'none';
+            }
+
+            const imgWrap = document.getElementById('sdImageWrap');
+            if (item.image) {
+                imgWrap.innerHTML = '<span style="color:rgba(255,255,255,0.2)">⏳ Загрузка...</span>';
+                _loadDetailImage(item.image, imgWrap);
+            } else {
+                imgWrap.innerHTML = '<span>Нет изображения</span>';
+            }
+
+            _updateDetailButtons(idx);
+            document.getElementById('scriptDetailOverlay').classList.add('open');
+        }
+
+        function _updateDetailButtons(idx) {
+            const catalog = _sdCatalogType === 'other' ? window._othersCatalog : window._mlCatalog;
+            const item = catalog?.[idx];
+            if (!item) return;
+
+            const installBtn   = document.getElementById('sdInstallBtn');
+            const uninstallBtn = document.getElementById('sdUninstallBtn');
+
+            let isInstalled;
+            if (_sdCatalogType === 'other') {
+                isInstalled = window._installedOtherFiles.has(_othersInstalledKey(item));
+            } else {
+                const fileName = (item.file || '').toLowerCase().split(/[\\/]/).pop();
+                isInstalled = fileName && window._installedScriptFiles.has(fileName);
+            }
+
+            installBtn.disabled        = isInstalled;
+            installBtn.textContent     = isInstalled ? '✅ Установлено' : '📥 Установить';
+            installBtn.className       = 'script-detail-install-btn';
+            uninstallBtn.style.display = isInstalled ? 'block' : 'none';
+        }
+
+        function closeScriptDetail(event, force) {
+            if (!force && event && event.target !== document.getElementById('scriptDetailOverlay')) return;
+            document.getElementById('scriptDetailOverlay').classList.remove('open');
+            _sdCurrentIdx = null;
+        }
+
+        async function installFromDetail() {
+            if (_sdCatalogType === 'other') { await _installOtherFromDetail(); return; }
+            const idx  = _sdCurrentIdx;
+            const item = window._mlCatalog?.[idx];
+            if (!item) return;
+            const btn = document.getElementById('sdInstallBtn');
+            btn.disabled = true; btn.className = 'script-detail-install-btn progress';
+            try {
+                btn.textContent = '⏳ Скачивается...';
+                if (window.pywebview && window.pywebview.api.install_moonloader_script) {
+                    btn.textContent = '⚙️ Устанавливается...';
+                    const result = await window.pywebview.api.install_moonloader_script(item.url, item.file);
+                    if (!result.success) throw new Error(result.message);
+                } else { await new Promise(r => setTimeout(r, 900)); }
+                const fileName = (item.file || '').toLowerCase().split(/[\\/]/).pop();
+                if (fileName) window._installedScriptFiles.add(fileName);
+                _updateDetailButtons(idx);
+                _syncCatalogCard('mlInstBtn_' + idx, 'mlInstStatus_' + idx, true);
+                showNotification('Установлен: ' + item.name, 'success');
+            } catch(e) {
+                btn.disabled = false; btn.textContent = '📥 Установить'; btn.className = 'script-detail-install-btn';
+                showNotification('Ошибка: ' + e.message, 'error');
+            }
+        }
+
+        async function _installOtherFromDetail() {
+            const idx  = _sdCurrentIdx;
+            const item = window._othersCatalog?.[idx];
+            if (!item) return;
+            const btn = document.getElementById('sdInstallBtn');
+            btn.disabled = true; btn.className = 'script-detail-install-btn progress';
+            try {
+                btn.textContent = '⏳ Скачивается...';
+                if (window.pywebview && window.pywebview.api.install_other_file) {
+                    btn.textContent = '⚙️ Устанавливается...';
+                    const result = await window.pywebview.api.install_other_file(item.url, item.file, item.destination || 'root');
+                    if (!result.success) throw new Error(result.message);
+                } else { await new Promise(r => setTimeout(r, 900)); }
+                window._installedOtherFiles.add(_othersInstalledKey(item));
+                _updateDetailButtons(idx);
+                _syncCatalogCard('otherInstBtn_' + idx, 'otherInstStatus_' + idx, true);
+                showNotification('Установлен: ' + item.name, 'success');
+            } catch(e) {
+                btn.disabled = false; btn.textContent = '📥 Установить'; btn.className = 'script-detail-install-btn';
+                showNotification('Ошибка: ' + e.message, 'error');
+            }
+        }
+
+        async function uninstallFromDetail() {
+            if (_sdCatalogType === 'other') { await _uninstallOtherFromDetail(); return; }
+            const idx  = _sdCurrentIdx;
+            const item = window._mlCatalog?.[idx];
+            if (!item) return;
+            const btn = document.getElementById('sdUninstallBtn');
+            btn.disabled = true; btn.textContent = '⏳ Удаление...';
+            try {
+                if (window.pywebview && window.pywebview.api.remove_moonloader_script) {
+                    const result = await window.pywebview.api.remove_moonloader_script(item.file);
+                    if (!result.success) throw new Error(result.message);
+                } else { await new Promise(r => setTimeout(r, 600)); }
+                const fileName = (item.file || '').toLowerCase().split(/[\\/]/).pop();
+                if (fileName) window._installedScriptFiles.delete(fileName);
+                _updateDetailButtons(idx);
+                _syncCatalogCard('mlInstBtn_' + idx, 'mlInstStatus_' + idx, false);
+                showNotification('Удалён: ' + item.name, 'success');
+            } catch(e) {
+                btn.disabled = false; btn.textContent = '🗑️ Удалить';
+                showNotification('Ошибка: ' + e.message, 'error');
+            }
+        }
+
+        async function _uninstallOtherFromDetail() {
+            const idx  = _sdCurrentIdx;
+            const item = window._othersCatalog?.[idx];
+            if (!item) return;
+            const btn = document.getElementById('sdUninstallBtn');
+            btn.disabled = true; btn.textContent = '⏳ Удаление...';
+            try {
+                if (window.pywebview && window.pywebview.api.remove_other_file) {
+                    const result = await window.pywebview.api.remove_other_file(item.file, item.destination || 'root');
+                    if (!result.success) throw new Error(result.message);
+                } else { await new Promise(r => setTimeout(r, 600)); }
+                window._installedOtherFiles.delete(_othersInstalledKey(item));
+                _updateDetailButtons(idx);
+                _syncCatalogCard('otherInstBtn_' + idx, 'otherInstStatus_' + idx, false);
+                showNotification('Удалён: ' + item.name, 'success');
+            } catch(e) {
+                btn.disabled = false; btn.textContent = '🗑️ Удалить';
+                showNotification('Ошибка: ' + e.message, 'error');
+            }
+        }
+
+        // ---- КАТАЛОГ "ДРУГОЕ" ----
+        async function loadOthersCatalog() {
+            const grid   = document.getElementById('othersGrid');
+            const status = document.getElementById('othersStatus');
+            if (!grid) return;
+
+            status.textContent = '⏳ Загрузка с GitHub...';
+            grid.innerHTML = '<div class="mods-empty">⏳ Загрузка каталога...</div>';
+
+            let items = null;
+            try {
+                if (window.pywebview && window.pywebview.api.fetch_others_catalog) {
+                    const result = await window.pywebview.api.fetch_others_catalog();
+                    if (result && result.success) items = result.data;
+                    else if (result) status.textContent = '❌ ' + result.message;
+                }
+            } catch(e) {}
+
+            if (!items) {
+                try {
+                    const resp = await fetch('https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/others.txt', { cache: 'no-store' });
+                    if (resp.ok) items = parsConfigsTxt(await resp.text());
+                } catch(e) {}
+            }
+
+            if (!items || items.length === 0) {
+                status.textContent = '';
+                grid.innerHTML = '<div class="mods-empty">❌ Файл others.txt не найден или пуст</div>';
+                return;
+            }
+
+            window._othersCatalog = items;
+            await _checkOthersInstalled(items);
+            status.textContent = `Найдено: ${items.length}`;
+            grid.innerHTML = '';
+
+            const destOrder = ['root', 'asi', 'cleo', 'moonloader', 'plugins'];
+            const groups = {};
+            items.forEach((item, idx) => {
+                const d = (item.destination || 'root').toLowerCase();
+                if (!groups[d]) groups[d] = [];
+                groups[d].push({ item, idx });
+            });
+            const allDests = [...new Set([...destOrder, ...Object.keys(groups)])].filter(d => groups[d]);
+
+            allDests.forEach(dest => {
+                const label = DEST_LABELS[dest] || ('📁 ' + dest);
+                const hdr = document.createElement('div');
+                hdr.style.cssText = 'font-family:"Montserrat Alternates";font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.7px;margin-top:10px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;';
+                hdr.textContent = label;
+                grid.appendChild(hdr);
+
+                groups[dest].forEach(({ item, idx }) => {
+                    const installed = window._installedOtherFiles.has(_othersInstalledKey(item));
+                    const card = document.createElement('div');
+                    card.className = 'mods-item';
+                    card.style.cssText = 'align-items:flex-start;gap:10px;cursor:pointer;';
+                    card.addEventListener('mouseenter', () => card.style.background = 'rgba(255,255,255,0.06)');
+                    card.addEventListener('mouseleave', () => card.style.background = '');
+                    card.innerHTML = `
+                        <span class="mods-item-icon" style="font-size:20px;margin-top:2px;">${item.icon || '📦'}</span>
+                        <div class="mods-item-info">
+                            <div class="mods-item-name">${item.name}</div>
+                            <div class="mods-item-sub" style="margin-bottom:4px;">от ${item.author || '?'} · ${item.tag || ''}</div>
+                            <div style="font-family:'Montserrat Alternates';font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;">${item.description || ''}</div>
+                            <div id="otherInstStatus_${idx}" style="font-family:'Montserrat Alternates';font-size:11px;min-height:14px;margin-top:4px;${installed ? 'color:rgba(100,220,140,0.8)' : ''}">
+                                ${installed ? '✅ Установлено' : ''}
+                            </div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;margin-top:2px;">
+                            <button class="mods-install-btn ${installed ? 'done' : ''}" id="otherInstBtn_${idx}"
+                                    style="${installed ? 'opacity:0.65;cursor:default;' : ''}"
+                                    ${installed ? 'disabled' : ''}
+                                    onclick="event.stopPropagation(); _quickInstallOther(${idx}, this)">
+                                ${installed ? '✅ Установлено' : '📥 Установить'}
+                            </button>
+                            <span style="font-family:'Montserrat Alternates';font-size:10px;color:rgba(255,255,255,0.25);">Нажми для подробностей</span>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => openScriptDetail(idx, 'other'));
+                    grid.appendChild(card);
+                });
+            });
+        }
+
+        async function _checkOthersInstalled(items) {
+            window._installedOtherFiles.clear();
+            if (!window.pywebview || !window.pywebview.api.check_other_installed) return;
+            await Promise.all(items.map(async item => {
+                try {
+                    const r = await window.pywebview.api.check_other_installed(item.file, item.destination || 'root');
+                    if (r && r.installed) window._installedOtherFiles.add(_othersInstalledKey(item));
+                } catch(e) {}
+            }));
+        }
+
+        async function _quickInstallOther(idx, btn) {
+            const item = window._othersCatalog?.[idx];
+            if (!item) return;
+            const status = document.getElementById(`otherInstStatus_${idx}`);
+            btn.disabled = true; btn.className = 'mods-install-btn downloading'; btn.textContent = '⏳';
+            try {
+                if (window.pywebview && window.pywebview.api.install_other_file) {
+                    btn.className = 'mods-install-btn installing';
+                    const result = await window.pywebview.api.install_other_file(item.url, item.file, item.destination || 'root');
+                    if (!result.success) throw new Error(result.message);
+                } else { await new Promise(r => setTimeout(r, 800)); }
+                window._installedOtherFiles.add(_othersInstalledKey(item));
+                _syncCatalogCard('otherInstBtn_' + idx, 'otherInstStatus_' + idx, true);
+                showNotification('Установлен: ' + item.name, 'success');
+            } catch(e) {
+                btn.disabled = false; btn.className = 'mods-install-btn'; btn.textContent = '📥 Установить';
+                if (status) { status.textContent = '❌ ' + e.message; status.style.color = 'rgba(255,100,100,0.8)'; }
+            }
+        }
         // ---- ПРЕСЕТЫ ARIZONAPATCHES ----
         const CONFIGS_TXT_URL = 'https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/configs.txt';
 
         function parsConfigsTxt(text) {
             const presets = [];
             let current = null;
+            const BLOCK_MARKERS = ['[config]', '[script]', '[file]'];
             for (const rawLine of text.split('\n')) {
                 const line = rawLine.trim();
                 if (!line || line.startsWith('#')) continue;
-                if (line === '[config]') {
+                if (BLOCK_MARKERS.includes(line.toLowerCase())) {
                     if (current) presets.push(current);
                     current = {};
                     continue;
