@@ -1,6 +1,6 @@
 # ArizonaLauncher
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Python Version](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 
 > Лаунчер который совмещает все достоинства всех лаунчеров для Аризоны
 
@@ -46,7 +46,7 @@ python main.py
 ## 🔧 Требования
 
 - **Операционная система:** Windows 10/11 c Microsoft Edge WebView2 Runtime
-- **Python:** 3.10 или выше (если запускаете из исходников)
+- **Python:** 3.11 или выше (если запускаете из исходников)
 - **Оперативная память:** около 100 мб
 - **Свободное место:** 200 МБ
 
