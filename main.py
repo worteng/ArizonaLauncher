@@ -49,21 +49,28 @@ class ArizonaLauncher:
         except Exception as e: logger.error(f"Config save error: {e}")
 
     def auto_detect_game_paths(self):
-        searches = [Path.home() / "AppData" / "Local" / "Programs" / "Arizona Games Launcher",
-                    Path("C:/Program Files/Arizona Games Launcher"), Path("C:/Program Files (x86)/Arizona Games Launcher"),
-                    Path("D:/Games/Arizona"), Path("C:/Games/Arizona")] + [Path(f"{d}/") for d in ['C:', 'D:', 'E:', 'F:']]
+        """Быстрый поиск по известным путям установки Arizona Games Launcher."""
+        GAME_SUBPATH = Path("bin") / "arizona"
+
+        # Точные известные пути (без rglob — мгновенно)
+        base_candidates = [
+            Path.home() / "AppData" / "Local" / "Programs" / "Arizona Games Launcher",
+            Path("C:/Program Files/Arizona Games Launcher"),
+            Path("C:/Program Files (x86)/Arizona Games Launcher"),
+        ]
+
         found_gta = found_launcher = None
-        for base in searches:
-            if not base.exists(): continue
-            try:
-                for gta in base.rglob("gta_sa.exe"):
-                    if "temp" not in str(gta).lower() and "cache" not in str(gta).lower():
-                        found_gta = gta
-                        launch = gta.parent / "ArizonaLauncher6_byAIR.exe"
-                        if launch.exists(): found_launcher = launch
-                        break
-                if found_gta and found_launcher: break
-            except (PermissionError, OSError): continue
+
+        for base in base_candidates:
+            game_dir = base / GAME_SUBPATH
+            gta = game_dir / "gta_sa.exe"
+            if gta.exists():
+                found_gta = gta
+                launch = game_dir / "ArizonaLauncher6_byAIR.exe"
+                if launch.exists():
+                    found_launcher = launch
+                break
+
         if found_gta: self.game_path = self.config['game_path'] = str(found_gta)
         if found_launcher: self.launcher_path = self.config['launcher_path'] = str(found_launcher)
         if found_gta or found_launcher: self.save_config()
@@ -143,9 +150,99 @@ class ArizonaLauncher:
     def write_patches(self, data):
         if not self.patches_path: return {"success": False, "message": "Path not set"}
         try:
+            # Создаём бэкап перед записью (если файл уже существует)
+            if os.path.exists(self.patches_path):
+                self._create_patches_backup()
             with open(self.patches_path, 'w', encoding='utf-8') as f: json.dump(data, f, indent=4, ensure_ascii=False)
             return {"success": True, "message": "Saved"}
         except Exception as e: return {"success": False, "message": str(e)}
+
+    def _create_patches_backup(self, label: str = ""):
+        """Сохраняет текущий #ArizonaPatches.json в папку бэкапов. Максимум 15 штук."""
+        MAX_BACKUPS = 15
+        try:
+            backup_dir = Path(self.documents_path) / "backups"
+            backup_dir.mkdir(parents=True, exist_ok=True)
+
+            from datetime import datetime
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            suffix = f"_{label}" if label else ""
+            backup_name = f"patches_{ts}{suffix}.json"
+            backup_path = backup_dir / backup_name
+
+            import shutil
+            shutil.copy2(self.patches_path, backup_path)
+            logger.info(f"_create_patches_backup: {backup_path}")
+
+            # Удаляем старые если больше MAX_BACKUPS
+            all_backups = sorted(backup_dir.glob("patches_*.json"), key=lambda p: p.stat().st_mtime)
+            while len(all_backups) > MAX_BACKUPS:
+                all_backups[0].unlink(missing_ok=True)
+                all_backups.pop(0)
+
+            return str(backup_path)
+        except Exception as e:
+            logger.warning(f"_create_patches_backup error: {e}")
+            return None
+
+    def list_patches_backups(self):
+        """Возвращает список бэкапов (новые первыми)."""
+        try:
+            backup_dir = Path(self.documents_path) / "backups"
+            if not backup_dir.exists():
+                return []
+            files = sorted(backup_dir.glob("patches_*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+            result = []
+            from datetime import datetime
+            for f in files:
+                try:
+                    mtime = datetime.fromtimestamp(f.stat().st_mtime)
+                    result.append({
+                        "filename": f.name,
+                        "path": str(f),
+                        "date": mtime.strftime("%d.%m.%Y %H:%M:%S"),
+                        "size": f.stat().st_size,
+                    })
+                except Exception:
+                    continue
+            return result
+        except Exception as e:
+            logger.warning(f"list_patches_backups error: {e}")
+            return []
+
+    def restore_patches_backup(self, filename: str):
+        """Восстанавливает патчи из бэкапа."""
+        try:
+            backup_dir = Path(self.documents_path) / "backups"
+            backup_path = backup_dir / filename
+            if not backup_path.exists():
+                return {"success": False, "message": f"Бэкап не найден: {filename}"}
+            with open(backup_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            # Создаём бэкап текущего перед восстановлением
+            if self.patches_path and os.path.exists(self.patches_path):
+                self._create_patches_backup(label="before_restore")
+            result = self.write_patches(data)
+            if result["success"]:
+                logger.info(f"restore_patches_backup: восстановлен {filename}")
+                return {"success": True, "data": data, "message": f"Восстановлен: {filename}"}
+            return result
+        except Exception as e:
+            logger.error(f"restore_patches_backup error: {e}")
+            return {"success": False, "message": str(e)}
+
+    def delete_patches_backup(self, filename: str):
+        """Удаляет конкретный бэкап."""
+        try:
+            backup_dir = Path(self.documents_path) / "backups"
+            backup_path = backup_dir / filename
+            if not backup_path.exists():
+                return {"success": False, "message": "Файл не найден"}
+            backup_path.unlink()
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+
 
 class WebViewApp:
     def __init__(self): self.launcher = ArizonaLauncher()
@@ -208,19 +305,160 @@ class WebViewApp:
             if not folder_path:
                 return {"success": False, "message": "Папка не выбрана"}
 
-            game_exe    = os.path.join(folder_path, "gta_sa.exe")
+            game_exe     = os.path.join(folder_path, "gta_sa.exe")
             launcher_exe = os.path.join(folder_path, "ArizonaLauncher6_byAIR.exe")
+            plugins_dir  = os.path.join(folder_path, "preloading_plugins")
 
             if not os.path.exists(game_exe):
                 return {"success": False, "message": "gta_sa.exe не найден в выбранной папке"}
+
+            missing = []
             if not os.path.exists(launcher_exe):
-                return {"success": False, "message": "ArizonaLauncher6_byAIR.exe не найден в выбранной папке"}
+                missing.append("launcher")
+            if not os.path.isdir(plugins_dir):
+                missing.append("preloading_plugins")
+
+            if missing:
+                # Сохраняем папку для последующей установки
+                self._pending_game_folder = folder_path
+                return {
+                    "success": False,
+                    "needs_install": True,
+                    "folder": folder_path,
+                    "missing": missing,
+                    "message": "Требуется установка компонентов"
+                }
 
             self.launcher.set_game_paths(game_exe, launcher_exe)
             return {"success": True, "message": f"Путь установлен: {folder_path}"}
         except Exception as e:
             logger.error(f"Error selecting game path: {e}")
             return {"success": False, "message": str(e)}
+
+    def download_and_install_launcher(self, folder_path):
+        """Скачивает архив лаунчера с GitHub и устанавливает в папку игры.
+           Отправляет прогресс через JS-событие."""
+        GITHUB_RELEASE_URL = "https://github.com/worteng/ArizonaLauncher/releases/latest/download/ArizonaLauncher.zip"
+        import zipfile, tempfile, shutil
+
+        def _send(stage, progress=0, message=""):
+            try:
+                import webview as wv
+                wins = wv.windows
+                if wins:
+                    js = f"window._onLauncherInstallProgress && window._onLauncherInstallProgress({json.dumps({'stage': stage, 'progress': progress, 'message': message})})"
+                    wins[0].evaluate_js(js)
+            except Exception as ex:
+                logger.warning(f"_send progress error: {ex}")
+
+        try:
+            _send("download", 0, "Подключение к GitHub...")
+
+            # 1. Качаем архив с прогрессом
+            resp = requests.get(GITHUB_RELEASE_URL, stream=True, timeout=60, verify=False,
+                                headers={"User-Agent": "Mozilla/5.0"})
+            if resp.status_code != 200:
+                _send("error", 0, f"Ошибка загрузки: HTTP {resp.status_code}")
+                return {"success": False, "message": f"HTTP {resp.status_code}"}
+
+            total = int(resp.headers.get("content-length", 0))
+            downloaded = 0
+
+            tmp_zip = os.path.join(tempfile.gettempdir(), "arizona_launcher_install.zip")
+            with open(tmp_zip, "wb") as f:
+                for chunk in resp.iter_content(chunk_size=65536):
+                    if chunk:
+                        f.write(chunk)
+                        downloaded += len(chunk)
+                        pct = int(downloaded / total * 80) if total else 10
+                        mb = downloaded / 1024 / 1024
+                        _send("download", pct, f"Скачано {mb:.1f} МБ...")
+
+            _send("extract", 82, "Распаковка архива...")
+
+            # 2. Распаковываем
+            tmp_dir = os.path.join(tempfile.gettempdir(), "arizona_launcher_extract")
+            if os.path.exists(tmp_dir):
+                shutil.rmtree(tmp_dir, ignore_errors=True)
+            os.makedirs(tmp_dir, exist_ok=True)
+
+            with zipfile.ZipFile(tmp_zip, 'r') as zf:
+                zf.extractall(tmp_dir)
+
+            _send("install", 90, "Установка файлов...")
+
+            # 3. Ищем ArizonaLauncher6_byAIR.exe рекурсивно в распакованном
+            launcher_src = None
+            for root, dirs, files in os.walk(tmp_dir):
+                for fname in files:
+                    if fname.lower() == "arizonalauncher6_byair.exe":
+                        launcher_src = os.path.join(root, fname)
+                        break
+                if launcher_src:
+                    break
+
+            if not launcher_src:
+                # Если не нашли точное имя — берём любой .exe
+                for root, dirs, files in os.walk(tmp_dir):
+                    for fname in files:
+                        if fname.lower().endswith(".exe"):
+                            launcher_src = os.path.join(root, fname)
+                            break
+                    if launcher_src:
+                        break
+
+            if not launcher_src:
+                _send("error", 0, "ArizonaLauncher6_byAIR.exe не найден в архиве")
+                return {"success": False, "message": "Исполняемый файл не найден в архиве"}
+
+            launcher_dest = os.path.join(folder_path, "ArizonaLauncher6_byAIR.exe")
+            shutil.copy2(launcher_src, launcher_dest)
+
+            # 4. Копируем все файлы рядом с .exe (DLL и т.п.)
+            src_dir = os.path.dirname(launcher_src)
+            for fname in os.listdir(src_dir):
+                src_file = os.path.join(src_dir, fname)
+                if os.path.isfile(src_file) and src_file != launcher_src:
+                    shutil.copy2(src_file, os.path.join(folder_path, fname))
+
+            # 5. Создаём preloading_plugins если нет
+            plugins_dir = os.path.join(folder_path, "preloading_plugins")
+            os.makedirs(plugins_dir, exist_ok=True)
+
+            _send("install", 97, "Финализация...")
+
+            # 6. Устанавливаем пути
+            game_exe = os.path.join(folder_path, "gta_sa.exe")
+            self.launcher.set_game_paths(game_exe, launcher_dest)
+
+            # Чистка
+            try:
+                os.remove(tmp_zip)
+                shutil.rmtree(tmp_dir, ignore_errors=True)
+            except Exception:
+                pass
+
+            _send("done", 100, "Установка завершена!")
+            logger.info(f"download_and_install_launcher: установлен в {folder_path}")
+            return {"success": True, "message": "Лаунчер успешно установлен"}
+
+        except requests.exceptions.ConnectionError:
+            _send("error", 0, "Нет подключения к интернету")
+            return {"success": False, "message": "Нет подключения к интернету"}
+        except requests.exceptions.Timeout:
+            _send("error", 0, "Тайм-аут соединения")
+            return {"success": False, "message": "Тайм-аут соединения"}
+        except Exception as e:
+            logger.error(f"download_and_install_launcher error: {e}")
+            _send("error", 0, str(e))
+            return {"success": False, "message": str(e)}
+
+    def start_launcher_install(self, folder_path):
+        """Запускает скачивание и установку лаунчера в фоновом потоке"""
+        def run():
+            self.download_and_install_launcher(folder_path)
+        Thread(target=run, daemon=True).start()
+        return {"success": True, "message": "Загрузка начата"}
 
     def select_bg_image(self):
         """Выбрать картинку для фона лаунчера, вернуть base64 data URL"""
@@ -285,6 +523,9 @@ class WebViewApp:
             bool_count = sum(1 for v in data.values() if isinstance(v, bool))
             if bool_count == 0:
                 return {"success": False, "message": "Файл не содержит настроек патчей"}
+            # Создаём бэкап текущего конфига перед применением импорта
+            if self.launcher.patches_path and os.path.exists(self.launcher.patches_path):
+                self.launcher._create_patches_backup(label="before_import")
             return {"success": True, "data": data, "keys_count": bool_count}
         except Exception as e:
             logger.error(f"import_patches error: {e}")
@@ -394,6 +635,9 @@ class WebViewApp:
 
     def read_patches(self): return self.launcher.read_patches()
     def write_patches(self, data): return self.launcher.write_patches(data)
+    def list_patches_backups(self): return self.launcher.list_patches_backups()
+    def restore_patches_backup(self, filename): return self.launcher.restore_patches_backup(filename)
+    def delete_patches_backup(self, filename): return self.launcher.delete_patches_backup(filename)
 
     def fetch_patch_presets(self):
         """Загружает configs.txt с GitHub и парсит список пресетов"""
@@ -701,6 +945,47 @@ class WebViewApp:
             logger.error(f"remove_other_file error: {e}")
             return {"success": False, "message": str(e)}
 
+    def delete_moonloader_script(self, filename):
+        """Удаляет скрипт из папки moonloader (поддерживает .disabled версию)"""
+        ml_dir = self._get_moonloader_dir()
+        if not ml_dir:
+            return {"success": False, "message": "Папка moonloader не найдена"}
+        try:
+            # Пробуем найти файл в обоих вариантах
+            candidates = [
+                os.path.join(ml_dir, filename),
+                os.path.join(ml_dir, filename + '.disabled'),
+            ]
+            deleted = []
+            for path in candidates:
+                if os.path.exists(path):
+                    os.remove(path)
+                    deleted.append(os.path.basename(path))
+            if deleted:
+                logger.info(f"delete_moonloader_script: удалён {deleted}")
+                return {"success": True, "message": f"Удалён: {', '.join(deleted)}"}
+            return {"success": False, "message": f"Файл не найден: {filename}"}
+        except Exception as e:
+            logger.error(f"delete_moonloader_script error: {e}")
+            return {"success": False, "message": str(e)}
+
+    def install_lua_file(self, filename, content_b64):
+        """Копирует .lua файл (переданный как base64) в папку moonloader"""
+        import base64 as _b64
+        ml_dir = self._get_moonloader_dir()
+        if not ml_dir:
+            return {"success": False, "message": "Папка moonloader не найдена. Сначала укажи путь к игре."}
+        try:
+            content = _b64.b64decode(content_b64)
+            dest = os.path.join(ml_dir, filename)
+            with open(dest, 'wb') as f:
+                f.write(content)
+            logger.info(f"install_lua_file: {dest}")
+            return {"success": True, "message": f"Скрипт '{filename}' установлен в moonloader"}
+        except Exception as e:
+            logger.error(f"install_lua_file error: {e}")
+            return {"success": False, "message": str(e)}
+
     def check_other_installed(self, filename, destination):
         """Проверяет установлен ли файл"""
         dest_dir, err = self._resolve_dest(destination)
@@ -710,19 +995,288 @@ class WebViewApp:
         return {"installed": os.path.exists(file_path), "path": file_path}
 
 
+def _check_vcredist() -> bool:
+    """Проверяет наличие Visual C++ Redistributable 2015–2022 (x64)."""
+    try:
+        import winreg
+        keys = [
+            # VC++ 2015–2022 x64
+            r"SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\X64",
+            r"SOFTWARE\WOW6432Node\Microsoft\VisualStudio\14.0\VC\Runtimes\X64",
+            # VC++ 2022 (v17)
+            r"SOFTWARE\Microsoft\VisualStudio\17.0\VC\Runtimes\X64",
+        ]
+        for key_path in keys:
+            try:
+                with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key_path) as k:
+                    installed, _ = winreg.QueryValueEx(k, "Installed")
+                    if installed == 1:
+                        return True
+            except OSError:
+                continue
+        return False
+    except Exception:
+        return True  # если не Windows или ошибка — не блокируем
+
+
+def _check_webview2() -> bool:
+    """Проверяет наличие Microsoft Edge WebView2 Runtime."""
+    try:
+        import winreg
+        guids = [
+            "{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}",  # WebView2 Runtime
+            "{2CD8A007-E189-409D-A2C8-9AF4EF3C72AA}",  # Edge (Chromium)
+        ]
+        roots = [winreg.HKEY_LOCAL_MACHINE, winreg.HKEY_CURRENT_USER]
+        sub_paths = [
+            r"SOFTWARE\Microsoft\EdgeUpdate\Clients\{}",
+            r"SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{}",
+        ]
+        for root in roots:
+            for sub in sub_paths:
+                for guid in guids:
+                    try:
+                        with winreg.OpenKey(root, sub.format(guid)):
+                            return True
+                    except OSError:
+                        continue
+        return False
+    except Exception:
+        return True  # не блокируем при ошибке
+
+
+def _show_dependency_dialog(missing: list):
+    """Показывает нативное PyQt5-окно со ссылками на скачивание зависимостей.
+    Возвращает True если пользователь нажал 'Продолжить', False если 'Выход'."""
+    from PyQt5.QtWidgets import (QApplication, QDialog, QVBoxLayout, QHBoxLayout,
+                                  QLabel, QPushButton, QFrame)
+    from PyQt5.QtCore import Qt, QUrl
+    from PyQt5.QtGui import QDesktopServices, QFont, QColor, QPalette
+
+    app = QApplication.instance() or QApplication(sys.argv)
+
+    dlg = QDialog()
+    dlg.setWindowTitle("Arizona RP Launcher — Требуются компоненты")
+    dlg.setFixedSize(520, 0)  # высота авто
+    dlg.setStyleSheet("""
+        QDialog {
+            background: #0d0f18;
+        }
+        QLabel {
+            color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        QPushButton {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 13px;
+            padding: 9px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+        QPushButton#dlBtn {
+            background: rgba(0,120,212,0.85);
+            color: white;
+        }
+        QPushButton#dlBtn:hover {
+            background: rgba(0,140,240,0.95);
+        }
+        QPushButton#continueBtn {
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.7);
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        QPushButton#continueBtn:hover {
+            background: rgba(255,255,255,0.14);
+            color: white;
+        }
+        QPushButton#exitBtn {
+            background: rgba(200,50,50,0.3);
+            color: rgba(255,150,150,0.9);
+            border: 1px solid rgba(200,50,50,0.4);
+        }
+        QPushButton#exitBtn:hover {
+            background: rgba(220,60,60,0.5);
+        }
+        QFrame#card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+        }
+    """)
+
+    layout = QVBoxLayout(dlg)
+    layout.setContentsMargins(24, 22, 24, 22)
+    layout.setSpacing(14)
+
+    # Заголовок
+    title = QLabel("⚠️  Требуются дополнительные компоненты")
+    title.setStyleSheet("font-size: 16px; font-weight: bold; color: rgba(255,220,80,0.95);")
+    title.setWordWrap(True)
+    layout.addWidget(title)
+
+    subtitle = QLabel("Для работы лаунчера необходимо установить следующие компоненты:")
+    subtitle.setStyleSheet("font-size: 12px; color: rgba(255,255,255,0.55); margin-bottom: 4px;")
+    subtitle.setWordWrap(True)
+    layout.addWidget(subtitle)
+
+    DEPS = {
+        "vcredist": {
+            "name": "Visual C++ Redistributable 2015–2022",
+            "desc": "Библиотеки времени выполнения Microsoft C++",
+            "url": "https://aka.ms/vs/17/release/vc_redist.x64.exe",
+            "icon": "🔧"
+        },
+        "webview2": {
+            "name": "Microsoft Edge WebView2 Runtime",
+            "desc": "Движок для отображения интерфейса лаунчера",
+            "url": "https://go.microsoft.com/fwlink/p/?LinkId=2124703",
+            "icon": "🌐"
+        }
+    }
+
+    result = {"action": "exit"}
+
+    for key in missing:
+        dep = DEPS.get(key)
+        if not dep:
+            continue
+
+        card = QFrame()
+        card.setObjectName("card")
+        card_layout = QHBoxLayout(card)
+        card_layout.setContentsMargins(16, 14, 16, 14)
+        card_layout.setSpacing(14)
+
+        icon_lbl = QLabel(dep["icon"])
+        icon_lbl.setStyleSheet("font-size: 26px;")
+        icon_lbl.setFixedWidth(36)
+        card_layout.addWidget(icon_lbl)
+
+        info_layout = QVBoxLayout()
+        info_layout.setSpacing(3)
+        name_lbl = QLabel(dep["name"])
+        name_lbl.setStyleSheet("font-size: 13px; font-weight: bold; color: rgba(255,255,255,0.92);")
+        desc_lbl = QLabel(dep["desc"])
+        desc_lbl.setStyleSheet("font-size: 11px; color: rgba(255,255,255,0.4);")
+        info_layout.addWidget(name_lbl)
+        info_layout.addWidget(desc_lbl)
+        card_layout.addLayout(info_layout, 1)
+
+        url = dep["url"]
+        dl_btn = QPushButton("⬇ Скачать")
+        dl_btn.setObjectName("dlBtn")
+        dl_btn.setFixedHeight(36)
+        dl_btn.clicked.connect(lambda checked, u=url: QDesktopServices.openUrl(QUrl(u)))
+        card_layout.addWidget(dl_btn)
+
+        layout.addWidget(card)
+
+    # Разделитель
+    sep = QFrame()
+    sep.setFrameShape(QFrame.HLine)
+    sep.setStyleSheet("border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 4px 0;")
+    layout.addWidget(sep)
+
+    note = QLabel("После установки компонентов перезапустите лаунчер.\n"
+                  "Или нажмите «Продолжить», чтобы запустить без гарантий.")
+    note.setStyleSheet("font-size: 11px; color: rgba(255,255,255,0.35); line-height: 1.5;")
+    note.setWordWrap(True)
+    layout.addWidget(note)
+
+    # Кнопки
+    btn_row = QHBoxLayout()
+    btn_row.setSpacing(8)
+
+    exit_btn = QPushButton("Выход")
+    exit_btn.setObjectName("exitBtn")
+    exit_btn.setFixedHeight(40)
+    exit_btn.clicked.connect(lambda: (result.update({"action": "exit"}), dlg.accept()))
+
+    cont_btn = QPushButton("Продолжить без установки →")
+    cont_btn.setObjectName("continueBtn")
+    cont_btn.setFixedHeight(40)
+    cont_btn.clicked.connect(lambda: (result.update({"action": "continue"}), dlg.accept()))
+
+    btn_row.addWidget(exit_btn)
+    btn_row.addWidget(cont_btn, 1)
+    layout.addLayout(btn_row)
+
+    dlg.adjustSize()
+    dlg.exec_()
+
+    return result["action"] == "continue"
+
+
 def main():
-    import os
-    # Принудительно используем PyQt5 — WinForms требует .NET который может отсутствовать
     os.environ.setdefault("PYWEBVIEW_GUI", "pyqt5")
 
+    # ── Проверка первого запуска ──────────────────────────
+    config_path = Path.home() / "Documents" / "ArizonaLauncher" / "config.json"
+    is_first_run = not config_path.exists()
+    force_deps   = "--show-deps" in sys.argv
+
+    if is_first_run or force_deps:
+        missing = []
+        if force_deps:
+            # Режим просмотра — показываем оба пункта независимо от реальных проверок
+            missing = ["vcredist", "webview2"]
+        else:
+            if not _check_vcredist():
+                missing.append("vcredist")
+            if not _check_webview2():
+                missing.append("webview2")
+
+        if missing:
+            logger.info(f"{'[force]' if force_deps else 'Первый запуск'}, отсутствуют: {missing}")
+            should_continue = _show_dependency_dialog(missing)
+            if not should_continue:
+                sys.exit(0)
+
+    # ── Запуск основного окна ─────────────────────────────
     app = WebViewApp()
+
+    # При первом запуске — пробуем найти игру автоматически
+    auto_found = False
+    if is_first_run and not force_deps:
+        auto_found = app.launcher.auto_detect_game_paths()
+        if auto_found:
+            # Синхронизируем пути в WebViewApp
+            app.game_path    = app.launcher.game_path
+            app.launcher_path = app.launcher.launcher_path
+            logger.info(f"Авто-обнаружение: {app.launcher.game_path}")
+        else:
+            logger.info("Авто-обнаружение: игра не найдена, пользователь укажет вручную")
+
+    def _on_loaded():
+        """После загрузки страницы показываем уведомление об авто-обнаружении."""
+        import time as _t
+        _t.sleep(0.8)   # ждём пока JS инициализируется
+        try:
+            wins = webview.windows
+            if not wins:
+                return
+            w = wins[0]
+            if auto_found:
+                game_dir = str(Path(app.launcher.game_path).parent).replace("\\", "\\\\")
+                w.evaluate_js(
+                    f"showNotification('✅ Игра найдена: {game_dir}', 'success')"
+                )
+            else:
+                w.evaluate_js(
+                    "showNotification('📂 Игра не найдена — укажите путь в меню папок', 'error')"
+                )
+        except Exception as ex:
+            logger.warning(f"_on_loaded notify error: {ex}")
+
     try:
         window = webview.create_window('Arizona RP Launcher', 'index.html', js_api=app, width=1200, height=800,
                                        resizable=True, fullscreen=False, min_size=(800, 600))
+        if is_first_run:
+            window.events.loaded += _on_loaded
         webview.start(debug=False)
     except Exception as e:
         logger.error(f"Error: {e}")
-        import sys
         if sys.stdin and sys.stdin.isatty():
             input("Press Enter to exit...")
 

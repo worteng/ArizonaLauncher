@@ -68,6 +68,53 @@
             pointer-events: none;
         }
 
+        /* ── Drag & Drop оверлей ── */
+        #drag-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.72);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 16px;
+            pointer-events: none;
+        }
+        #drag-overlay.active {
+            display: flex;
+        }
+        #drag-overlay .drag-icon {
+            width: 80px;
+            height: 80px;
+            border: 3px dashed rgba(0, 180, 255, 0.8);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: drag-pulse 1.2s ease-in-out infinite;
+        }
+        #drag-overlay .drag-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: rgba(0, 180, 255, 0.9);
+        }
+        #drag-overlay .drag-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 22px;
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow: 0 0 20px rgba(0, 180, 255, 0.6);
+        }
+        #drag-overlay .drag-sub {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.55);
+        }
+        @keyframes drag-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 180, 255, 0.35); }
+            50%       { box-shadow: 0 0 0 12px rgba(0, 180, 255, 0); }
+        }
+
         /* Основной интерфейс */
         .interface {
             width: 100%;
@@ -386,162 +433,851 @@
         }
 
         /* Модальное окно настроек */
+        /* ══════════════════════════════════════════
+           LAUNCHER INSTALL MODAL
+        ══════════════════════════════════════════ */
+        .install-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.72);
+            backdrop-filter: blur(8px);
+            z-index: 1200;
+            align-items: center;
+            justify-content: center;
+        }
+        .install-overlay.open { display: flex; }
+
+        .install-modal {
+            background: rgba(12, 14, 22, 0.99);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            width: min(500px, 92vw);
+            box-shadow: 0 28px 90px rgba(0,0,0,0.8);
+            overflow: hidden;
+            animation: creIn 0.22s ease;
+        }
+
+        .install-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .install-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 16px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* Шаги */
+        .install-steps {
+            display: flex;
+            padding: 18px 24px 0;
+            gap: 0;
+        }
+
+        .install-step {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+        }
+
+        .install-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 14px;
+            left: calc(50% + 14px);
+            right: calc(-50% + 14px);
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .install-step.active .install-step-dot { background: rgba(0,150,255,0.8); border-color: rgba(0,180,255,0.5); }
+        .install-step.done .install-step-dot { background: rgba(0,180,80,0.8); border-color: rgba(0,200,100,0.5); }
+        .install-step.error .install-step-dot { background: rgba(220,50,50,0.8); border-color: rgba(255,80,80,0.5); }
+
+        .install-step-dot {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px;
+            transition: all 0.3s;
+            z-index: 1;
+        }
+
+        .install-step-label {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.35);
+            text-align: center;
+        }
+
+        .install-step.active .install-step-label,
+        .install-step.done .install-step-label { color: rgba(255,255,255,0.7); }
+
+        /* Предупреждение об антивирусе */
+        .install-av-warning {
+            margin: 18px 24px 0;
+            background: rgba(255, 165, 0, 0.08);
+            border: 1px solid rgba(255, 165, 0, 0.25);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .install-av-icon { font-size: 22px; flex-shrink: 0; line-height: 1; }
+
+        .install-av-text { flex: 1; }
+
+        .install-av-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            color: rgba(255, 200, 80, 0.95);
+            margin-bottom: 5px;
+        }
+
+        .install-av-desc {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.6;
+        }
+
+        /* Прогресс-бар */
+        .install-progress-wrap {
+            margin: 18px 24px 0;
+            display: none;
+        }
+        .install-progress-wrap.visible { display: block; }
+
+        .install-progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 7px;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+        }
+
+        .install-progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .install-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, rgba(0,120,255,0.8), rgba(0,200,255,0.9));
+            border-radius: 3px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        .install-progress-fill.done {
+            background: linear-gradient(90deg, rgba(0,180,80,0.8), rgba(0,220,120,0.9));
+        }
+
+        .install-progress-fill.error {
+            background: linear-gradient(90deg, rgba(200,50,50,0.8), rgba(255,80,80,0.9));
+        }
+
+        .install-footer {
+            display: flex;
+            gap: 8px;
+            padding: 18px 24px 22px;
+            margin-top: 6px;
+        }
+
+        .install-footer .s-btn { flex: 1; height: 42px; font-size: 13px; }
+        .cre-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(6px);
+            z-index: 1100;
+            align-items: center;
+            justify-content: center;
+        }
+        .cre-overlay.open { display: flex; }
+
+        .cre-modal {
+            background: rgba(14, 16, 24, 0.99);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            width: min(480px, 92vw);
+            box-shadow: 0 24px 80px rgba(0,0,0,0.75);
+            overflow: hidden;
+            animation: creIn 0.22s ease;
+        }
+
+        @keyframes creIn {
+            from { opacity: 0; transform: scale(0.95) translateY(8px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .cre-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .cre-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 15px;
+            color: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cre-body {
+            padding: 10px 0 4px;
+        }
+
+        .cre-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 22px;
+            gap: 14px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .cre-row:last-child { border-bottom: none; }
+        .cre-row:hover { background: rgba(255,255,255,0.035); }
+
+        .cre-bit-badge {
+            width: 28px; height: 28px;
+            border-radius: 7px;
+            background: rgba(0, 120, 212, 0.15);
+            border: 1px solid rgba(0, 140, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(100, 180, 255, 0.7);
+            flex-shrink: 0;
+        }
+
+        .cre-info { flex: 1; min-width: 0; }
+
+        .cre-effect-name {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            color: rgba(255,255,255,0.85);
+        }
+
+        .cre-effect-hint {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            margin-top: 2px;
+        }
+
+        .cre-value-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 22px;
+            margin-top: 2px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.025);
+        }
+
+        .cre-value-label {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.35);
+        }
+
+        .cre-value-number {
+            font-family: 'Montserrat Alternates', monospace, sans-serif;
+            font-size: 14px;
+            color: rgba(120, 200, 255, 0.9);
+            letter-spacing: 1px;
+        }
+
+        .cre-footer {
+            display: flex;
+            gap: 8px;
+            padding: 14px 22px 18px;
+        }
+
+        .cre-footer .s-btn { flex: 1; height: 40px; }
+
+        /* Переопределяем s-toggle внутри cre-row */
+        .cre-row .s-toggle { flex-shrink: 0; }
+
+        /* Бинарный дисплей */
+        .cre-bits-display {
+            display: flex;
+            gap: 3px;
+            align-items: center;
+        }
+        .cre-bit-cell {
+            width: 22px; height: 22px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: monospace;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .cre-bit-cell.on {
+            background: rgba(0,150,255,0.3);
+            color: rgba(140,210,255,0.95);
+            border: 1px solid rgba(0,150,255,0.35);
+        }
+        .cre-bit-cell.off {
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.07);
+        }
+        .cre-bit-cell.fixed {
+            background: rgba(255,255,255,0.06);
+            color: rgba(255,255,255,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        /* Кнопка открытия модала из чекбоксов патчей */
+        .patch-cre-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            background: rgba(0, 120, 212, 0.2);
+            border: 1px solid rgba(0, 150, 255, 0.3);
+            border-radius: 6px;
+            color: rgba(120, 195, 255, 0.9);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.18s;
+            white-space: nowrap;
+            margin-left: 8px;
+        }
+        .patch-cre-btn:hover {
+            background: rgba(0,140,255,0.3);
+            border-color: rgba(0,180,255,0.5);
+        }
         .settings-panel {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 90%;
-            max-width: 700px;
-            max-height: 80vh;
-            background: rgba(30, 30, 30, 0.98);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            width: min(940px, 95vw);
+            height: min(86vh, 680px);
+            background: rgba(11, 13, 20, 0.98);
+            border-radius: 18px;
+            padding: 0;
+            box-shadow: 0 32px 90px rgba(0, 0, 0, 0.8);
             z-index: 1000;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(24px);
+            flex-direction: row;
+            align-items: stretch;
+            overflow: hidden;
+        }
+
+        /* ── Левая навигация ── */
+        .settings-nav {
+            width: 210px;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.025);
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
             flex-direction: column;
+            padding: 0 0 16px;
+            overflow-y: auto;
+        }
+
+        .settings-nav-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 22px 20px 16px;
+        }
+
+        .settings-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.18s;
+            text-align: left;
+            border-radius: 0;
+            position: relative;
+        }
+
+        .settings-nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .settings-nav-item.active {
+            background: rgba(0, 120, 212, 0.15);
+            color: rgba(120, 195, 255, 0.95);
+        }
+
+        .settings-nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 8px; bottom: 8px;
+            width: 3px;
+            background: rgba(0, 160, 255, 0.8);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .snav-icon {
+            font-size: 16px;
+            flex-shrink: 0;
+            width: 22px;
+            text-align: center;
+        }
+
+        .settings-nav-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.05);
+            margin: 8px 16px;
+        }
+
+        /* ── Правая часть ── */
+        .settings-body {
+            flex: 1;
+            min-width: 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .settings-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 28px 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            flex-shrink: 0;
         }
 
         .settings-title {
             font-family: 'Montserrat Alternates', sans-serif;
-            font-size: 24px;
+            font-size: 18px;
             color: var(--text-color);
+            letter-spacing: 0.3px;
         }
 
         .close-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 28px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.6);
+            font-size: 20px;
             cursor: pointer;
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 4px;
-            transition: all var(--transition-speed);
+            border-radius: 8px;
+            transition: all 0.18s;
+            flex-shrink: 0;
         }
 
         .close-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 50, 50, 0.2);
+            border-color: rgba(255,80,80,0.3);
+            color: rgba(255, 150, 150, 0.9);
         }
 
-        /* Вкладки настроек */
-        .settings-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .settings-tab {
-            padding: 10px 20px;
-            background: transparent;
-            border: none;
-            color: rgba(255, 255, 255, 0.6);
-            font-family: 'Montserrat Alternates', sans-serif;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all var(--transition-speed);
-            border-bottom: 2px solid transparent;
-        }
-
-        .settings-tab.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
-        }
-
-        .settings-tab:hover {
-            color: rgba(255, 255, 255, 0.9);
-        }
-
+        /* ── Tab контент ── */
         .settings-tab-content {
             display: none;
             flex-direction: column;
-            gap: 15px;
-            overflow-y: auto;
-            max-height: 50vh;
-            padding-right: 10px;
+            gap: 12px;
+            overflow-y: scroll;
+            padding: 22px 28px;
+            flex: 1;
+            min-height: 0;
         }
 
         .settings-tab-content.active {
             display: flex;
         }
 
-        .settings-tab-content::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .settings-tab-content::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 3px;
-        }
-
+        .settings-tab-content::-webkit-scrollbar { width: 5px; }
+        .settings-tab-content::-webkit-scrollbar-track { background: transparent; }
         .settings-tab-content::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.12);
             border-radius: 3px;
         }
 
+        /* ── Section карточки ── */
+        .s-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .s-section-head {
+            padding: 12px 16px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .s-section-head-icon { font-size: 15px; }
+
+        .s-section-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .s-section-body {
+            padding: 6px 0;
+        }
+
+        /* ── Checkbox / Toggle rows ── */
         .checkbox-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
-            transition: all var(--transition-speed);
+            gap: 12px;
+            padding: 9px 16px;
+            background: transparent;
+            border-radius: 0;
+            transition: background 0.15s;
+            cursor: pointer;
         }
 
         .checkbox-item:hover {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.03);
         }
 
         .checkbox-item input[type="checkbox"] {
-            width: 20px;
+            width: 0; height: 0;
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Кастомный тогл-переключатель */
+        .s-toggle {
+            width: 36px;
             height: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            position: relative;
+            flex-shrink: 0;
+            transition: background 0.2s;
             cursor: pointer;
-            accent-color: var(--primary-color);
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .s-toggle::after {
+            content: '';
+            position: absolute;
+            width: 14px; height: 14px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 50%;
+            top: 2px; left: 2px;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .checkbox-item input:checked ~ .s-toggle,
+        .launch-item input:checked ~ .s-toggle,
+        .s-toggle.on {
+            background: rgba(0, 155, 255, 0.6);
+            border-color: rgba(0,155,255,0.4);
+        }
+
+        .checkbox-item input:checked ~ .s-toggle::after,
+        .launch-item input:checked ~ .s-toggle::after,
+        .s-toggle.on::after {
+            transform: translateX(16px);
+            background: white;
         }
 
         .checkbox-label {
-            color: rgba(255, 255, 255, 0.9);
+            color: rgba(255, 255, 255, 0.8);
             font-family: 'Montserrat Alternates', sans-serif;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             flex: 1;
         }
 
-        .save-btn {
-            width: 100%;
-            height: 45px;
-            background: var(--primary-color);
-            border: none;
-            border-radius: 8px;
+        .checkbox-hint {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.25);
+            font-weight: normal;
+            display: block;
+            margin-top: 1px;
+        }
+
+        /* Поля ввода в настройках */
+        .s-input-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            gap: 12px;
+        }
+
+        .s-input-label {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            color: rgba(255,255,255,0.8);
+            flex: 1;
+        }
+
+        .s-input {
+            width: 120px;
+            height: 34px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 7px;
             color: white;
             font-family: 'Montserrat Alternates', sans-serif;
-            font-size: 14px;
+            font-size: 13px;
+            padding: 0 10px;
+            outline: none;
+            transition: border-color 0.18s;
+        }
+
+        .s-input:focus {
+            border-color: rgba(0, 140, 255, 0.5);
+            background: rgba(255,255,255,0.09);
+        }
+
+        /* Кнопка сохранения */
+        .save-btn {
+            width: calc(100% - 56px);
+            height: 42px;
+            background: linear-gradient(135deg, rgba(0, 120, 212, 0.85), rgba(0, 80, 165, 0.85));
+            border: 1px solid rgba(0, 150, 255, 0.3);
+            border-radius: 10px;
+            color: white;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
             font-weight: bold;
             cursor: pointer;
-            transition: all var(--transition-speed);
-            margin-top: 20px;
+            transition: all 0.2s;
+            margin: 0 28px 20px;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;     /* не сжимается и не перекрывает контент */
         }
 
         .save-btn:hover {
-            background: rgba(0, 120, 212, 1);
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, rgba(0, 140, 240, 0.95), rgba(0, 100, 190, 0.95));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 18px rgba(0, 120, 212, 0.35);
+        }
+
+        /* ── Launch tab grid ── */
+        .launch-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .launch-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .launch-item:hover {
+            background: rgba(255,255,255,0.055);
+            border-color: rgba(255,255,255,0.09);
+        }
+
+        .launch-item input[type="checkbox"] {
+            position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;
+        }
+
+        .launch-item-text { flex: 1; min-width: 0; }
+
+        .launch-item-name {
+            display: block;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.85);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .launch-item-flag {
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            color: rgba(100,180,255,0.5);
+            display: block;
+            margin-top: 1px;
+        }
+
+        .launch-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 2px;
+        }
+
+        .launch-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 9px;
+        }
+
+        .launch-input-label {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.85);
+            white-space: nowrap;
+        }
+
+        .launch-inputs .s-input {
+            width: 120px;
+            flex-shrink: 0;
+        }
+        #checkboxGroup {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        #checkboxGroup .checkbox-item {
+            border-radius: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        /* Карточки import/export */
+        .s-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .s-card-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 14px;
+            color: rgba(255,255,255,0.85);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .s-card-desc {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            line-height: 1.5;
+        }
+
+        .s-btn {
+            height: 38px;
+            padding: 0 16px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: rgba(255,255,255,0.8);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.18s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .s-btn:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(255,255,255,0.18);
+            transform: translateY(-1px);
+        }
+
+        .s-btn.primary {
+            background: rgba(0, 120, 212, 0.3);
+            border-color: rgba(0, 140, 255, 0.35);
+            color: rgba(140, 200, 255, 0.95);
+        }
+
+        .s-btn.danger {
+            background: rgba(180, 40, 40, 0.3);
+            border-color: rgba(220, 60, 60, 0.35);
+            color: rgba(255, 160, 160, 0.9);
+        }
+
+        .s-btn-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .s-btn-row .s-btn { flex: 1; }
+
+        /* Превью фона */
+        #bgPreview {
+            width: 100%;
+            height: 80px !important;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
         }
 
         /* Модальное окно выбора папки */
@@ -869,6 +1605,35 @@
         }
         .mods-item-toggle.on { background: rgba(0, 180, 100, 0.7); }
         .mods-item-toggle.on::after { transform: translateX(16px); }
+
+        /* Кнопка удаления скрипта */
+        .mods-item-delete {
+            width: 28px; height: 28px;
+            background: transparent;
+            border: 1px solid rgba(255, 80, 80, 0);
+            border-radius: 7px;
+            color: rgba(255, 100, 100, 0.4);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.18s;
+            flex-shrink: 0;
+            padding: 0;
+        }
+
+        .mods-item:hover .mods-item-delete {
+            color: rgba(255, 100, 100, 0.7);
+            border-color: rgba(255, 80, 80, 0.2);
+        }
+
+        .mods-item-delete:hover {
+            background: rgba(255, 50, 50, 0.15) !important;
+            border-color: rgba(255, 80, 80, 0.4) !important;
+            color: rgba(255, 130, 130, 0.95) !important;
+            transform: scale(1.08);
+        }
 
         .ml-sub-tab {
             font-family: 'Montserrat Alternates', sans-serif;
@@ -1199,6 +1964,17 @@
     </style>
 </head>
 <body>
+    <!-- Drag & Drop оверлей -->
+    <div id="drag-overlay">
+        <div class="drag-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+            </svg>
+        </div>
+        <div class="drag-title">Бросай .lua сюда</div>
+        <div class="drag-sub">Файл будет установлен в папку moonloader</div>
+    </div>
+
     <div id="container">
         <canvas id="main-canvas"></canvas>
         <canvas id="bloom-canvas"></canvas>
@@ -1207,7 +1983,7 @@
             <div class="left-panel">
                 <div class="header">
                     <div class="title">Arizona RP</div>
-                    <div class="subtitle">Launcher v0.0.5</div>
+                    <div class="subtitle">Launcher v0.0.6</div>
                 </div>
 
                 <div class="nickname-section">
@@ -1267,164 +2043,221 @@
 
         <!-- Модальное окно настроек -->
         <div class="settings-panel" id="settingsPanel">
-            <div class="settings-header">
-                <div class="settings-title">Настройки</div>
-                <button class="close-btn" onclick="closeSettings()">×</button>
+            <!-- Левый сайдбар -->
+            <div class="settings-nav">
+                <div class="settings-nav-title">Настройки</div>
+                <button id="tabBtnPatches" class="settings-nav-item active" onclick="switchTab('patches')">
+                    <span class="snav-icon">🛡️</span> Патчи
+                </button>
+                <button id="tabBtnLaunch" class="settings-nav-item" onclick="switchTab('launch')">
+                    <span class="snav-icon">🚀</span> Запуск
+                </button>
+                <button id="tabBtnImport" class="settings-nav-item" onclick="switchTab('import')">
+                    <span class="snav-icon">📦</span> Импорт / Экспорт
+                </button>
+                <div class="settings-nav-divider"></div>
+                <button id="tabBtnLauncher" class="settings-nav-item" onclick="switchTab('launcher')">
+                    <span class="snav-icon">🎨</span> Лаунчер
+                </button>
             </div>
 
-            <div class="settings-tabs">
-                <button id="tabBtnPatches" class="settings-tab active" onclick="switchTab('patches')">Патчи</button>
-                <button id="tabBtnLaunch" class="settings-tab" onclick="switchTab('launch')">Запуск</button>
-                <button id="tabBtnImport" class="settings-tab" onclick="switchTab('import')">Импорт / Экспорт</button>
-                <button id="tabBtnLauncher" class="settings-tab" onclick="switchTab('launcher')">Лаунчер</button>
-            </div>
-
-            <div id="patchesTab" class="settings-tab-content active">
-                <div id="checkboxGroup"></div>
-            </div>
-
-            <div id="launchTab" class="settings-tab-content">
-
-                <div class="checkbox-item">
-                    <input type="checkbox" id="windowModeCheck">
-                    <label class="checkbox-label" for="windowModeCheck">Оконный режим (-window)</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" id="widescreenCheck">
-                    <label class="checkbox-label" for="widescreenCheck">Широкоэкранный режим (-widescreen)</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" id="graphicsCheck">
-                    <label class="checkbox-label" for="graphicsCheck">Графический режим (-graphics)</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" id="authCefCheck">
-                    <label class="checkbox-label" for="authCefCheck">Авторизация через CEF (-auth_cef_enable)</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" id="textureModeCheck">
-                    <label class="checkbox-label" for="textureModeCheck">Текстурный режим (-t)</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" id="colorDepth16Check">
-                    <label class="checkbox-label" for="colorDepth16Check">16-битная глубина цвета (-16bpp)</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" id="allowHdrCheck">
-                    <label class="checkbox-label" for="allowHdrCheck">HDR (-allow_hdr)</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" id="enableGrassCheck">
-                    <label class="checkbox-label" for="enableGrassCheck">Трава (-enable_grass)</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" id="ldoCheck">
-                    <label class="checkbox-label" for="ldoCheck">LDO оптимизация (-ldo)</label>
-                </div>
-                <div class="checkbox-item">
-                    <input type="checkbox" id="seasonsCheck">
-                    <label class="checkbox-label" for="seasonsCheck">Сезоны (-seasons)</label>
+            <!-- Правая часть -->
+            <div class="settings-body">
+                <div class="settings-header">
+                    <div class="settings-title" id="settingsPanelTitle">🛡️ ArizonaPatches</div>
+                    <button class="close-btn" onclick="closeSettings()">×</button>
                 </div>
 
-                <div class="checkbox-item" style="flex-direction: column; align-items: flex-start; gap: 6px;">
-                    <label class="checkbox-label">Память (МБ) — -mem</label>
-                    <input type="number" id="memoryInput" min="512" max="16384" step="512"
-                           style="width:100%; height:38px; background:rgba(255,255,255,0.1);
-                                  border:1px solid rgba(255,255,255,0.2); border-radius:6px;
-                                  color:white; font-family:'Montserrat Alternates'; font-size:14px;
-                                  padding:0 12px; outline:none;">
+                <!-- Патчи -->
+                <div id="patchesTab" class="settings-tab-content active">
+                    <div id="checkboxGroup"></div>
                 </div>
 
-                <div class="checkbox-item" style="flex-direction: column; align-items: flex-start; gap: 6px;">
-                    <label class="checkbox-label">CDN (-cdn)</label>
-                    <input type="text" id="cdnInput" placeholder="1,1,1"
-                           style="width:100%; height:38px; background:rgba(255,255,255,0.1);
-                                  border:1px solid rgba(255,255,255,0.2); border-radius:6px;
-                                  color:white; font-family:'Montserrat Alternates'; font-size:14px;
-                                  padding:0 12px; outline:none;">
-                </div>
+                <!-- Запуск -->
+                <div id="launchTab" class="settings-tab-content">
 
-            </div>
-
-            <div id="importTab" class="settings-tab-content">
-
-                <!-- Экспорт -->
-                <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:16px;">
-                    <div style="font-family:'Montserrat Alternates';font-size:15px;color:rgba(255,255,255,0.9);margin-bottom:8px;">📤 Экспорт настроек</div>
-                    <div style="font-family:'Montserrat Alternates';font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:12px;">Сохранить текущие настройки патчей в .json файл и поделиться с другом</div>
-                    <button onclick="doExport()" class="save-btn" style="margin-top:0;height:42px;font-size:14px;">
-                        📤 Сохранить файл настроек
-                    </button>
-                </div>
-
-                <!-- Импорт -->
-                <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:16px;">
-                    <div style="font-family:'Montserrat Alternates';font-size:15px;color:rgba(255,255,255,0.9);margin-bottom:8px;">📥 Импорт настроек</div>
-                    <div style="font-family:'Montserrat Alternates';font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:12px;">Загрузить файл настроек от друга и применить</div>
-                    <div style="display:flex;gap:8px;">
-                        <button onclick="doImport()" class="save-btn" style="margin-top:0;flex:1;height:42px;font-size:14px;background:rgba(0,120,212,0.8);">
-                            📥 Выбрать файл и применить
-                        </button>
-                        <button onclick="doRollback()" id="rollbackBtn" class="save-btn"
-                                style="margin-top:0;flex:1;height:42px;font-size:14px;background:rgba(180,50,50,0.8);display:none;">
-                            ↩️ Откатить
-                        </button>
-                    </div>
-                    <div id="importStatus" style="margin-top:10px;font-family:'Montserrat Alternates';font-size:12px;min-height:18px;"></div>
-                </div>
-
-            </div>
-
-            <div id="launcherTab" class="settings-tab-content">
-
-                <!-- Живые обои -->
-                <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;">
-                    <div style="font-family:'Montserrat Alternates';font-size:15px;color:rgba(255,255,255,0.9);">🎨 Фон лаунчера</div>
-
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="liveWallpaperCheck" onchange="applyLauncherSettings()">
-                        <label class="checkbox-label" for="liveWallpaperCheck">Живые обои (волны и частицы)</label>
+                    <div class="launch-grid">
+                        <label class="launch-item">
+                            <input type="checkbox" id="windowModeCheck">
+                            <div class="s-toggle"></div>
+                            <div class="launch-item-text">
+                                <span class="launch-item-name">Оконный режим</span>
+                                <span class="launch-item-flag">-window</span>
+                            </div>
+                        </label>
+                        <label class="launch-item">
+                            <input type="checkbox" id="widescreenCheck">
+                            <div class="s-toggle"></div>
+                            <div class="launch-item-text">
+                                <span class="launch-item-name">Широкоэкранный</span>
+                                <span class="launch-item-flag">-widescreen</span>
+                            </div>
+                        </label>
+                        <label class="launch-item">
+                            <input type="checkbox" id="graphicsCheck">
+                            <div class="s-toggle"></div>
+                            <div class="launch-item-text">
+                                <span class="launch-item-name">Графика</span>
+                                <span class="launch-item-flag">-graphics</span>
+                            </div>
+                        </label>
+                        <label class="launch-item">
+                            <input type="checkbox" id="authCefCheck">
+                            <div class="s-toggle"></div>
+                            <div class="launch-item-text">
+                                <span class="launch-item-name">Авторизация CEF</span>
+                                <span class="launch-item-flag">-auth_cef_enable</span>
+                            </div>
+                        </label>
+                        <label class="launch-item">
+                            <input type="checkbox" id="textureModeCheck">
+                            <div class="s-toggle"></div>
+                            <div class="launch-item-text">
+                                <span class="launch-item-name">Текстурный режим</span>
+                                <span class="launch-item-flag">-t</span>
+                            </div>
+                        </label>
+                        <label class="launch-item">
+                            <input type="checkbox" id="colorDepth16Check">
+                            <div class="s-toggle"></div>
+                            <div class="launch-item-text">
+                                <span class="launch-item-name">16-бит глубина цвета</span>
+                                <span class="launch-item-flag">-16bpp</span>
+                            </div>
+                        </label>
+                        <label class="launch-item">
+                            <input type="checkbox" id="allowHdrCheck">
+                            <div class="s-toggle"></div>
+                            <div class="launch-item-text">
+                                <span class="launch-item-name">HDR</span>
+                                <span class="launch-item-flag">-allow_hdr</span>
+                            </div>
+                        </label>
+                        <label class="launch-item">
+                            <input type="checkbox" id="enableGrassCheck">
+                            <div class="s-toggle"></div>
+                            <div class="launch-item-text">
+                                <span class="launch-item-name">Трава</span>
+                                <span class="launch-item-flag">-enable_grass</span>
+                            </div>
+                        </label>
+                        <label class="launch-item">
+                            <input type="checkbox" id="ldoCheck">
+                            <div class="s-toggle"></div>
+                            <div class="launch-item-text">
+                                <span class="launch-item-name">LDO оптимизация</span>
+                                <span class="launch-item-flag">-ldo</span>
+                            </div>
+                        </label>
+                        <label class="launch-item">
+                            <input type="checkbox" id="seasonsCheck">
+                            <div class="s-toggle"></div>
+                            <div class="launch-item-text">
+                                <span class="launch-item-name">Сезоны</span>
+                                <span class="launch-item-flag">-seasons</span>
+                            </div>
+                        </label>
                     </div>
 
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="wavesCheck" onchange="applyLauncherSettings()">
-                        <label class="checkbox-label" for="wavesCheck">Волны</label>
+                    <div class="launch-inputs">
+                        <div class="launch-input-row">
+                            <span class="launch-input-label">Память (МБ)</span>
+                            <span class="launch-item-flag" style="flex:1">-mem</span>
+                            <input type="number" id="memoryInput" min="512" max="16384" step="512" class="s-input">
+                        </div>
+                        <div class="launch-input-row">
+                            <span class="launch-input-label">CDN</span>
+                            <span class="launch-item-flag" style="flex:1">-cdn</span>
+                            <input type="text" id="cdnInput" placeholder="1,1,1" class="s-input">
+                        </div>
                     </div>
 
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="particlesCheck" onchange="applyLauncherSettings()">
-                        <label class="checkbox-label" for="particlesCheck">Частицы</label>
-                    </div>
                 </div>
 
-                <!-- Кастомный фон -->
-                <div style="background:rgba(255,255,255,0.04);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;">
-                    <div style="font-family:'Montserrat Alternates';font-size:15px;color:rgba(255,255,255,0.9);">🖼️ Кастомный фон</div>
-                    <div style="font-family:'Montserrat Alternates';font-size:12px;color:rgba(255,255,255,0.45);">PNG, JPG, WEBP</div>
+                <!-- Импорт / Экспорт -->
+                <div id="importTab" class="settings-tab-content">
 
-                    <!-- Превью -->
-                    <div id="bgPreview" style="
-                        width:100%;height:90px;border-radius:8px;
-                        background:rgba(0,0,0,0.3);
-                        border:1px solid rgba(255,255,255,0.1);
-                        display:flex;align-items:center;justify-content:center;
-                        font-family:'Montserrat Alternates';font-size:12px;color:rgba(255,255,255,0.4);
-                        background-size:cover;background-position:center;overflow:hidden;
-                    ">Фон не выбран</div>
-
-                    <div style="display:flex;gap:8px;">
-                        <button onclick="selectBgImage()" class="save-btn" style="margin-top:0;flex:1;height:38px;font-size:13px;">
-                            📂 Выбрать картинку
-                        </button>
-                        <button onclick="clearBgImage()" class="save-btn" style="margin-top:0;flex:1;height:38px;font-size:13px;background:rgba(150,50,50,0.7);">
-                            🗑️ Убрать
-                        </button>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                        <div class="s-card">
+                            <div class="s-card-title">📤 Экспорт</div>
+                            <div class="s-card-desc">Сохранить текущий конфиг в файл</div>
+                            <div class="s-btn-row" style="margin-top:6px;">
+                                <button onclick="doExport()" class="s-btn primary">📤 Сохранить</button>
+                            </div>
+                        </div>
+                        <div class="s-card">
+                            <div class="s-card-title">📥 Импорт</div>
+                            <div class="s-card-desc">Загрузить конфиг из файла</div>
+                            <div class="s-btn-row" style="margin-top:6px;">
+                                <button onclick="doImport()" class="s-btn primary">📥 Загрузить</button>
+                            </div>
+                        </div>
                     </div>
+
+                    <div id="importStatus" style="font-family:'Montserrat Alternates';font-size:11px;color:rgba(255,255,255,0.35);min-height:16px;"></div>
+
+                    <!-- Бэкапы -->
+                    <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+                        <span style="font-family:'Montserrat Alternates';font-size:12px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:0.8px;text-transform:uppercase;">
+                            🗂 Бэкапы конфига
+                        </span>
+                        <button class="s-btn" style="height:28px;padding:0 12px;font-size:10px;" onclick="loadBackupsList()">🔄 Обновить</button>
+                    </div>
+
+                    <div id="backupsList" style="display:flex;flex-direction:column;gap:4px;">
+                        <div style="font-family:'Montserrat Alternates';font-size:11px;color:rgba(255,255,255,0.2);text-align:center;padding:20px 0;">
+                            Загрузка...
+                        </div>
+                    </div>
+
                 </div>
 
+                <!-- Лаунчер -->
+                <div id="launcherTab" class="settings-tab-content">
+
+                    <div class="s-section">
+                        <div class="s-section-head">
+                            <span class="s-section-head-icon">🎬</span>
+                            <span class="s-section-title">Анимация фона</span>
+                        </div>
+                        <div class="s-section-body">
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="liveWallpaperCheck" onchange="applyLauncherSettings()">
+                                <div class="s-toggle"></div>
+                                <span class="checkbox-label">Живые обои (волны и частицы)</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="wavesCheck" onchange="applyLauncherSettings()">
+                                <div class="s-toggle"></div>
+                                <span class="checkbox-label">Волны</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" id="particlesCheck" onchange="applyLauncherSettings()">
+                                <div class="s-toggle"></div>
+                                <span class="checkbox-label">Частицы</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="s-section">
+                        <div class="s-section-head">
+                            <span class="s-section-head-icon">🖼️</span>
+                            <span class="s-section-title">Кастомный фон</span>
+                        </div>
+                        <div class="s-section-body" style="padding: 12px 16px; display: flex; flex-direction: column; gap: 10px;">
+                            <div id="bgPreview">Фон не выбран</div>
+                            <div class="s-btn-row">
+                                <button onclick="selectBgImage()" class="s-btn primary">📂 Выбрать картинку</button>
+                                <button onclick="clearBgImage()" class="s-btn danger">🗑️ Убрать</button>
+                            </div>
+                            <div style="font-family:'Montserrat Alternates';font-size:10px;color:rgba(255,255,255,0.25);">PNG, JPG, WEBP</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <button class="save-btn" onclick="saveSettings()">💾 Сохранить настройки</button>
             </div>
-
-            <button class="save-btn" onclick="saveSettings()">Сохранить настройки</button>
         </div>
 
         <!-- Модальное окно выбора действия с папкой -->
@@ -1528,9 +2361,7 @@
                         <div class="script-detail-tag" id="sdTag"></div>
                     </div>
                     <div class="script-detail-right">
-                        <div class="script-detail-image" id="sdImageWrap">
-                            <span>Нет изображения</span>
-                        </div>
+                        <div class="script-detail-image" id="sdImageWrap"></div>
                     </div>
                 </div>
 
@@ -1550,6 +2381,93 @@
                 <div class="script-detail-footer">
                     <button class="script-detail-install-btn" id="sdInstallBtn" onclick="installFromDetail()">📥 Установить</button>
                     <button class="script-detail-uninstall-btn" id="sdUninstallBtn" onclick="uninstallFromDetail()">🗑️ Удалить</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Installer modal -->
+        <div class="install-overlay" id="installOverlay">
+            <div class="install-modal">
+                <div class="install-header">
+                    <div class="install-title" id="installModalTitle">⬇️ Установка лаунчера</div>
+                    <button class="close-btn" id="installCloseBtn" onclick="closeInstallModal()">×</button>
+                </div>
+
+                <!-- Шаги -->
+                <div class="install-steps">
+                    <div class="install-step active" id="istep-warn">
+                        <div class="install-step-dot">⚠️</div>
+                        <div class="install-step-label">Предупреждение</div>
+                    </div>
+                    <div class="install-step" id="istep-dl">
+                        <div class="install-step-dot">⬇️</div>
+                        <div class="install-step-label">Загрузка</div>
+                    </div>
+                    <div class="install-step" id="istep-inst">
+                        <div class="install-step-dot">📦</div>
+                        <div class="install-step-label">Установка</div>
+                    </div>
+                    <div class="install-step" id="istep-done">
+                        <div class="install-step-dot">✅</div>
+                        <div class="install-step-label">Готово</div>
+                    </div>
+                </div>
+
+                <!-- Предупреждение об антивирусе -->
+                <div class="install-av-warning" id="installAvWarning">
+                    <div class="install-av-icon">🛡️</div>
+                    <div class="install-av-text">
+                        <div class="install-av-title">Рекомендуется отключить антивирус</div>
+                        <div class="install-av-desc">
+                            Антивирус может ложно срабатывать на загружаемый файл
+                            <b style="color:rgba(255,200,80,0.9)">ArizonaLauncher6_byAIR.exe</b>
+                            и блокировать установку.<br><br>
+                            Рекомендуется временно отключить антивирус или добавить папку игры
+                            в исключения <b>до начала установки</b>.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Прогресс-бар (скрыт до начала загрузки) -->
+                <div class="install-progress-wrap" id="installProgressWrap">
+                    <div class="install-progress-label">
+                        <span id="installProgressMsg">Подготовка...</span>
+                        <span id="installProgressPct">0%</span>
+                    </div>
+                    <div class="install-progress-bar">
+                        <div class="install-progress-fill" id="installProgressFill"></div>
+                    </div>
+                </div>
+
+                <div class="install-footer">
+                    <button class="s-btn" id="installCancelBtn" onclick="closeInstallModal()">Отмена</button>
+                    <button class="s-btn primary" id="installStartBtn" onclick="startLauncherInstall()">
+                        ⬇️ Понял, скачать и установить
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Render Effects modal -->
+        <div class="cre-overlay" id="creOverlay" onclick="if(event.target===this)closeCRE()">
+            <div class="cre-modal">
+                <div class="cre-header">
+                    <div class="cre-title">✨ Кастомные эффекты рендеринга</div>
+                    <button class="close-btn" onclick="closeCRE()">×</button>
+                </div>
+                <div class="cre-body">
+                    <div id="creRows"></div>
+                    <div class="cre-value-display">
+                        <span class="cre-value-label">Итоговое значение CustomRenderEffects</span>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <div class="cre-bits-display" id="creBitsDisplay"></div>
+                            <span class="cre-value-number" id="creValueNumber">63</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="cre-footer">
+                    <button class="s-btn" onclick="closeCRE()">Отмена</button>
+                    <button class="s-btn primary" onclick="saveCRE()">✓ Применить</button>
                 </div>
             </div>
         </div>
@@ -1981,6 +2899,9 @@
                                 title="${script.enabled ? 'Выключить' : 'Включить'}"
                                 onclick="toggleMoonloaderScript(this)">
                         </button>
+                        <button class="mods-item-delete"
+                                title="Удалить ${script.name}"
+                                onclick="deleteMoonloaderScript('${script.name}', this)">🗑</button>
                     `;
                     pane.appendChild(item);
                 });
@@ -2014,6 +2935,36 @@
                 showNotification('Ошибка: ' + e.message, 'error');
             } finally {
                 btn.disabled = false;
+            }
+        }
+
+        async function deleteMoonloaderScript(name, btn) {
+            if (!confirm(`Удалить скрипт "${name}"?`)) return;
+            const item = btn.closest('.mods-item');
+            btn.disabled = true;
+            btn.textContent = '⏳';
+            try {
+                let result;
+                if (window.pywebview && window.pywebview.api.delete_moonloader_script) {
+                    result = await window.pywebview.api.delete_moonloader_script(name);
+                } else {
+                    result = { success: true };
+                }
+                if (result && result.success) {
+                    item.style.transition = 'opacity 0.25s, transform 0.25s';
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateX(20px)';
+                    setTimeout(() => { item.remove(); setMlStatus('Скриптов: ' + document.getElementById('mlPaneInstalled').children.length); }, 250);
+                    showNotification('🗑️ ' + name + ' удалён', 'success');
+                } else {
+                    btn.disabled = false;
+                    btn.textContent = '🗑';
+                    showNotification('Ошибка: ' + (result && result.message || 'неизвестная ошибка'), 'error');
+                }
+            } catch(e) {
+                btn.disabled = false;
+                btn.textContent = '🗑';
+                showNotification('Ошибка удаления', 'error');
             }
         }
 
@@ -2168,18 +3119,38 @@
         }
 
         async function _loadDetailImage(url, wrap) {
-            try {
-                if (window.pywebview && window.pywebview.api.fetch_image_as_base64) {
+            // 1. Пробуем через Python (обход CORS в PyWebView)
+            if (window.pywebview && window.pywebview.api.fetch_image_as_base64) {
+                try {
                     const result = await window.pywebview.api.fetch_image_as_base64(url);
-                    if (result && result.success) {
+                    if (result && result.success && result.data_url) {
                         wrap.innerHTML = `<img src="${result.data_url}" alt="preview">`;
                         return;
                     }
-                }
-                wrap.innerHTML = `<img src="${url}" alt="preview" onerror="this.parentElement.innerHTML='<span>Нет изображения</span>'">`;
-            } catch(e) {
-                wrap.innerHTML = '<span>Нет изображения</span>';
+                } catch(e) {}
             }
+
+            // 2. Пробуем прямой img (работает в браузере / когда CORS не мешает)
+            await new Promise(resolve => {
+                const img = document.createElement('img');
+                img.alt = 'preview';
+                img.onload = () => { wrap.innerHTML = ''; wrap.appendChild(img); resolve(); };
+                img.onerror = () => {
+                    _setImgPlaceholder(wrap);
+                    resolve();
+                };
+                img.src = url;
+            });
+        }
+
+        function _setImgPlaceholder(wrap) {
+            wrap.innerHTML = `
+                <div style="display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0.35;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)">
+                        <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                    </svg>
+                    <span style="font-family:'Montserrat Alternates';font-size:11px;color:rgba(255,255,255,0.5);">Нет превью</span>
+                </div>`;
         }
 
         function openScriptDetail(idx, catalogType) {
@@ -2213,10 +3184,10 @@
 
             const imgWrap = document.getElementById('sdImageWrap');
             if (item.image) {
-                imgWrap.innerHTML = '<span style="color:rgba(255,255,255,0.2)">⏳ Загрузка...</span>';
+                imgWrap.innerHTML = '<span style="font-family:\'Montserrat Alternates\';font-size:11px;color:rgba(255,255,255,0.2);">⏳ Загрузка...</span>';
                 _loadDetailImage(item.image, imgWrap);
             } else {
-                imgWrap.innerHTML = '<span>Нет изображения</span>';
+                _setImgPlaceholder(imgWrap);
             }
 
             _updateDetailButtons(idx);
@@ -2618,8 +3589,12 @@
                     if (result.success) {
                         showNotification('Путь к игре установлен', 'success');
                         closeFolderModal();
-                    } else {
-                        showNotification(result.message || 'Отменено', 'error');
+                    } else if (result.needs_install) {
+                        // Нужна установка — показываем модал
+                        closeFolderModal();
+                        openInstallModal(result.folder, result.missing);
+                    } else if (result.message !== 'Папка не выбрана') {
+                        showNotification(result.message || 'Ошибка', 'error');
                     }
                 } else {
                     showNotification('Функция доступна только в приложении', 'error');
@@ -2628,6 +3603,100 @@
                 console.error('Ошибка установки пути:', error);
                 showNotification('Ошибка установки пути', 'error');
             }
+        }
+
+        // ─── Install modal ───────────────────────────────────
+        let _installFolder = '';
+
+        function openInstallModal(folder, missing) {
+            _installFolder = folder || '';
+            // Сброс состояния
+            _resetInstallModal();
+            document.getElementById('installOverlay').classList.add('open');
+        }
+
+        function closeInstallModal() {
+            document.getElementById('installOverlay').classList.remove('open');
+        }
+
+        function _resetInstallModal() {
+            document.getElementById('installModalTitle').textContent = '⬇️ Установка лаунчера';
+            document.getElementById('installAvWarning').style.display = '';
+            document.getElementById('installProgressWrap').classList.remove('visible');
+            document.getElementById('installProgressFill').style.width = '0%';
+            document.getElementById('installProgressFill').className = 'install-progress-fill';
+            document.getElementById('installProgressMsg').textContent = 'Подготовка...';
+            document.getElementById('installProgressPct').textContent = '0%';
+            document.getElementById('installStartBtn').style.display = '';
+            document.getElementById('installCancelBtn').textContent = 'Отмена';
+            document.getElementById('installCloseBtn').style.display = '';
+            ['istep-warn','istep-dl','istep-inst','istep-done'].forEach((id,i) => {
+                const el = document.getElementById(id);
+                el.className = 'install-step' + (i === 0 ? ' active' : '');
+            });
+        }
+
+        async function startLauncherInstall() {
+            if (!_installFolder) return;
+            // Скрываем предупреждение, показываем прогресс
+            document.getElementById('installAvWarning').style.display = 'none';
+            document.getElementById('installProgressWrap').classList.add('visible');
+            document.getElementById('installStartBtn').style.display = 'none';
+            document.getElementById('installCloseBtn').style.display = 'none';
+            document.getElementById('installCancelBtn').textContent = 'Подождите...';
+            document.getElementById('installCancelBtn').disabled = true;
+
+            _setInstallStep('dl');
+
+            // Регистрируем коллбэк прогресса
+            window._onLauncherInstallProgress = function(data) {
+                const fill = document.getElementById('installProgressFill');
+                document.getElementById('installProgressMsg').textContent = data.message || '';
+                document.getElementById('installProgressPct').textContent = data.progress + '%';
+                fill.style.width = data.progress + '%';
+
+                if (data.stage === 'extract' || data.stage === 'install') {
+                    _setInstallStep('inst');
+                } else if (data.stage === 'done') {
+                    _setInstallStep('done');
+                    fill.classList.add('done');
+                    document.getElementById('installModalTitle').textContent = '✅ Установка завершена';
+                    document.getElementById('installCancelBtn').textContent = 'Закрыть';
+                    document.getElementById('installCancelBtn').disabled = false;
+                    showNotification('✅ Лаунчер установлен!', 'success');
+                } else if (data.stage === 'error') {
+                    fill.classList.add('error');
+                    document.getElementById('installModalTitle').textContent = '❌ Ошибка установки';
+                    document.getElementById('installProgressMsg').textContent = data.message;
+                    document.getElementById('installCancelBtn').textContent = 'Закрыть';
+                    document.getElementById('installCancelBtn').disabled = false;
+                    document.getElementById('installStartBtn').style.display = '';
+                    document.getElementById('installStartBtn').textContent = '🔄 Повторить';
+                    document.getElementById('installCloseBtn').style.display = '';
+                    showNotification('Ошибка: ' + data.message, 'error');
+                }
+            };
+
+            try {
+                if (window.pywebview && window.pywebview.api.start_launcher_install) {
+                    await window.pywebview.api.start_launcher_install(_installFolder);
+                }
+            } catch(e) {
+                showNotification('Ошибка запуска установки', 'error');
+                document.getElementById('installCancelBtn').disabled = false;
+                document.getElementById('installCancelBtn').textContent = 'Закрыть';
+            }
+        }
+
+        function _setInstallStep(step) {
+            const map = { warn: 0, dl: 1, inst: 2, done: 3 };
+            const idx = map[step] ?? 0;
+            ['istep-warn','istep-dl','istep-inst','istep-done'].forEach((id, i) => {
+                const el = document.getElementById(id);
+                if (i < idx) el.className = 'install-step done';
+                else if (i === idx) el.className = 'install-step active';
+                else el.className = 'install-step';
+            });
         }
 
         async function openGameFolder() {
@@ -2698,26 +3767,28 @@
 
         // Переключение вкладок
         function switchTab(tabName) {
-            document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.settings-nav-item').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.settings-tab-content').forEach(c => c.classList.remove('active'));
-            if (tabName === 'patches') {
-                document.getElementById('tabBtnPatches').classList.add('active');
-                document.getElementById('patchesTab').classList.add('active');
-            } else if (tabName === 'launch') {
-                document.getElementById('tabBtnLaunch').classList.add('active');
-                document.getElementById('launchTab').classList.add('active');
-            } else if (tabName === 'import') {
-                document.getElementById('tabBtnImport').classList.add('active');
-                document.getElementById('importTab').classList.add('active');
-            } else if (tabName === 'launcher') {
-                document.getElementById('tabBtnLauncher').classList.add('active');
-                document.getElementById('launcherTab').classList.add('active');
-                loadLauncherSettings();
+            const tabMap = {
+                patches: { btn: 'tabBtnPatches', content: 'patchesTab',  title: '🛡️ ArizonaPatches' },
+                launch:  { btn: 'tabBtnLaunch',  content: 'launchTab',   title: '🚀 Параметры запуска' },
+                import:  { btn: 'tabBtnImport',  content: 'importTab',   title: '📦 Импорт / Экспорт' },
+                launcher:{ btn: 'tabBtnLauncher',content: 'launcherTab', title: '🎨 Лаунчер' },
+            };
+            const t = tabMap[tabName];
+            if (t) {
+                const btn = document.getElementById(t.btn);
+                if (btn) btn.classList.add('active');
+                const content = document.getElementById(t.content);
+                if (content) content.classList.add('active');
+                const titleEl = document.getElementById('settingsPanelTitle');
+                if (titleEl) titleEl.textContent = t.title;
+                if (tabName === 'import') loadBackupsList();
             }
         }
 
         // ---- ИМПОРТ / ЭКСПОРТ ----
-        let patchesBackup = null; // для отката
+        // ---- ИМПОРТ / ЭКСПОРТ / БЭКАПЫ ----
 
         async function doExport() {
             try {
@@ -2744,11 +3815,7 @@
                         setImportStatus(result.message === 'Отменено' ? '' : '❌ ' + result.message, '#f44');
                         return;
                     }
-                    // Сохраняем бекап для отката
-                    patchesBackup = JSON.parse(JSON.stringify(patchesData));
-                    // Полностью заменяем данные (deep copy)
                     patchesData = JSON.parse(JSON.stringify(result.data));
-                    // Сразу пишем на диск — полная замена, не ждём "Сохранить"
                     const saveResult = await window.pywebview.api.write_patches(patchesData);
                     if (!saveResult.success) {
                         setImportStatus('❌ Ошибка записи: ' + saveResult.message, '#f44');
@@ -2756,8 +3823,8 @@
                     }
                     renderCheckboxes();
                     switchTab('patches');
-                    document.getElementById('rollbackBtn').style.display = '';
-                    setImportStatus('✅ Загружено и записано ' + result.keys_count + ' настроек.', '#0f0');
+                    setImportStatus('✅ Загружено ' + result.keys_count + ' настроек. Бэкап создан автоматически.', '#0f0');
+                    loadBackupsList();
                 } else {
                     setImportStatus('⚠️ Функция доступна только в приложении', '#ff0');
                 }
@@ -2766,17 +3833,66 @@
             }
         }
 
-        async function doRollback() {
-            if (!patchesBackup) return;
-            patchesData = JSON.parse(JSON.stringify(patchesBackup));
-            patchesBackup = null;
-            if (window.pywebview && window.pywebview.api.write_patches) {
-                await window.pywebview.api.write_patches(patchesData);
+        async function loadBackupsList() {
+            const container = document.getElementById('backupsList');
+            if (!container) return;
+            container.innerHTML = '<div style="font-family:\'Montserrat Alternates\';font-size:11px;color:rgba(255,255,255,0.2);text-align:center;padding:20px 0;">Загрузка...</div>';
+            if (!window.pywebview || !window.pywebview.api.list_patches_backups) {
+                container.innerHTML = '<div style="font-family:\'Montserrat Alternates\';font-size:11px;color:rgba(255,255,255,0.2);text-align:center;padding:20px 0;">Доступно только в приложении</div>';
+                return;
             }
-            renderCheckboxes();
-            switchTab('patches');
-            document.getElementById('rollbackBtn').style.display = 'none';
-            setImportStatus('↩️ Настройки откачены к предыдущим значениям', '#ff0');
+            const list = await window.pywebview.api.list_patches_backups();
+            if (!list || list.length === 0) {
+                container.innerHTML = '<div style="font-family:\'Montserrat Alternates\';font-size:11px;color:rgba(255,255,255,0.2);text-align:center;padding:20px 0;">Бэкапов пока нет</div>';
+                return;
+            }
+            container.innerHTML = '';
+            list.forEach((b, idx) => {
+                const item = document.createElement('div');
+                item.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:8px;';
+                const isImport = b.filename.includes('before_import');
+                const isRestore = b.filename.includes('before_restore');
+                const icon = isImport ? '📥' : isRestore ? '🔄' : '💾';
+                const label = isImport ? 'перед импортом' : isRestore ? 'перед восстановлением' : 'при сохранении';
+                item.innerHTML = `
+                    <span style="font-size:15px;flex-shrink:0;">${icon}</span>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-family:'Montserrat Alternates';font-size:11px;color:rgba(255,255,255,0.8);">${b.date}</div>
+                        <div style="font-family:'Montserrat Alternates';font-size:10px;color:rgba(255,255,255,0.3);">${label} · ${(b.size/1024).toFixed(1)} КБ</div>
+                    </div>
+                    <button onclick="restoreBackup('${b.filename}')" style="height:28px;padding:0 10px;background:rgba(0,120,212,0.25);border:1px solid rgba(0,140,255,0.3);border-radius:6px;color:rgba(140,200,255,0.9);font-family:'Montserrat Alternates';font-size:10px;cursor:pointer;" title="Восстановить">↩️</button>
+                    <button onclick="deleteBackup('${b.filename}', this)" style="height:28px;padding:0 10px;background:transparent;border:1px solid rgba(255,80,80,0);border-radius:6px;color:rgba(255,100,100,0.4);font-family:'Montserrat Alternates';font-size:12px;cursor:pointer;" title="Удалить">🗑</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        async function restoreBackup(filename) {
+            if (!confirm(`Восстановить бэкап от ${filename.replace('patches_','').replace('.json','')}?\nТекущий конфиг будет сохранён как новый бэкап.`)) return;
+            const result = await window.pywebview.api.restore_patches_backup(filename);
+            if (result.success) {
+                patchesData = JSON.parse(JSON.stringify(result.data));
+                renderCheckboxes();
+                switchTab('patches');
+                showNotification('✅ Конфиг восстановлен из бэкапа', 'success');
+                loadBackupsList();
+            } else {
+                showNotification('❌ Ошибка: ' + result.message, 'error');
+            }
+        }
+
+        async function deleteBackup(filename, btn) {
+            btn.disabled = true;
+            const result = await window.pywebview.api.delete_patches_backup(filename);
+            if (result.success) {
+                btn.closest('div[style]').remove();
+                const container = document.getElementById('backupsList');
+                if (container && container.children.length === 0) {
+                    container.innerHTML = '<div style="font-family:\'Montserrat Alternates\';font-size:11px;color:rgba(255,255,255,0.2);text-align:center;padding:20px 0;">Бэкапов нет</div>';
+                }
+            } else {
+                btn.disabled = false;
+            }
         }
 
         function setImportStatus(msg, color) {
@@ -2906,10 +4022,8 @@
         function renderCheckboxes() {
             checkboxGroup.innerHTML = '';
             const keys = Object.keys(patchesData).filter(k => typeof patchesData[k] === 'boolean');
-            if (keys.length === 0) {
-            }
             keys.forEach(key => {
-                const item = document.createElement('div');
+                const item = document.createElement('label');
                 item.className = 'checkbox-item';
 
                 const cb = document.createElement('input');
@@ -2917,13 +4031,32 @@
                 cb.id = 'patch_' + key;
                 cb.checked = patchesData[key];
 
-                const lbl = document.createElement('label');
+                const toggle = document.createElement('div');
+                toggle.className = 's-toggle' + (cb.checked ? ' on' : '');
+                cb.addEventListener('change', () => {
+                    toggle.classList.toggle('on', cb.checked);
+                });
+
+                const lbl = document.createElement('span');
                 lbl.className = 'checkbox-label';
-                lbl.htmlFor = 'patch_' + key;
+                lbl.style.fontSize = '11px';
                 lbl.textContent = translations[key] || key.replace(/([A-Z])/g, ' $1').trim();
 
                 item.appendChild(cb);
+                item.appendChild(toggle);
                 item.appendChild(lbl);
+
+                // Для UseCustomRenderEffects добавляем кнопку настройки
+                if (key === 'UseCustomRenderEffects' && 'CustomRenderEffects' in patchesData) {
+                    const creBtn = document.createElement('button');
+                    creBtn.type = 'button';
+                    creBtn.className = 'patch-cre-btn';
+                    creBtn.innerHTML = '⚙️ Эффекты';
+                    creBtn.title = 'Настроить CustomRenderEffects';
+                    creBtn.onclick = function(e) { e.preventDefault(); e.stopPropagation(); openCRE(); };
+                    item.appendChild(creBtn);
+                }
+
                 checkboxGroup.appendChild(item);
             });
         }
@@ -3191,6 +4324,201 @@
             console.log("PyWebView готов");
             init();
         });
+
+        // ──────────────────────────────────────────
+        //  DRAG & DROP — установка .lua в moonloader
+        // ──────────────────────────────────────────
+        (function () {
+            const overlay = document.getElementById('drag-overlay');
+            let dragCounter = 0;   // считаем enter/leave для дочерних элементов
+
+            function showOverlay() {
+                overlay.classList.add('active');
+            }
+            function hideOverlay() {
+                overlay.classList.remove('active');
+                dragCounter = 0;
+            }
+
+            document.addEventListener('dragenter', function (e) {
+                e.preventDefault();
+                // Показываем оверлей только если тащат файл
+                if (e.dataTransfer && e.dataTransfer.types && e.dataTransfer.types.includes('Files')) {
+                    dragCounter++;
+                    if (dragCounter === 1) showOverlay();
+                }
+            });
+
+            document.addEventListener('dragleave', function (e) {
+                dragCounter--;
+                if (dragCounter <= 0) hideOverlay();
+            });
+
+            document.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+            });
+
+            document.addEventListener('drop', function (e) {
+                e.preventDefault();
+                hideOverlay();
+
+                const files = Array.from(e.dataTransfer.files || []);
+                const luaFiles = files.filter(f => f.name.toLowerCase().endsWith('.lua'));
+
+                if (luaFiles.length === 0) {
+                    showNotification('Можно бросать только .lua файлы', 'error');
+                    return;
+                }
+
+                luaFiles.forEach(function (file) {
+                    const reader = new FileReader();
+                    reader.onload = async function (evt) {
+                        // Преобразуем ArrayBuffer → base64
+                        const bytes = new Uint8Array(evt.target.result);
+                        let binary = '';
+                        for (let i = 0; i < bytes.byteLength; i++) {
+                            binary += String.fromCharCode(bytes[i]);
+                        }
+                        const b64 = btoa(binary);
+
+                        try {
+                            let result;
+                            if (window.pywebview && window.pywebview.api && window.pywebview.api.install_lua_file) {
+                                result = await window.pywebview.api.install_lua_file(file.name, b64);
+                            } else {
+                                // Демо-режим (тест в браузере)
+                                result = { success: true, message: `[DEMO] ${file.name} установлен в moonloader` };
+                            }
+
+                            if (result && result.success) {
+                                showNotification('✓ ' + (result.message || `${file.name} установлен`), 'success');
+                                // Обновить список если открыта вкладка moonloader
+                                const modsModal = document.getElementById('modsModal');
+                                const mlPaneInstalled = document.getElementById('mlPaneInstalled');
+                                if (modsModal && modsModal.style.display !== 'none' && mlPaneInstalled) {
+                                    if (typeof loadMoonloaderScripts === 'function') loadMoonloaderScripts();
+                                }
+                            } else {
+                                showNotification('Ошибка: ' + (result && result.message ? result.message : 'неизвестная ошибка'), 'error');
+                            }
+                        } catch (err) {
+                            console.error('install_lua_file error:', err);
+                            showNotification('Ошибка установки скрипта', 'error');
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                });
+            });
+        })();
+        // ══════════════════════════════════════════════
+        //  CUSTOM RENDER EFFECTS — битовая маска
+        // ══════════════════════════════════════════════
+        const CRE_BITS = [
+            { bit: 2,  value: 4,   name: 'Пост-обработка',              hint: 'Эффекты постпроцессинга' },
+            { bit: 3,  value: 8,   name: 'Трейсеры и чекпоинты',        hint: 'Визуальные маркеры трейсеров' },
+            { bit: 4,  value: 16,  name: 'Таргеты на персонаже',         hint: 'Индикаторы прицеливания' },
+            { bit: 5,  value: 32,  name: 'Эффекты оружия и выстрелы',   hint: 'Дульное пламя, гильзы, вспышки' },
+            { bit: 6,  value: 64,  name: 'Кровь, дымка и искры',        hint: 'Попадания, взрывы, окружение' },
+            { bit: 7,  value: 128, name: 'Следы от шин',                 hint: 'Тормозной путь и следы на дороге' },
+        ];
+
+        // Биты 0 и 1 (значения 1 и 2) — не описаны, храним и восстанавливаем
+        const CRE_FIXED_MASK = 0b11; // биты 0 и 1
+
+        let _creCurrentValue = 63; // рабочее значение пока модал открыт
+
+        function openCRE() {
+            _creCurrentValue = typeof patchesData['CustomRenderEffects'] === 'number'
+                ? patchesData['CustomRenderEffects']
+                : 63;
+            buildCRERows();
+            updateCREDisplay();
+            document.getElementById('creOverlay').classList.add('open');
+        }
+
+        function closeCRE() {
+            document.getElementById('creOverlay').classList.remove('open');
+        }
+
+        function saveCRE() {
+            patchesData['CustomRenderEffects'] = _creCurrentValue;
+            closeCRE();
+            showNotification('✓ Эффекты применены (значение: ' + _creCurrentValue + ')', 'success');
+        }
+
+        function buildCRERows() {
+            const container = document.getElementById('creRows');
+            container.innerHTML = '';
+
+            CRE_BITS.forEach(cfg => {
+                const row = document.createElement('label');
+                row.className = 'cre-row';
+
+                const isOn = !!(_creCurrentValue & cfg.value);
+
+                const badge = document.createElement('div');
+                badge.className = 'cre-bit-badge';
+                badge.textContent = cfg.value;
+
+                const info = document.createElement('div');
+                info.className = 'cre-info';
+                info.innerHTML = `<div class="cre-effect-name">${cfg.name}</div><div class="cre-effect-hint">${cfg.hint}</div>`;
+
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.checked = isOn;
+                cb.style.cssText = 'position:absolute;opacity:0;width:0;height:0;pointer-events:none;';
+                cb.dataset.bitValue = cfg.value;
+
+                const toggle = document.createElement('div');
+                toggle.className = 's-toggle' + (isOn ? ' on' : '');
+
+                cb.addEventListener('change', () => {
+                    toggle.classList.toggle('on', cb.checked);
+                    if (cb.checked) {
+                        _creCurrentValue |= cfg.value;
+                    } else {
+                        _creCurrentValue &= ~cfg.value;
+                    }
+                    updateCREDisplay();
+                });
+
+                row.appendChild(badge);
+                row.appendChild(info);
+                row.appendChild(cb);
+                row.appendChild(toggle);
+                container.appendChild(row);
+            });
+
+            // Создаём 6 ячеек бинарного дисплея (биты 7..2, без зарезервированных 0 и 1)
+            const disp = document.getElementById('creBitsDisplay');
+            disp.innerHTML = '';
+            for (let i = 7; i >= 2; i--) {
+                const bitVal = 1 << i;
+                const cell = document.createElement('div');
+                cell.className = 'cre-bit-cell';
+                cell.dataset.bit = i;
+                cell.title = CRE_BITS.find(c => c.value === bitVal)?.name || `Бит ${i+1}`;
+                disp.appendChild(cell);
+            }
+        }
+
+        function updateCREDisplay() {
+            document.getElementById('creValueNumber').textContent = _creCurrentValue;
+
+            const disp = document.getElementById('creBitsDisplay');
+            const cells = disp.querySelectorAll('.cre-bit-cell');
+            cells.forEach(cell => {
+                const i = parseInt(cell.dataset.bit);
+                const bitVal = 1 << i;
+                const isSet = !!(_creCurrentValue & bitVal);
+                cell.textContent = isSet ? '1' : '0';
+                cell.classList.toggle('on', isSet);
+                cell.classList.toggle('off', !isSet);
+            });
+        }
+
     </script>
 </body>
 </html>
