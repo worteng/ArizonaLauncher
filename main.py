@@ -26,7 +26,7 @@ class ArizonaLauncher:
                     'launch_params': {'memory': 4096, 'widescreen': False, 'texture_mode': False, 'color_depth_16': False,
                                       'allow_hdr': False, 'enable_grass': False, 'ldo': False, 'seasons': False,
                                       'graphics': False, 'auth_cef_enable': False, 'window_mode': True, 'cdn': '1,1,1'},
-                    'launcher_settings': {'live_wallpaper': True, 'waves': True, 'particles': True, 'bg_image': None}}
+                    'launcher_settings': {'bg_image': None}}
         if os.path.exists(self.config_path):
             try:
                 with open(self.config_path, 'r', encoding='utf-8') as f:
@@ -74,7 +74,7 @@ class ArizonaLauncher:
         if found_gta: self.game_path = self.config['game_path'] = str(found_gta)
         if found_launcher: self.launcher_path = self.config['launcher_path'] = str(found_launcher)
         if found_gta or found_launcher: self.save_config()
-        return bool(found_gta and found_launcher)
+        return bool(found_gta)  # достаточно найти gta_sa.exe
 
     def set_game_paths(self, game, launcher):
         self.game_path, self.launcher_path = game, launcher
@@ -291,6 +291,59 @@ class WebViewApp:
         from PyQt5.QtWidgets import QApplication
         return QApplication.instance() or QApplication([])
 
+    def select_bg_image(self):
+        """Выбрать картинку для фона лаунчера, вернуть base64 data URL"""
+        try:
+            import base64, mimetypes
+            from PyQt5.QtWidgets import QFileDialog
+            app = self._qt_app()
+            file_path, _ = QFileDialog.getOpenFileName(
+                None,
+                "Выбрать картинку для фона",
+                "",
+                "Изображения (*.png *.jpg *.jpeg *.webp *.bmp);;Все файлы (*)"
+            )
+            if not file_path:
+                return {"success": False, "message": "Отменено"}
+            mime = mimetypes.guess_type(file_path)[0] or "image/jpeg"
+            with open(file_path, 'rb') as f:
+                data = base64.b64encode(f.read()).decode('utf-8')
+            return {"success": True, "data_url": f"data:{mime};base64,{data}"}
+        except Exception as e:
+            logger.error(f"select_bg_image error: {e}")
+            return {"success": False, "message": str(e)}
+
+    def _check_game_folder(self, folder_path):
+        """Проверяет папку игры и возвращает статус.
+        Варианты:
+          ok          — всё есть (gta_sa + launcher + plugins с файлами)
+          needs_install — нужна установка лаунчера/патчер архива
+          no_game     — gta_sa.exe не найден
+        """
+        game_exe     = os.path.join(folder_path, "gta_sa.exe")
+        launcher_exe = os.path.join(folder_path, "ArizonaLauncher6_byAIR.exe")
+        plugins_dir  = os.path.join(folder_path, "preloading_plugins")
+
+        if not os.path.exists(game_exe):
+            return {"status": "no_game", "folder": folder_path}
+
+        has_launcher = os.path.exists(launcher_exe)
+        has_plugins  = os.path.isdir(plugins_dir) and bool(os.listdir(plugins_dir))
+
+        if has_launcher and has_plugins:
+            return {"status": "ok", "folder": folder_path,
+                    "game_exe": game_exe, "launcher_exe": launcher_exe}
+
+        # Чего не хватает
+        missing = []
+        if not has_launcher: missing.append("launcher")
+        if not has_plugins:  missing.append("preloading_plugins")
+
+        return {"status": "needs_install", "folder": folder_path,
+                "missing": missing,
+                "game_exe": game_exe,
+                "launcher_exe": launcher_exe if has_launcher else ""}
+
     def select_game_path(self):
         """Открыть диалог выбора папки с игрой"""
         try:
@@ -305,31 +358,24 @@ class WebViewApp:
             if not folder_path:
                 return {"success": False, "message": "Папка не выбрана"}
 
-            game_exe     = os.path.join(folder_path, "gta_sa.exe")
-            launcher_exe = os.path.join(folder_path, "ArizonaLauncher6_byAIR.exe")
-            plugins_dir  = os.path.join(folder_path, "preloading_plugins")
+            check = self._check_game_folder(folder_path)
 
-            if not os.path.exists(game_exe):
+            if check["status"] == "no_game":
                 return {"success": False, "message": "gta_sa.exe не найден в выбранной папке"}
 
-            missing = []
-            if not os.path.exists(launcher_exe):
-                missing.append("launcher")
-            if not os.path.isdir(plugins_dir):
-                missing.append("preloading_plugins")
-
-            if missing:
-                # Сохраняем папку для последующей установки
-                self._pending_game_folder = folder_path
+            if check["status"] == "needs_install":
+                # Сохраняем game_path уже сейчас, launcher установим позже
+                self.launcher.set_game_paths(check["game_exe"], check.get("launcher_exe", ""))
                 return {
                     "success": False,
                     "needs_install": True,
                     "folder": folder_path,
-                    "missing": missing,
+                    "missing": check["missing"],
                     "message": "Требуется установка компонентов"
                 }
 
-            self.launcher.set_game_paths(game_exe, launcher_exe)
+            # Всё хорошо
+            self.launcher.set_game_paths(check["game_exe"], check["launcher_exe"])
             return {"success": True, "message": f"Путь установлен: {folder_path}"}
         except Exception as e:
             logger.error(f"Error selecting game path: {e}")
@@ -338,7 +384,7 @@ class WebViewApp:
     def download_and_install_launcher(self, folder_path):
         """Скачивает архив лаунчера с GitHub и устанавливает в папку игры.
            Отправляет прогресс через JS-событие."""
-        GITHUB_RELEASE_URL = "https://github.com/worteng/ArizonaLauncher/releases/latest/download/ArizonaLauncher.zip"
+        GITHUB_RELEASE_URL = "https://raw.githubusercontent.com/worteng/ArizonaLauncher/refs/heads/main/others/arizonapatcher.zip"
         import zipfile, tempfile, shutil
 
         def _send(stage, progress=0, message=""):
@@ -421,15 +467,37 @@ class WebViewApp:
                 if os.path.isfile(src_file) and src_file != launcher_src:
                     shutil.copy2(src_file, os.path.join(folder_path, fname))
 
-            # 5. Создаём preloading_plugins если нет
+            # 5. Копируем preloading_plugins из архива (если есть), иначе создаём пустую
             plugins_dir = os.path.join(folder_path, "preloading_plugins")
-            os.makedirs(plugins_dir, exist_ok=True)
+            plugins_src = None
+            for root, dirs, files in os.walk(tmp_dir):
+                if os.path.basename(root).lower() == "preloading_plugins":
+                    plugins_src = root
+                    break
+
+            if plugins_src:
+                _send("install", 94, "Копирование preloading_plugins...")
+                if os.path.exists(plugins_dir):
+                    # Копируем файлы поверх, не удаляя существующие
+                    for fname in os.listdir(plugins_src):
+                        src_file = os.path.join(plugins_src, fname)
+                        if os.path.isfile(src_file):
+                            shutil.copy2(src_file, os.path.join(plugins_dir, fname))
+                else:
+                    shutil.copytree(plugins_src, plugins_dir)
+                logger.info(f"preloading_plugins скопирован из архива в {plugins_dir}")
+            else:
+                os.makedirs(plugins_dir, exist_ok=True)
 
             _send("install", 97, "Финализация...")
 
             # 6. Устанавливаем пути
             game_exe = os.path.join(folder_path, "gta_sa.exe")
             self.launcher.set_game_paths(game_exe, launcher_dest)
+
+            # 7. Добавляем в исключения Windows Defender
+            _send("install", 98, "Добавление в исключения антивируса...")
+            self._add_defender_exclusion(launcher_dest)
 
             # Чистка
             try:
@@ -460,27 +528,6 @@ class WebViewApp:
         Thread(target=run, daemon=True).start()
         return {"success": True, "message": "Загрузка начата"}
 
-    def select_bg_image(self):
-        """Выбрать картинку для фона лаунчера, вернуть base64 data URL"""
-        try:
-            import base64, mimetypes
-            from PyQt5.QtWidgets import QFileDialog
-            app = self._qt_app()
-            file_path, _ = QFileDialog.getOpenFileName(
-                None,
-                "Выбрать картинку для фона",
-                "",
-                "Изображения (*.png *.jpg *.jpeg *.webp *.bmp);;Все файлы (*)"
-            )
-            if not file_path:
-                return {"success": False, "message": "Отменено"}
-            mime = mimetypes.guess_type(file_path)[0] or "image/jpeg"
-            with open(file_path, 'rb') as f:
-                data = base64.b64encode(f.read()).decode('utf-8')
-            return {"success": True, "data_url": f"data:{mime};base64,{data}"}
-        except Exception as e:
-            logger.error(f"select_bg_image error: {e}")
-            return {"success": False, "message": str(e)}
 
     def export_patches(self, data):
         """Сохранить настройки патчей в файл через диалог"""
@@ -529,6 +576,75 @@ class WebViewApp:
             return {"success": True, "data": data, "keys_count": bool_count}
         except Exception as e:
             logger.error(f"import_patches error: {e}")
+            return {"success": False, "message": str(e)}
+
+    def get_wallpapers(self):
+        """Сканирует папку wallpapers/ рядом с main.py и возвращает список файлов"""
+        import base64, mimetypes
+        try:
+            base_dir = Path(__file__).parent / "wallpapers"
+            if not base_dir.exists():
+                base_dir.mkdir(parents=True, exist_ok=True)
+                return {"success": True, "wallpapers": []}
+
+            supported = {'.jpg', '.jpeg', '.png', '.webp', '.bmp'}
+            result = []
+            for f in sorted(base_dir.iterdir()):
+                if f.is_file() and f.suffix.lower() in supported:
+                    try:
+                        mime = mimetypes.guess_type(f.name)[0] or 'image/jpeg'
+                        data = base64.b64encode(f.read_bytes()).decode('utf-8')
+                        result.append({
+                            "name": f.stem,
+                            "filename": f.name,
+                            "data_url": f"data:{mime};base64,{data}"
+                        })
+                    except Exception as e:
+                        logger.warning(f"get_wallpapers skip {f.name}: {e}")
+            return {"success": True, "wallpapers": result}
+        except Exception as e:
+            logger.error(f"get_wallpapers error: {e}")
+            return {"success": False, "message": str(e), "wallpapers": []}
+
+    def _add_defender_exclusion(self, file_path: str):
+        """Добавляет файл и его папку в исключения Windows Defender через PowerShell."""
+        try:
+            folder_path = os.path.dirname(file_path)
+            # Добавляем и файл и всю папку игры
+            ps_cmd = (
+                f"Add-MpPreference -ExclusionPath '{folder_path}'; "
+                f"Add-MpPreference -ExclusionProcess '{file_path}'"
+            )
+            result = subprocess.run(
+                ["powershell", "-NonInteractive", "-WindowStyle", "Hidden",
+                 "-Command", ps_cmd],
+                capture_output=True, timeout=15
+            )
+            if result.returncode == 0:
+                logger.info(f"_add_defender_exclusion: OK — {file_path}")
+            else:
+                # Если нет прав — пробуем через elevation (запрос UAC)
+                logger.warning(f"_add_defender_exclusion: нет прав, пробуем с elevation")
+                subprocess.run(
+                    ["powershell", "-NonInteractive", "-WindowStyle", "Hidden",
+                     "-Command",
+                     f"Start-Process powershell -Verb RunAs -ArgumentList "
+                     f"'-NonInteractive -WindowStyle Hidden -Command \"{ps_cmd}\"'"],
+                    capture_output=True, timeout=15
+                )
+        except Exception as e:
+            logger.warning(f"_add_defender_exclusion error: {e}")
+
+    def minimize_window(self):
+        """Сворачивает окно лаунчера в панель задач"""
+        try:
+            import webview as wv
+            wins = wv.windows
+            if wins:
+                wins[0].minimize()
+            return {"success": True}
+        except Exception as e:
+            logger.error(f"minimize_window error: {e}")
             return {"success": False, "message": str(e)}
 
     def open_game_folder(self):
@@ -827,26 +943,6 @@ class WebViewApp:
             logger.error(f"fetch_moonloader_catalog error: {e}")
             return {"success": False, "message": str(e)}
 
-    def fetch_image_as_base64(self, url):
-        """Скачивает изображение по URL и возвращает data URL в base64 (обход CORS в PyQt5)"""
-        try:
-            resp = requests.get(url, timeout=10, verify=False,
-                                headers={"User-Agent": "Mozilla/5.0"})
-            if resp.status_code != 200:
-                return {"success": False, "message": f"HTTP {resp.status_code}"}
-            import base64, mimetypes
-            content_type = resp.headers.get("Content-Type", "").split(";")[0].strip()
-            if not content_type.startswith("image/"):
-                # определяем по расширению URL
-                ext = url.rsplit(".", 1)[-1].lower()
-                content_type = {"jpg": "image/jpeg", "jpeg": "image/jpeg",
-                                "png": "image/png", "gif": "image/gif",
-                                "webp": "image/webp"}.get(ext, "image/jpeg")
-            b64 = base64.b64encode(resp.content).decode("utf-8")
-            return {"success": True, "data_url": f"data:{content_type};base64,{b64}"}
-        except Exception as e:
-            logger.error(f"fetch_image_as_base64 error: {e}")
-            return {"success": False, "message": str(e)}
 
     def install_moonloader_script(self, url, filename):
         """Скачивает скрипт и кладёт в moonloader/"""
@@ -967,6 +1063,27 @@ class WebViewApp:
             return {"success": False, "message": f"Файл не найден: {filename}"}
         except Exception as e:
             logger.error(f"delete_moonloader_script error: {e}")
+            return {"success": False, "message": str(e)}
+
+    def install_patches_file(self, filename, content_b64):
+        """Принимает .json файл (base64) и кладёт его как #ArizonaPatches.json в preloading_plugins"""
+        import base64 as _b64
+        try:
+            if not self.launcher.game_path:
+                return {"success": False, "message": "Путь к игре не установлен"}
+            plugins_dir = os.path.join(os.path.dirname(self.launcher.game_path), "preloading_plugins")
+            os.makedirs(plugins_dir, exist_ok=True)
+            dest = os.path.join(plugins_dir, "#ArizonaPatches.json")
+            # Бэкап старого файла перед заменой
+            if os.path.exists(dest):
+                self.launcher._create_patches_backup(label="before_drop")
+            content = _b64.b64decode(content_b64)
+            with open(dest, 'wb') as f:
+                f.write(content)
+            logger.info(f"install_patches_file: установлен {dest}")
+            return {"success": True, "message": f"Патчи обновлены из {filename}"}
+        except Exception as e:
+            logger.error(f"install_patches_file error: {e}")
             return {"success": False, "message": str(e)}
 
     def install_lua_file(self, filename, content_b64):
@@ -1241,37 +1358,48 @@ def main():
     if is_first_run and not force_deps:
         auto_found = app.launcher.auto_detect_game_paths()
         if auto_found:
-            # Синхронизируем пути в WebViewApp
-            app.game_path    = app.launcher.game_path
-            app.launcher_path = app.launcher.launcher_path
             logger.info(f"Авто-обнаружение: {app.launcher.game_path}")
         else:
             logger.info("Авто-обнаружение: игра не найдена, пользователь укажет вручную")
 
     def _on_loaded():
-        """После загрузки страницы показываем уведомление об авто-обнаружении."""
-        import time as _t
-        _t.sleep(0.8)   # ждём пока JS инициализируется
+        """После загрузки страницы проверяем состояние игры."""
+        import time as _t, json as _json
+        _t.sleep(0.8)
         try:
             wins = webview.windows
             if not wins:
                 return
             w = wins[0]
-            if auto_found:
-                game_dir = str(Path(app.launcher.game_path).parent).replace("\\", "\\\\")
-                w.evaluate_js(
-                    f"showNotification('✅ Игра найдена: {game_dir}', 'success')"
-                )
-            else:
+
+            if not auto_found:
                 w.evaluate_js(
                     "showNotification('📂 Игра не найдена — укажите путь в меню папок', 'error')"
+                )
+                return
+
+            game_dir = str(Path(app.launcher.game_path).parent)
+            check = app._check_game_folder(game_dir)
+
+            if check["status"] == "ok":
+                safe_dir = game_dir.replace("\\", "\\\\")
+                w.evaluate_js(
+                    f"showNotification('✅ Игра найдена: {safe_dir}', 'success')"
+                )
+            elif check["status"] == "needs_install":
+                payload = _json.dumps({
+                    "folder": check["folder"].replace("\\", "\\\\"),
+                    "missing": check["missing"]
+                })
+                w.evaluate_js(
+                    f"window._autoInstallPrompt && window._autoInstallPrompt({payload})"
                 )
         except Exception as ex:
             logger.warning(f"_on_loaded notify error: {ex}")
 
     try:
-        window = webview.create_window('Arizona RP Launcher', 'index.html', js_api=app, width=1200, height=800,
-                                       resizable=True, fullscreen=False, min_size=(800, 600))
+        window = webview.create_window('Arizona RP Launcher', 'index.html', js_api=app, width=1285, height=732,
+                                       resizable=True, fullscreen=False, min_size=(1032, 583))
         if is_first_run:
             window.events.loaded += _on_loaded
         webview.start(debug=False)

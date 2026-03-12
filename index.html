@@ -47,26 +47,6 @@
             flex-direction: column;
         }
         
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-        
-        #main-canvas {
-            z-index: 1;
-        }
-        
-        #bloom-canvas {
-            z-index: 2;
-            opacity: 0;
-            filter: blur(20px);
-            mix-blend-mode: screen;
-            pointer-events: none;
-        }
 
         /* ── Drag & Drop оверлей ── */
         #drag-overlay {
@@ -139,6 +119,7 @@
             gap: 20px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s ease;
         }
 
         .right-panel {
@@ -151,6 +132,99 @@
             flex-direction: column;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s ease;
+        }
+
+        .left-panel.slide-out {
+            transform: translateX(-130%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .right-panel.slide-out {
+            transform: translateX(130%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ── Launch overlay ── */
+        .launch-screen {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            z-index: 10;
+        }
+
+        .launch-screen.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .launch-screen-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: clamp(28px, 3.5vw, 42px);
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 1px;
+            text-shadow: 0 0 30px rgba(255,255,255,0.25);
+        }
+
+        .launch-screen-dots {
+            display: inline-flex;
+            gap: 6px;
+            margin-left: 4px;
+        }
+
+        .launch-screen-dots span {
+            width: 6px; height: 6px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 50%;
+            animation: ldot 1.2s ease-in-out infinite;
+        }
+        .launch-screen-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .launch-screen-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes ldot {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .launch-screen-status {
+            font-size: 14px;
+            color: rgba(255,255,255,0.45);
+            letter-spacing: 0.5px;
+            min-height: 20px;
+            transition: opacity 0.3s ease;
+        }
+
+        .launch-screen-bar-wrap {
+            width: clamp(200px, 30vw, 320px);
+            height: 3px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .launch-screen-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, rgba(255,255,255,0.4), rgba(255,255,255,0.8));
+            border-radius: 2px;
+            transition: width 0.6s ease;
+            animation: bar-shimmer 2s ease infinite;
+        }
+
+        @keyframes bar-shimmer {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.4); }
+            100% { filter: brightness(1); }
         }
 
         .header {
@@ -945,6 +1019,7 @@
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 12px;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         .s-section-head {
@@ -1075,6 +1150,11 @@
             padding: 0 10px;
             outline: none;
             transition: border-color 0.18s;
+        }
+
+        .s-input option {
+            background: #1a1c28;
+            color: white;
         }
 
         .s-input:focus {
@@ -1262,22 +1342,90 @@
 
         .s-btn-row .s-btn { flex: 1; }
 
-        /* Превью фона */
-        #bgPreview {
-            width: 100%;
-            height: 80px !important;
+
+        /* Wallpaper grid */
+        #launcherTab {
+            overflow-y: auto !important;
+            padding: 20px 22px !important;
+            gap: 14px !important;
+        }
+
+        .wp-section-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .wallpaper-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .wp-card {
+            cursor: pointer;
             border-radius: 10px;
-            background: rgba(0,0,0,0.35);
-            border: 1px solid rgba(255,255,255,0.08);
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: border-color 0.2s, transform 0.15s;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .wp-card:hover { transform: scale(1.03); border-color: rgba(255,255,255,0.25); }
+        .wp-card-active { border-color: rgba(0,160,255,0.8) !important; }
+
+        .wp-thumb {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background-size: cover;
+            background-position: center;
+            background-color: rgba(255,255,255,0.05);
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Montserrat Alternates', sans-serif;
-            font-size: 12px;
+            font-size: 20px;
             color: rgba(255,255,255,0.3);
-            background-size: cover;
-            background-position: center;
-            overflow: hidden;
+        }
+
+        .wp-thumb-none { font-size: 22px; color: rgba(255,255,255,0.2); }
+        .wp-thumb-custom { font-size: 22px; }
+
+        .wp-check {
+            position: absolute;
+            top: 4px; right: 4px;
+            background: rgba(0,160,255,0.85);
+            color: #fff;
+            border-radius: 50%;
+            width: 18px; height: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px;
+        }
+
+        .wp-loading {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .wp-label {
+            text-align: center;
+            font-size: 10px;
+            padding: 4px 2px;
+            color: rgba(255,255,255,0.5);
+            font-family: 'Montserrat Alternates', sans-serif;
         }
 
         /* Модальное окно выбора папки */
@@ -1971,14 +2119,11 @@
                 <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
             </svg>
         </div>
-        <div class="drag-title">Бросай .lua сюда</div>
-        <div class="drag-sub">Файл будет установлен в папку moonloader</div>
+        <div class="drag-title" id="dragTitle">Бросай файл сюда</div>
+        <div class="drag-sub" id="dragSub">Файл будет установлен автоматически</div>
     </div>
 
     <div id="container">
-        <canvas id="main-canvas"></canvas>
-        <canvas id="bloom-canvas"></canvas>
-
         <div class="interface">
             <div class="left-panel">
                 <div class="header">
@@ -2018,6 +2163,20 @@
                     </button>
 
                 </div>
+            </div>
+
+            <!-- Экран запуска игры -->
+            <div class="launch-screen" id="launchScreen">
+                <div class="launch-screen-title">
+                    Запуск игры
+                    <span class="launch-screen-dots">
+                        <span></span><span></span><span></span>
+                    </span>
+                </div>
+                <div class="launch-screen-bar-wrap">
+                    <div class="launch-screen-bar" id="launchBar"></div>
+                </div>
+                <div class="launch-screen-status" id="launchStatus">Подготовка...</div>
             </div>
 
             <div class="right-panel">
@@ -2097,7 +2256,7 @@
                             <input type="checkbox" id="graphicsCheck">
                             <div class="s-toggle"></div>
                             <div class="launch-item-text">
-                                <span class="launch-item-name">Графика</span>
+                                <span class="launch-item-name">Графика Plus</span>
                                 <span class="launch-item-flag">-graphics</span>
                             </div>
                         </label>
@@ -2137,7 +2296,7 @@
                             <input type="checkbox" id="enableGrassCheck">
                             <div class="s-toggle"></div>
                             <div class="launch-item-text">
-                                <span class="launch-item-name">Трава</span>
+                                <span class="launch-item-name">Больше растительности</span>
                                 <span class="launch-item-flag">-enable_grass</span>
                             </div>
                         </label>
@@ -2145,7 +2304,7 @@
                             <input type="checkbox" id="ldoCheck">
                             <div class="s-toggle"></div>
                             <div class="launch-item-text">
-                                <span class="launch-item-name">LDO оптимизация</span>
+                                <span class="launch-item-name">Оптимизация для HDD</span>
                                 <span class="launch-item-flag">-ldo</span>
                             </div>
                         </label>
@@ -2163,7 +2322,13 @@
                         <div class="launch-input-row">
                             <span class="launch-input-label">Память (МБ)</span>
                             <span class="launch-item-flag" style="flex:1">-mem</span>
-                            <input type="number" id="memoryInput" min="512" max="16384" step="512" class="s-input">
+                            <select id="memoryInput" class="s-input">
+                                <option value="1024">1024</option>
+                                <option value="2048">2048</option>
+                                <option value="3072">3072</option>
+                                <option value="4096" selected>4096</option>
+                                <option value="5120">5120</option>
+                            </select>
                         </div>
                         <div class="launch-input-row">
                             <span class="launch-input-label">CDN</span>
@@ -2214,46 +2379,8 @@
 
                 <!-- Лаунчер -->
                 <div id="launcherTab" class="settings-tab-content">
-
-                    <div class="s-section">
-                        <div class="s-section-head">
-                            <span class="s-section-head-icon">🎬</span>
-                            <span class="s-section-title">Анимация фона</span>
-                        </div>
-                        <div class="s-section-body">
-                            <label class="checkbox-item">
-                                <input type="checkbox" id="liveWallpaperCheck" onchange="applyLauncherSettings()">
-                                <div class="s-toggle"></div>
-                                <span class="checkbox-label">Живые обои (волны и частицы)</span>
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" id="wavesCheck" onchange="applyLauncherSettings()">
-                                <div class="s-toggle"></div>
-                                <span class="checkbox-label">Волны</span>
-                            </label>
-                            <label class="checkbox-item">
-                                <input type="checkbox" id="particlesCheck" onchange="applyLauncherSettings()">
-                                <div class="s-toggle"></div>
-                                <span class="checkbox-label">Частицы</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="s-section">
-                        <div class="s-section-head">
-                            <span class="s-section-head-icon">🖼️</span>
-                            <span class="s-section-title">Кастомный фон</span>
-                        </div>
-                        <div class="s-section-body" style="padding: 12px 16px; display: flex; flex-direction: column; gap: 10px;">
-                            <div id="bgPreview">Фон не выбран</div>
-                            <div class="s-btn-row">
-                                <button onclick="selectBgImage()" class="s-btn primary">📂 Выбрать картинку</button>
-                                <button onclick="clearBgImage()" class="s-btn danger">🗑️ Убрать</button>
-                            </div>
-                            <div style="font-family:'Montserrat Alternates';font-size:10px;color:rgba(255,255,255,0.25);">PNG, JPG, WEBP</div>
-                        </div>
-                    </div>
-
+                    <div class="wp-section-title">🖼️ ОБОИ</div>
+                    <div id="wallpaperGrid" class="wallpaper-grid"></div>
                 </div>
 
                 <button class="save-btn" onclick="saveSettings()">💾 Сохранить настройки</button>
@@ -2476,10 +2603,6 @@
 
     <script>
         // Глобальные переменные
-        const canvas = document.getElementById('main-canvas');
-        const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
-        const bloomCanvas = document.getElementById('bloom-canvas');
-        const bloomCtx = bloomCanvas.getContext('2d', { alpha: true });
 
         const nicknameInput = document.getElementById('nicknameInput');
         const serverSelect = document.getElementById('serverSelect');
@@ -2496,18 +2619,6 @@
         let serversData = [];
         window._installedScriptFiles = new Set(); // имена файлов установленных скриптов
 
-        // ОПТИМИЗИРОВАННАЯ КОНФИГУРАЦИЯ ГРАФИКИ (БЕЗ НАСТРОЕК)
-        const CONFIG = {
-            particlesCount: 30,
-            wavesEnabled: true,
-            showParticles: true,
-            wavesSpeed: 1,
-            wavesBrightness: 1,
-            bloomStrength: 0.3,
-            bloomType: 'light',
-            targetFPS: 30,
-            waveStep: 4
-        };
 
         // Переводы для патчей
         const translations = {
@@ -2515,7 +2626,7 @@
             "CCamInteriorFix": "Исправление интовой стрельбы",
             "COcclusionFix": "Исправление просадки фпс в центре карты",
             "DontDefaultWindowMode": "Возвращение полноэкранного режима (по дефолту оконный без рамок)",
-            "DontInterfereAntiAFK": "Использовать AntiAFK (если есть)",
+            "DontInterfereAntiAFK": "(Не) мешать работе AntiAFK",
             "DontUseGreenZone": "Удалить зеленые зоны (для LocalDM)",
             "DontUseScaleRadarMapIcons": "Не использовать увеличенные иконки радара",
             "DontUseCustomAttachObject": "Использовать стандартное прикрепление объектов",
@@ -2539,10 +2650,8 @@
 
         // Инициализация
         async function init() {
-            initCanvas();
-            initParticles();
-            await initLauncherSettings(); // применяем сохранённые настройки фона/анимации
-            animate();
+            
+            await initLauncherSettings(); // применяем сохранённые настройки фона
             
             // Загрузка данных
             await loadServers();
@@ -2589,8 +2698,9 @@
         function updateServerSelect() {
             const savedServer = currentServer || serverSelect.value;
             serverSelect.innerHTML = '';
-            
-            serversData.forEach(server => {
+
+            const sorted = [...serversData].sort((a, b) => a.number - b.number);
+            sorted.forEach(server => {
                 const option = document.createElement('option');
                 option.value = server.number;
                 option.textContent = `${server.name} (${server.online}/${server.maxplayers})`;
@@ -2763,28 +2873,87 @@
                 return;
             }
 
-            startBtn.disabled = true;
-            startBtn.classList.add('start-btn-loading');
+            // ── Анимация запуска ──
+            showLaunchScreen(serverData);
 
             try {
                 if (window.pywebview && window.pywebview.api.start_game) {
+                    setLaunchStatus('Запуск лаунчера...', 30);
                     const result = await window.pywebview.api.start_game(nickname, serverData, null);
                     if (result.success) {
-                        showNotification('Игра запускается!', 'success');
+                        setLaunchStatus('Загрузка игры...', 65);
+                        // Ждём пока gta_sa.exe запустится (~3с) и сворачиваем
+                        await new Promise(resolve => setTimeout(resolve, 3000));
+                        setLaunchStatus('Игра запущена! Сворачивание...', 95);
+                        await new Promise(resolve => setTimeout(resolve, 600));
+                        if (window.pywebview.api.minimize_window) {
+                            window.pywebview.api.minimize_window();
+                        }
+                        // После сворачивания — скрываем оверлей и возвращаем панели
+                        await new Promise(resolve => setTimeout(resolve, 400));
+                        hideLaunchScreen();
                     } else {
+                        setLaunchStatus('Ошибка: ' + result.message, 0);
+                        await new Promise(resolve => setTimeout(resolve, 1800));
+                        hideLaunchScreen();
                         showNotification('Ошибка: ' + result.message, 'error');
                     }
                 } else {
-                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    // Демо-режим
+                    setLaunchStatus('Завершение предыдущих процессов...', 15);
+                    await new Promise(resolve => setTimeout(resolve, 700));
+                    setLaunchStatus('Запуск лаунчера...', 40);
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    setLaunchStatus('Загрузка игры...', 70);
+                    await new Promise(resolve => setTimeout(resolve, 900));
+                    setLaunchStatus('Игра запущена! Сворачивание...', 95);
+                    await new Promise(resolve => setTimeout(resolve, 600));
+                    hideLaunchScreen();
                     showNotification('Игра запущена (демо режим)', 'success');
                 }
             } catch (error) {
                 console.error('Ошибка запуска игры:', error);
+                setLaunchStatus('Ошибка запуска', 0);
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                hideLaunchScreen();
                 showNotification('Ошибка запуска игры', 'error');
-            } finally {
+            }
+        }
+
+        function showLaunchScreen(serverData) {
+            const leftPanel  = document.querySelector('.left-panel');
+            const rightPanel = document.querySelector('.right-panel');
+            const screen     = document.getElementById('launchScreen');
+
+            setLaunchStatus('Подготовка...', 5);
+            leftPanel.classList.add('slide-out');
+            rightPanel.classList.add('slide-out');
+
+            // Показываем оверлей чуть позже чтобы анимация началась красиво
+            setTimeout(() => {
+                screen.classList.add('visible');
+            }, 200);
+        }
+
+        function hideLaunchScreen() {
+            const leftPanel  = document.querySelector('.left-panel');
+            const rightPanel = document.querySelector('.right-panel');
+            const screen     = document.getElementById('launchScreen');
+
+            screen.classList.remove('visible');
+            setTimeout(() => {
+                leftPanel.classList.remove('slide-out');
+                rightPanel.classList.remove('slide-out');
                 startBtn.disabled = false;
                 startBtn.classList.remove('start-btn-loading');
-            }
+            }, 300);
+        }
+
+        function setLaunchStatus(text, progress) {
+            const statusEl = document.getElementById('launchStatus');
+            const barEl    = document.getElementById('launchBar');
+            if (statusEl) statusEl.textContent = text;
+            if (barEl && progress > 0) barEl.style.width = progress + '%';
         }
 
         // Модальное окно папки
@@ -3610,10 +3779,14 @@
 
         function openInstallModal(folder, missing) {
             _installFolder = folder || '';
-            // Сброс состояния
             _resetInstallModal();
             document.getElementById('installOverlay').classList.add('open');
         }
+
+        // Вызывается из Python при первом запуске если нужна установка
+        window._autoInstallPrompt = function(data) {
+            openInstallModal(data.folder, data.missing);
+        };
 
         function closeInstallModal() {
             document.getElementById('installOverlay').classList.remove('open');
@@ -3730,8 +3903,7 @@
         }
 
         function handleResize() {
-            initCanvas();
-            initParticles();
+            
         }
 
         // Дефолтные данные патчей (используются как fallback)
@@ -3901,57 +4073,21 @@
         }
 
         // ---- НАСТРОЙКИ ЛАУНЧЕРА ----
-        // Текущие настройки в памяти (загружаются из Python при старте)
-        let launcherSettings = { live_wallpaper: true, waves: true, particles: true, bg_image: null };
+        let launcherSettings = { bg_image: null };
 
-        // Применяет настройки из объекта launcherSettings к canvas и фону
         function applyLauncherSettingsFromObj(s) {
-            CONFIG.wavesEnabled  = s.live_wallpaper && s.waves;
-            CONFIG.showParticles = s.live_wallpaper && s.particles;
-
-            if (!s.live_wallpaper) {
-                cancelAnimationFrame(animationId);
-                animationId = null;
-                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-                bloomCanvas.style.opacity = '0';
-            } else {
-                if (!animationId) animate(0);
+            let dataUrl = s.bg_data || null;
+            // Если bg_image это filename — ищем в загруженных обоях
+            if (!dataUrl && s.bg_image) {
+                const found = _wallpapers.find(w => w.filename === s.bg_image);
+                if (found) dataUrl = found.data_url;
+                else if (s.bg_image.startsWith('data:')) dataUrl = s.bg_image; // "своя"
             }
-
-            applyBgImage(s.bg_image || null);
+            applyBgImage(dataUrl);
         }
 
-        // Вызывается при открытии вкладки — загружает актуальные значения в чекбоксы
-        async function loadLauncherSettings() {
-            try {
-                if (window.pywebview && window.pywebview.api.get_launcher_settings) {
-                    const result = await window.pywebview.api.get_launcher_settings();
-                    if (result.success) launcherSettings = Object.assign(launcherSettings, result.data);
-                }
-            } catch(e) {}
-
-            document.getElementById('liveWallpaperCheck').checked = launcherSettings.live_wallpaper !== false;
-            document.getElementById('wavesCheck').checked         = launcherSettings.waves !== false;
-            document.getElementById('particlesCheck').checked     = launcherSettings.particles !== false;
-
-            const preview = document.getElementById('bgPreview');
-            if (launcherSettings.bg_image) {
-                preview.style.backgroundImage = `url('${launcherSettings.bg_image}')`;
-                preview.textContent = '';
-            } else {
-                preview.style.backgroundImage = '';
-                preview.textContent = 'Фон не выбран';
-            }
-        }
-
-        // Вызывается при изменении чекбоксов — применяет сразу, сохраняет через Python
         async function applyLauncherSettings() {
-            launcherSettings.live_wallpaper = document.getElementById('liveWallpaperCheck').checked;
-            launcherSettings.waves          = document.getElementById('wavesCheck').checked;
-            launcherSettings.particles      = document.getElementById('particlesCheck').checked;
-
             applyLauncherSettingsFromObj(launcherSettings);
-
             try {
                 if (window.pywebview && window.pywebview.api.save_launcher_settings) {
                     await window.pywebview.api.save_launcher_settings(launcherSettings);
@@ -3965,13 +4101,8 @@
                     const result = await window.pywebview.api.select_bg_image();
                     if (result.success) {
                         launcherSettings.bg_image = result.data_url;
-                        applyBgImage(result.data_url);
-                        const preview = document.getElementById('bgPreview');
-                        preview.style.backgroundImage = `url('${result.data_url}')`;
-                        preview.textContent = '';
-                        if (window.pywebview && window.pywebview.api.save_launcher_settings) {
-                            await window.pywebview.api.save_launcher_settings(launcherSettings);
-                        }
+                        applyLauncherSettings();
+                        renderWallpaperGrid();
                     } else if (result.message !== 'Отменено') {
                         showNotification('Ошибка: ' + result.message, 'error');
                     }
@@ -3985,13 +4116,75 @@
 
         async function clearBgImage() {
             launcherSettings.bg_image = null;
-            applyBgImage(null);
-            const preview = document.getElementById('bgPreview');
-            preview.style.backgroundImage = '';
-            preview.textContent = 'Фон не выбран';
+            applyLauncherSettings();
+            renderWallpaperGrid();
+        }
+
+        let _wallpapers = []; // загружаются из wallpapers/
+
+        async function loadWallpapers() {
+            if (window.pywebview && window.pywebview.api.get_wallpapers) {
+                try {
+                    const result = await window.pywebview.api.get_wallpapers();
+                    if (result.success) _wallpapers = result.wallpapers;
+                } catch(e) {}
+            }
+            renderWallpaperGrid();
+        }
+
+        function renderWallpaperGrid() {
+            const grid = document.getElementById('wallpaperGrid');
+            if (!grid) return;
+            const current = launcherSettings.bg_image;
+            grid.innerHTML = '';
+
+            // Карточка "Нет фона"
+            const noneCard = document.createElement('div');
+            noneCard.className = 'wp-card' + (!current ? ' wp-card-active' : '');
+            noneCard.innerHTML = `<div class="wp-thumb wp-thumb-none">✕</div><div class="wp-label">Нет</div>`;
+            noneCard.onclick = clearBgImage;
+            grid.appendChild(noneCard);
+
+            // Карточки из wallpapers/
+            if (_wallpapers.length === 0) {
+                // пусто — ничего не показываем
+            } else {
+                _wallpapers.forEach(wp => {
+                    const isActive = current === wp.filename;
+                    const card = document.createElement('div');
+                    card.className = 'wp-card' + (isActive ? ' wp-card-active' : '');
+                    card.innerHTML = `
+                        <div class="wp-thumb" style="background-image:url('${wp.data_url}')">
+                            ${isActive ? '<div class="wp-check">✓</div>' : ''}
+                        </div>
+                        <div class="wp-label">${wp.name}</div>`;
+                    card.onclick = () => applyLocalWallpaper(wp);
+                    grid.appendChild(card);
+                });
+            }
+
+            // Карточка "Своя"
+            const isCustom = current && !_wallpapers.find(w => w.filename === current);
+            const customCard = document.createElement('div');
+            customCard.className = 'wp-card' + (isCustom ? ' wp-card-active' : '');
+            customCard.innerHTML = `
+                <div class="wp-thumb wp-thumb-custom" ${isCustom && current.startsWith('data:') ? `style="background-image:url('${current}')"` : ''}>
+                    ${!isCustom ? '🖼️' : '<div class="wp-check">✓</div>'}
+                </div>
+                <div class="wp-label">Своя</div>`;
+            customCard.onclick = selectBgImage;
+            grid.appendChild(customCard);
+        }
+
+        function applyLocalWallpaper(wp) {
+            // Сохраняем filename как ключ, data_url как значение
+            launcherSettings.bg_image = wp.filename;
+            launcherSettings.bg_data  = wp.data_url;
+            applyBgImage(wp.data_url);
+            renderWallpaperGrid();
             try {
                 if (window.pywebview && window.pywebview.api.save_launcher_settings) {
-                    await window.pywebview.api.save_launcher_settings(launcherSettings);
+                    window.pywebview.api.save_launcher_settings(launcherSettings);
                 }
             } catch(e) {}
         }
@@ -4015,6 +4208,7 @@
                     if (result.success) launcherSettings = Object.assign(launcherSettings, result.data);
                 }
             } catch(e) {}
+            await loadWallpapers(); // загружает wallpapers/ и рендерит грид
             applyLauncherSettingsFromObj(launcherSettings);
         }
 
@@ -4182,122 +4376,6 @@
             }
         }
 
-        // ОПТИМИЗИРОВАННЫЕ ГРАФИЧЕСКИЕ ФУНКЦИИ
-        let canvasWidth, canvasHeight;
-        let particles = [];
-        let time = 0;
-        let animationId;
-        let lastFrameTime = 0;
-        const frameInterval = 1000 / CONFIG.targetFPS;
-
-        function initCanvas() {
-            canvasWidth = window.innerWidth;
-            canvasHeight = window.innerHeight;
-            
-            canvas.width = canvasWidth;
-            canvas.height = canvasHeight;
-            bloomCanvas.width = canvasWidth;
-            bloomCanvas.height = canvasHeight;
-        }
-
-        function initParticles() {
-            particles = [];
-            const count = CONFIG.particlesCount * (canvasWidth * canvasHeight) / (1920 * 1080);
-            for(let i = 0; i < count; i++) {
-                particles.push({
-                    x: Math.random() * canvasWidth,
-                    y: Math.random() * canvasHeight,
-                    size: Math.random() * 2 + 0.5,
-                    speedX: (Math.random() - 0.5) * 0.3,
-                    speedY: (Math.random() - 0.5) * 0.3,
-                    alpha: Math.random() * 0.25 + 0.1,
-                    waveInfluence: Math.random() * 0.015
-                });
-            }
-        }
-
-        function renderWaves() {
-            if (!CONFIG.wavesEnabled) return;
-            
-            time += 0.008 * CONFIG.wavesSpeed;
-            
-            const waveCount = 4;
-            for(let i = 0; i < waveCount; i++) {
-                const waveY = (i / waveCount) * canvasHeight;
-                const amplitude = 15 + i * 4;
-                const frequency = 0.004 + i * 0.0008;
-                const width = 1 + i * 0.25;
-                const alpha = 0.04 + i * 0.04;
-                
-                ctx.beginPath();
-                ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * CONFIG.wavesBrightness})`;
-                ctx.lineWidth = width;
-                ctx.lineCap = 'round';
-                
-                for(let x = 0; x <= canvasWidth; x += CONFIG.waveStep) {
-                    const y = waveY + 
-                             Math.sin(x * frequency + time) * amplitude +
-                             Math.sin(x * frequency * 0.5 + time * 1.2) * amplitude * 0.25;
-                    
-                    if(x === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
-                }
-                
-                ctx.stroke();
-            }
-        }
-
-        function renderParticles() {
-            if (!CONFIG.showParticles) return;
-            
-            const timeOffset = time * 2;
-            
-            for(const p of particles) {
-                p.x += p.speedX + Math.sin(timeOffset + p.x * 0.008) * p.waveInfluence;
-                p.y += p.speedY + Math.cos(timeOffset + p.y * 0.008) * p.waveInfluence;
-                
-                if(p.x < 0 || p.x > canvasWidth) p.speedX *= -1;
-                if(p.y < 0 || p.y > canvasHeight) p.speedY *= -1;
-                
-                ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        function applyBloom() {
-            if (CONFIG.bloomType === 'none' || CONFIG.bloomStrength <= 0) {
-                bloomCanvas.style.opacity = '0';
-                return;
-            }
-
-            bloomCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-            bloomCtx.drawImage(canvas, 0, 0);
-
-            bloomCanvas.style.opacity = (CONFIG.bloomStrength * 0.8).toString();
-            bloomCanvas.style.filter = `blur(${16}px) brightness(${1 + CONFIG.bloomStrength * 0.5})`;
-        }
-
-        function animate(currentTime) {
-            const elapsed = currentTime - lastFrameTime;
-            
-            if (elapsed >= frameInterval) {
-                lastFrameTime = currentTime - (elapsed % frameInterval);
-                
-                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-                
-                renderWaves();
-                renderParticles();
-                applyBloom();
-            }
-            
-            animationId = requestAnimationFrame(animate);
-        }
-
         // Функция debounce для отложенного сохранения
         function debounce(func, delay) {
             let timeoutId;
@@ -4342,10 +4420,15 @@
 
             document.addEventListener('dragenter', function (e) {
                 e.preventDefault();
-                // Показываем оверлей только если тащат файл
                 if (e.dataTransfer && e.dataTransfer.types && e.dataTransfer.types.includes('Files')) {
                     dragCounter++;
-                    if (dragCounter === 1) showOverlay();
+                    if (dragCounter === 1) {
+                        const title = document.getElementById('dragTitle');
+                        const sub   = document.getElementById('dragSub');
+                        if (title) title.textContent = 'Бросай файл сюда';
+                        if (sub) sub.textContent = '.lua → moonloader   |   .json → ArizonaPatches';
+                        showOverlay();
+                    }
                 }
             });
 
@@ -4364,12 +4447,40 @@
                 hideOverlay();
 
                 const files = Array.from(e.dataTransfer.files || []);
-                const luaFiles = files.filter(f => f.name.toLowerCase().endsWith('.lua'));
+                const luaFiles  = files.filter(f => f.name.toLowerCase().endsWith('.lua'));
+                const jsonFiles = files.filter(f => f.name.toLowerCase().endsWith('.json'));
 
-                if (luaFiles.length === 0) {
-                    showNotification('Можно бросать только .lua файлы', 'error');
+                if (luaFiles.length === 0 && jsonFiles.length === 0) {
+                    showNotification('Поддерживаются .lua и .json файлы', 'error');
                     return;
                 }
+
+                // Обработка .json — патчи
+                jsonFiles.forEach(function (file) {
+                    const reader = new FileReader();
+                    reader.onload = async function (evt) {
+                        const bytes = new Uint8Array(evt.target.result);
+                        let binary = '';
+                        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+                        const b64 = btoa(binary);
+                        try {
+                            let result;
+                            if (window.pywebview && window.pywebview.api.install_patches_file) {
+                                result = await window.pywebview.api.install_patches_file(file.name, b64);
+                            } else {
+                                result = { success: true, message: `[DEMO] ${file.name} → #ArizonaPatches.json` };
+                            }
+                            if (result && result.success) {
+                                showNotification('✓ ' + (result.message || `${file.name} установлен`), 'success');
+                            } else {
+                                showNotification('Ошибка: ' + (result && result.message || 'неизвестная ошибка'), 'error');
+                            }
+                        } catch (err) {
+                            showNotification('Ошибка установки патчей', 'error');
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                });
 
                 luaFiles.forEach(function (file) {
                     const reader = new FileReader();
@@ -4494,7 +4605,7 @@
             // Создаём 6 ячеек бинарного дисплея (биты 7..2, без зарезервированных 0 и 1)
             const disp = document.getElementById('creBitsDisplay');
             disp.innerHTML = '';
-            for (let i = 7; i >= 2; i--) {
+            for (let i = 2; i <= 7; i++) {
                 const bitVal = 1 << i;
                 const cell = document.createElement('div');
                 cell.className = 'cre-bit-cell';
