@@ -1835,7 +1835,7 @@
             font-family: 'Montserrat Alternates', sans-serif;
             font-size: 14px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            z-index: 2000;
+            z-index: 99999;
             animation: slideIn 0.3s ease-out;
         }
 
@@ -2128,7 +2128,7 @@
             <div class="left-panel">
                 <div class="header">
                     <div class="title">Arizona RP</div>
-                    <div class="subtitle">Launcher v0.0.6</div>
+                    <div class="subtitle">Launcher v0.0.7</div>
                 </div>
 
                 <div class="nickname-section">
@@ -3447,8 +3447,8 @@
             const btn = document.getElementById('sdUninstallBtn');
             btn.disabled = true; btn.textContent = '⏳ Удаление...';
             try {
-                if (window.pywebview && window.pywebview.api.remove_moonloader_script) {
-                    const result = await window.pywebview.api.remove_moonloader_script(item.file);
+                if (window.pywebview && window.pywebview.api.delete_moonloader_script) {
+                    const result = await window.pywebview.api.delete_moonloader_script(item.file);
                     if (!result.success) throw new Error(result.message);
                 } else { await new Promise(r => setTimeout(r, 600)); }
                 const fileName = (item.file || '').toLowerCase().split(/[\\/]/).pop();
@@ -4116,6 +4116,7 @@
 
         async function clearBgImage() {
             launcherSettings.bg_image = null;
+            launcherSettings.bg_data  = null;
             applyLauncherSettings();
             renderWallpaperGrid();
         }

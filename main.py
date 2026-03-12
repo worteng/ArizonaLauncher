@@ -293,25 +293,35 @@ class WebViewApp:
 
     def select_bg_image(self):
         """Выбрать картинку для фона лаунчера, вернуть base64 data URL"""
-        try:
-            import base64, mimetypes
-            from PyQt5.QtWidgets import QFileDialog
-            app = self._qt_app()
-            file_path, _ = QFileDialog.getOpenFileName(
-                None,
-                "Выбрать картинку для фона",
-                "",
-                "Изображения (*.png *.jpg *.jpeg *.webp *.bmp);;Все файлы (*)"
-            )
-            if not file_path:
-                return {"success": False, "message": "Отменено"}
-            mime = mimetypes.guess_type(file_path)[0] or "image/jpeg"
-            with open(file_path, 'rb') as f:
-                data = base64.b64encode(f.read()).decode('utf-8')
-            return {"success": True, "data_url": f"data:{mime};base64,{data}"}
-        except Exception as e:
-            logger.error(f"select_bg_image error: {e}")
-            return {"success": False, "message": str(e)}
+        import base64, mimetypes, queue
+        from threading import Thread
+        result_queue = queue.Queue()
+
+        def _pick():
+            try:
+                from PyQt5.QtWidgets import QFileDialog
+                app = self._qt_app()
+                file_path, _ = QFileDialog.getOpenFileName(
+                    None,
+                    "Выбрать картинку для фона",
+                    "",
+                    "Изображения (*.png *.jpg *.jpeg *.webp *.bmp);;Все файлы (*)"
+                )
+                if not file_path:
+                    result_queue.put({"success": False, "message": "Отменено"})
+                    return
+                mime = mimetypes.guess_type(file_path)[0] or "image/jpeg"
+                with open(file_path, 'rb') as f:
+                    data = base64.b64encode(f.read()).decode('utf-8')
+                result_queue.put({"success": True, "data_url": f"data:{mime};base64,{data}"})
+            except Exception as e:
+                logger.error(f"select_bg_image error: {e}")
+                result_queue.put({"success": False, "message": str(e)})
+
+        t = Thread(target=_pick, daemon=True)
+        t.start()
+        t.join(timeout=60)
+        return result_queue.get() if not result_queue.empty() else {"success": False, "message": "Таймаут"}
 
     def _check_game_folder(self, folder_path):
         """Проверяет папку игры и возвращает статус.
