@@ -246,7 +246,33 @@ class ArizonaLauncher:
 
 class WebViewApp:
     def __init__(self): self.launcher = ArizonaLauncher()
+    
+    def is_gta_running(self):
+        running = any('gta_sa' in p.info['name'].lower()
+                    for p in psutil.process_iter(['name'])
+                    if p.info['name'])
+        was = getattr(self, '_gta_was_running', False)
+        self._gta_was_running = running
+        return {"running": running, "was_running": was}
 
+    def restore_window(self):
+        try:
+            wins = webview.windows
+            if wins:
+                wins[0].restore()
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+    def get_profiles(self):
+        profiles = self.launcher.config.get('profiles', [])
+        active_id = self.launcher.config.get('active_profile_id', None)
+        return {"success": True, "profiles": profiles, "active_id": active_id}
+
+    def save_profiles(self, profiles, active_id):
+        self.launcher.config['profiles'] = profiles
+        self.launcher.config['active_profile_id'] = active_id
+        self.launcher.save_config()
+        return {"success": True}
     def start_game(self, nickname, server_data=None, launch_params=None):
         def run():
             try: self.launcher.launch_game(nickname, server_data, launch_params)
@@ -268,7 +294,16 @@ class WebViewApp:
             "nickname": self.launcher.config.get('last_nickname', ''),
             "server": self.launcher.config.get('last_server', 15)
         }
+    def get_read_news_ids(self):
+        """Возвращает список прочитанных ID новостей"""
+        ids = self.launcher.config.get('read_news_ids', [])
+        return {"success": True, "ids": ids}
 
+    def save_read_news_ids(self, ids):
+        """Сохраняет список прочитанных ID новостей"""
+        self.launcher.config['read_news_ids'] = ids
+        self.launcher.save_config()
+        return {"success": True}
     def get_launcher_settings(self):
         return {"success": True, "data": self.launcher.config.get('launcher_settings', {})}
 

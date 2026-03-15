@@ -104,12 +104,16 @@
             display: flex;
             padding: 20px;
             gap: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
         }
 
         .left-panel {
             flex: 0 0 350px;
+            min-width: 0;
+            max-width: 350px;
+            width: 350px;
             background: var(--secondary-color);
             border-radius: var(--border-radius);
             padding: 20px;
@@ -119,20 +123,115 @@
             gap: 20px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s ease;
+            transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s ease;
+        }
+
+        /* Когда новости открыты — сдвигаем левую панель влево */
+        .news-open .left-panel {
+            transform: translateX(-190px);
         }
 
         .right-panel {
-            flex: 1;
+            position: fixed;
+            top: 20px;
+            right: 0;
+            height: calc(100% - 40px);
+            width: 360px;
             background: var(--secondary-color);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            box-shadow: 0px 4px 4px var(--shadow-color);
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            padding: 20px 20px 20px 58px;
+            box-shadow: -4px 0 28px rgba(0,0,0,0.4);
             display: flex;
             flex-direction: column;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s ease;
+            border-right: none;
+            transform: translateX(calc(100% - 48px));
+            transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+            overflow: hidden;
+        }
+
+        .right-panel.open {
+            transform: translateX(0) !important;
+        }
+
+        .right-panel.peek-anim {
+            transform: translateX(calc(100% - 48px - 170px)) !important;
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        }
+
+        .right-panel:not(.peek-anim) {
+            transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* News drawer handle tab */
+        .news-handle {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 155px;
+            background: rgba(0, 100, 200, 0.55);
+            border-radius: 10px 0 0 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            gap: 8px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-right: none;
+            transition: background 0.2s, box-shadow 0.2s;
+            z-index: 1;
+            user-select: none;
+        }
+
+        .news-handle:hover {
+            background: rgba(0, 130, 230, 0.72);
+            box-shadow: -4px 0 18px rgba(0, 120, 212, 0.5);
+        }
+
+        .news-handle-icon {
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .news-handle-label {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.85);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            letter-spacing: 1.5px;
+            white-space: nowrap;
+        }
+
+        .news-unread-badge {
+            display: none;
+            width: 20px;
+            height: 20px;
+            background: rgba(220, 50, 50, 0.95);
+            border-radius: 50%;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: white;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .news-unread-badge.show {
+            display: flex;
+            animation: badgePulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(220,50,50,0.4); transform: scale(1); }
+            50%       { box-shadow: 0 0 12px rgba(220,50,50,0.9); transform: scale(1.15); }
         }
 
         .left-panel.slide-out {
@@ -141,11 +240,7 @@
             pointer-events: none;
         }
 
-        .right-panel.slide-out {
-            transform: translateX(130%);
-            opacity: 0;
-            pointer-events: none;
-        }
+        /* right-panel slide-out is handled by the drawer system — see .right-panel.open */
 
         /* ── Launch overlay ── */
         .launch-screen {
@@ -438,6 +533,27 @@
             margin-bottom: 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all var(--transition-speed);
+            position: relative;
+        }
+
+        .news-item.unread {
+            border-left: 3px solid rgba(0, 140, 255, 0.7);
+            background: rgba(0, 100, 200, 0.08);
+        }
+
+        .news-item.unread::after {
+            content: 'NEW';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 9px;
+            color: rgba(100, 200, 255, 0.8);
+            background: rgba(0, 120, 212, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 140, 255, 0.3);
+            letter-spacing: 1px;
         }
 
         .news-item:hover {
@@ -529,7 +645,7 @@
             width: min(500px, 92vw);
             box-shadow: 0 28px 90px rgba(0,0,0,0.8);
             overflow: hidden;
-            animation: creIn 0.22s ease;
+            animation: creIn 0.35s cubic-bezier(0.34, 1.3, 0.64, 1);
         }
 
         .install-header {
@@ -694,13 +810,85 @@
             width: min(480px, 92vw);
             box-shadow: 0 24px 80px rgba(0,0,0,0.75);
             overflow: hidden;
-            animation: creIn 0.22s ease;
+            animation: creIn 0.35s cubic-bezier(0.34, 1.3, 0.64, 1);
         }
 
         @keyframes creIn {
-            from { opacity: 0; transform: scale(0.95) translateY(8px); }
-            to   { opacity: 1; transform: scale(1) translateY(0); }
+            0%   { opacity: 0; transform: scale(0.85); }
+            70%  { opacity: 1; transform: scale(1.02); }
+            100% { opacity: 1; transform: scale(1); }
         }
+
+        @keyframes creOut {
+            0%   { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.85); }
+        }
+
+        @keyframes settingsIn {
+            0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.85); }
+            70%  { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        @keyframes settingsOut {
+            0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.85); }
+        }
+
+        @keyframes modsIn {
+            0%   { opacity: 0; transform: scale(0.97); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes modsOut {
+            0%   { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.97); }
+        }
+
+        @keyframes overlayFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        @keyframes overlayFadeOut {
+            from { opacity: 1; }
+            to   { opacity: 0; }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(40px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideOutRight {
+            from { opacity: 1; transform: translateX(0); }
+            to   { opacity: 0; transform: translateX(40px); }
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideOutDown {
+            from { opacity: 1; transform: translateY(0); }
+            to   { opacity: 0; transform: translateY(30px); }
+        }
+        .cre-overlay.closing         { animation: overlayFadeOut 0.25s ease forwards; }
+        .cre-overlay.closing .cre-modal { animation: creOut 0.25s cubic-bezier(0.4, 0, 1, 1) forwards; }
+
+        .profiles-overlay.closing            { animation: overlayFadeOut 0.25s ease forwards; }
+        .profiles-overlay.closing .profiles-modal { animation: creOut 0.25s cubic-bezier(0.4, 0, 1, 1) forwards; }
+
+        .install-overlay.closing              { animation: overlayFadeOut 0.25s ease forwards; }
+        .install-overlay.closing .install-modal { animation: creOut 0.25s cubic-bezier(0.4, 0, 1, 1) forwards; }
+
+        .script-detail-overlay.closing                { animation: overlayFadeOut 0.25s ease forwards; }
+        .script-detail-overlay.closing .script-detail-panel { animation: slideOutRight 0.22s ease forwards; }
+
+        .settings-panel.closing { animation: settingsOut 0.25s cubic-bezier(0.4, 0, 1, 1) forwards; }
+
+        .folder-modal.closing { animation: settingsOut 0.25s cubic-bezier(0.4, 0, 1, 1) forwards; }
+
+        .mods-modal.closing { animation: modsOut 0.25s cubic-bezier(0.4, 0, 1, 1) forwards; }
 
         .cre-header {
             display: flex;
@@ -870,6 +1058,7 @@
             flex-direction: row;
             align-items: stretch;
             overflow: hidden;
+            animation: settingsIn 0.35s cubic-bezier(0.34, 1.3, 0.64, 1);
         }
 
         /* ── Левая навигация ── */
@@ -1446,6 +1635,7 @@
             backdrop-filter: blur(10px);
             flex-direction: column;
             gap: 15px;
+            animation: settingsIn 0.35s cubic-bezier(0.34, 1.3, 0.64, 1);
         }
 
         .folder-modal-header {
@@ -1496,7 +1686,7 @@
             z-index: 500;
             flex-direction: column;
             overflow: hidden;
-            animation: modsFadeIn 0.25s ease;
+            animation: modsIn 0.35s cubic-bezier(0.34, 1.3, 0.64, 1);
         }
 
         @keyframes modsFadeIn {
@@ -1870,8 +2060,7 @@
             }
 
             .right-panel {
-                flex: 1;
-                min-height: 300px;
+                width: 320px;
             }
         }
 
@@ -2109,6 +2298,362 @@
             border-color: rgba(200, 50, 50, 0.7);
             transform: translateY(-1px);
         }
+        /* ══════════════════════════════════════
+           CUSTOM SERVER SELECT
+        ══════════════════════════════════════ */
+        .custom-select {
+            position: relative;
+            width: 100%;
+            user-select: none;
+        }
+
+        .cs-trigger {
+            width: 100%;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 8px;
+            padding: 0 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+        }
+
+        .cs-trigger:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.28);
+        }
+
+        .custom-select.open .cs-trigger {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+            border-radius: 8px 8px 0 0;
+            background: rgba(255, 255, 255, 0.11);
+        }
+
+        .cs-trigger-content {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .cs-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(0, 210, 100, 0.85);
+            box-shadow: 0 0 6px rgba(0, 210, 100, 0.6);
+            flex-shrink: 0;
+        }
+
+        .cs-trigger-name {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.92);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .cs-trigger-online {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.38);
+            white-space: nowrap;
+            margin-left: auto;
+            padding-right: 6px;
+        }
+
+        .cs-arrow {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            opacity: 0.55;
+            transition: transform 0.25s ease;
+        }
+
+        .custom-select.open .cs-arrow {
+            transform: rotate(180deg);
+        }
+
+        /* Выпадающий список */
+        .cs-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0; right: 0;
+            background: rgba(10, 14, 26, 0.97);
+            border: 1px solid rgba(0, 120, 212, 0.35);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            max-height: 0;
+            overflow: hidden;
+            z-index: 200;
+            backdrop-filter: blur(18px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+            transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.22s ease;
+            opacity: 0;
+        }
+
+        .custom-select.open .cs-dropdown {
+            max-height: 320px;
+            opacity: 1;
+            overflow-y: auto;
+        }
+
+        .cs-dropdown::-webkit-scrollbar { width: 5px; }
+        .cs-dropdown::-webkit-scrollbar-track { background: transparent; }
+        .cs-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+
+        /* Элемент списка */
+        .cs-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            transition: background 0.15s;
+        }
+
+        .cs-item:last-child { border-bottom: none; }
+
+        .cs-item:hover {
+            background: rgba(0, 120, 212, 0.15);
+        }
+
+        .cs-item.selected {
+            background: rgba(0, 120, 212, 0.2);
+        }
+
+        .cs-item-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .cs-item-num {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            padding: 1px 5px;
+            flex-shrink: 0;
+        }
+
+        .cs-item-name {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            flex: 1;
+        }
+
+        .cs-item-count {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            white-space: nowrap;
+        }
+
+        .cs-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .cs-item-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 7px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        /* Онлайн-бар */
+        .cs-item-bar-wrap {
+            height: 3px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .cs-item-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.4s ease;
+        }
+
+        /* ══════════════════════════════════════
+           PROFILES MODAL
+        ══════════════════════════════════════ */
+        .profiles-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(6px);
+            z-index: 1100;
+            align-items: center;
+            justify-content: center;
+        }
+        .profiles-overlay.open { display: flex; }
+
+        .profiles-modal {
+            background: rgba(12, 14, 24, 0.99);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            width: min(500px, 92vw);
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.75);
+            animation: creIn 0.35s cubic-bezier(0.34, 1.3, 0.64, 1);
+        }
+
+        .profiles-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 22px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            flex-shrink: 0;
+        }
+
+        .profiles-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 15px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .profiles-body {
+            padding: 16px 20px 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .profiles-body::-webkit-scrollbar { width: 5px; }
+        .profiles-body::-webkit-scrollbar-track { background: transparent; }
+        .profiles-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+        .profile-item {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .profile-item.active-profile {
+            border-color: rgba(0, 140, 255, 0.5);
+            background: rgba(0, 100, 200, 0.1);
+        }
+
+        .profile-item:hover { background: rgba(255,255,255,0.07); }
+
+        .profile-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+            width: 36px;
+            text-align: center;
+        }
+
+        .profile-info { flex: 1; min-width: 0; }
+
+        .profile-name {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .profile-meta {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .profile-active-badge {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 9px;
+            color: rgba(0, 200, 120, 0.9);
+            background: rgba(0, 180, 100, 0.12);
+            border: 1px solid rgba(0, 180, 100, 0.25);
+            border-radius: 4px;
+            padding: 2px 7px;
+            flex-shrink: 0;
+        }
+
+        .profile-btns {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .profile-btn {
+            height: 30px;
+            padding: 0 12px;
+            border-radius: 7px;
+            border: none;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+
+        .profile-btn.apply {
+            background: rgba(0, 120, 212, 0.3);
+            border: 1px solid rgba(0, 140, 255, 0.4);
+            color: rgba(140, 210, 255, 0.9);
+        }
+        .profile-btn.apply:hover { background: rgba(0, 120, 212, 0.5); }
+
+        .profile-btn.del {
+            background: rgba(180, 40, 40, 0.2);
+            border: 1px solid rgba(200, 60, 60, 0.3);
+            color: rgba(255, 130, 130, 0.8);
+        }
+        .profile-btn.del:hover { background: rgba(200, 50, 50, 0.4); }
+
+        .profiles-add-btn {
+            width: 100%;
+            height: 42px;
+            background: rgba(255,255,255,0.04);
+            border: 1px dashed rgba(255,255,255,0.15);
+            border-radius: 10px;
+            color: rgba(255,255,255,0.5);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .profiles-add-btn:hover {
+            background: rgba(0,120,212,0.1);
+            border-color: rgba(0,140,255,0.35);
+            color: rgba(140,210,255,0.8);
+        }
+
+        .profiles-empty {
+            text-align: center;
+            padding: 30px 0;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.2);
+        }
+
     </style>
 </head>
 <body>
@@ -2128,7 +2673,7 @@
             <div class="left-panel">
                 <div class="header">
                     <div class="title">Arizona RP</div>
-                    <div class="subtitle">Launcher v0.0.7</div>
+                    <div class="subtitle">Launcher v0.0.8</div>
                 </div>
 
                 <div class="nickname-section">
@@ -2142,9 +2687,21 @@
 
                 <div class="server-section">
                     <label class="section-label">Выбор сервера</label>
-                    <select class="server-select" id="serverSelect">
-                        <option value="">Загрузка...</option>
-                    </select>
+                    <!-- Кастомный дропдаун -->
+                    <div class="custom-select" id="customServerSelect">
+                        <div class="cs-trigger" id="csTrigger" onclick="toggleServerDropdown()">
+                            <div class="cs-trigger-content">
+                                <img class="cs-icon" id="csTriggerIcon" src="" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                                <span class="cs-dot" id="csTriggerDot" style="display:none"></span>
+                                <span class="cs-trigger-name" id="csTriggerName">Загрузка...</span>
+                                <span class="cs-trigger-online" id="csTriggerOnline"></span>
+                            </div>
+                            <svg class="cs-arrow" id="csArrow" viewBox="0 0 24 24" fill="white"><path d="M7 10l5 5 5-5z"/></svg>
+                        </div>
+                        <div class="cs-dropdown" id="csDropdown"></div>
+                    </div>
+                    <!-- Скрытый select для совместимости -->
+                    <select id="serverSelect" style="display:none"></select>
                 </div>
 
                 <button class="start-btn" id="startBtn">
@@ -2161,7 +2718,9 @@
                     <button class="icon-btn" id="modsBtn" title="Моды" onclick="openModsModal()">
                         🧩 Моды
                     </button>
-
+                    <button class="icon-btn" title="Профили" onclick="openProfilesModal()">
+                        👤 Профили
+                    </button>
                 </div>
             </div>
 
@@ -2180,6 +2739,13 @@
             </div>
 
             <div class="right-panel">
+                <!-- Боковой язычок-ручка -->
+                <div class="news-handle" id="newsHandle" onclick="toggleNewsPanel()" title="Открыть / закрыть новости">
+                    <span class="news-handle-icon">📰</span>
+                    <span class="news-handle-label">Новости</span>
+                    <span class="news-unread-badge" id="newsUnreadBadge">0</span>
+                </div>
+
                 <div class="header">
                     <div class="title">Новости</div>
                 </div>
@@ -2599,6 +3165,20 @@
             </div>
         </div>
 
+        <!-- Profiles Modal -->
+        <div class="profiles-overlay" id="profilesOverlay" onclick="if(event.target===this)closeProfilesModal()">
+            <div class="profiles-modal">
+                <div class="profiles-header">
+                    <div class="profiles-title">👤 Профили</div>
+                    <button class="close-btn" onclick="closeProfilesModal()">×</button>
+                </div>
+                <div class="profiles-body">
+                    <div class="profiles-list" id="profilesList"></div>
+                    <button class="profiles-add-btn" onclick="createProfile()">＋ Создать профиль из текущих настроек</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -2648,6 +3228,307 @@
             "ServerAttachObjectForceDistance": "Принудительная дистанция для прикрепленных серверных объектов (настройте сами)"
         };
 
+        // ══════════════════════════════════════════════
+        //  PROFILES — сохранение/загрузка наборов настроек
+        // ══════════════════════════════════════════════
+        let _profiles = [];
+        let _activeProfileId = null;
+
+        async function _loadProfiles() {
+            try {
+                if (window.pywebview && window.pywebview.api.get_profiles) {
+                    const res = await window.pywebview.api.get_profiles();
+                    if (res && res.success) {
+                        _profiles = res.profiles || [];
+                        _activeProfileId = res.active_id || null;
+                        return;
+                    }
+                }
+            } catch {}
+            // localStorage fallback
+            try {
+                _profiles = JSON.parse(localStorage.getItem('arp_profiles') || '[]');
+                _activeProfileId = localStorage.getItem('arp_active_profile') || null;
+            } catch { _profiles = []; }
+        }
+
+        async function _saveProfiles() {
+            try {
+                if (window.pywebview && window.pywebview.api.save_profiles) {
+                    await window.pywebview.api.save_profiles(_profiles, _activeProfileId);
+                    return;
+                }
+            } catch {}
+            try {
+                localStorage.setItem('arp_profiles', JSON.stringify(_profiles));
+                localStorage.setItem('arp_active_profile', _activeProfileId || '');
+            } catch {}
+        }
+
+        async function openProfilesModal() {
+            await _loadProfiles();
+            _renderProfiles();
+            document.getElementById('profilesOverlay').classList.add('open');
+        }
+
+        function closeProfilesModal() {
+            _closeWithAnim(document.getElementById('profilesOverlay'), () => {
+                document.getElementById('profilesOverlay').classList.remove('open');
+            });
+        }
+
+        function _renderProfiles() {
+            const list = document.getElementById('profilesList');
+            list.innerHTML = '';
+
+            if (_profiles.length === 0) {
+                list.innerHTML = '<div class="profiles-empty">Нет сохранённых профилей.<br>Создайте первый из текущих настроек.</div>';
+                return;
+            }
+
+            _profiles.forEach(p => {
+                const isActive = p.id === _activeProfileId;
+                const luaCount = (p.lua_enabled || []).length;
+                const metaParts = [];
+                if (p.launch_params) metaParts.push(`Память: ${p.launch_params.memory || 4096} МБ`);
+                metaParts.push(`Lua: ${luaCount} скр.`);
+                const meta = metaParts.join(' · ');
+
+                const item = document.createElement('div');
+                item.className = 'profile-item' + (isActive ? ' active-profile' : '');
+                item.innerHTML = `
+                    <div class="profile-icon">${p.icon || '👤'}</div>
+                    <div class="profile-info">
+                        <div class="profile-name">${p.name}</div>
+                        <div class="profile-meta">${meta}</div>
+                    </div>
+                    ${isActive ? '<span class="profile-active-badge">✓ Активен</span>' : ''}
+                    <div class="profile-btns">
+                        <button class="profile-btn apply" onclick="applyProfile('${p.id}')">▶ Применить</button>
+                        <button class="profile-btn del" onclick="deleteProfile('${p.id}')">🗑</button>
+                    </div>`;
+                list.appendChild(item);
+            });
+        }
+
+        async function createProfile() {
+            const name = prompt('Название профиля:', 'Мой профиль');
+            if (!name) return;
+
+            // Снимаем текущие патчи и параметры запуска
+            let patches = {};
+            let launchParams = {};
+            let luaEnabled = [];
+            try {
+                if (window.pywebview) {
+                    if (window.pywebview.api.read_patches) {
+                        const pr = await window.pywebview.api.read_patches();
+                        if (pr && pr.success) patches = pr.data || {};
+                    }
+                    if (window.pywebview.api.read_launch_params) {
+                        launchParams = await window.pywebview.api.read_launch_params() || {};
+                    }
+                    if (window.pywebview.api.get_moonloader_scripts) {
+                        const mr = await window.pywebview.api.get_moonloader_scripts();
+                        if (mr && mr.success) {
+                            luaEnabled = (mr.scripts || []).filter(s => s.enabled).map(s => s.name);
+                        }
+                    }
+                }
+            } catch (e) { console.error('createProfile snapshot error:', e); }
+
+            const profile = {
+                id: 'p_' + Date.now(),
+                name,
+                icon: '👤',
+                created: new Date().toLocaleDateString('ru-RU'),
+                patches,
+                launch_params: launchParams,
+                lua_enabled: luaEnabled
+            };
+
+            _profiles.push(profile);
+            await _saveProfiles();
+            _renderProfiles();
+            showNotification('✓ Профиль «' + name + '» сохранён', 'success');
+        }
+
+        async function applyProfile(id) {
+            const p = _profiles.find(x => x.id === id);
+            if (!p) return;
+
+            try {
+                if (window.pywebview) {
+                    // Применяем патчи
+                    if (p.patches && Object.keys(p.patches).length && window.pywebview.api.write_patches) {
+                        await window.pywebview.api.write_patches(p.patches);
+                    }
+                    // Применяем параметры запуска
+                    if (p.launch_params && window.pywebview.api.update_launch_params) {
+                        await window.pywebview.api.update_launch_params(p.launch_params);
+                    }
+                    // Применяем список lua — включаем нужные, выключаем остальные
+                    if (window.pywebview.api.get_moonloader_scripts && window.pywebview.api.toggle_moonloader_script) {
+                        const mr = await window.pywebview.api.get_moonloader_scripts();
+                        if (mr && mr.success) {
+                            for (const s of mr.scripts) {
+                                const shouldBeEnabled = (p.lua_enabled || []).includes(s.name);
+                                if (s.enabled !== shouldBeEnabled) {
+                                    await window.pywebview.api.toggle_moonloader_script(s.name, shouldBeEnabled);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (e) { console.error('applyProfile error:', e); }
+
+            _activeProfileId = id;
+            await _saveProfiles();
+            _renderProfiles();
+            showNotification('✓ Профиль «' + p.name + '» применён', 'success');
+        }
+
+        async function deleteProfile(id) {
+            const p = _profiles.find(x => x.id === id);
+            if (!p || !confirm(`Удалить профиль «${p.name}»?`)) return;
+            _profiles = _profiles.filter(x => x.id !== id);
+            if (_activeProfileId === id) _activeProfileId = null;
+            await _saveProfiles();
+            _renderProfiles();
+        }
+
+        // ══════════════════════════════════════════════
+        //  GTA WATCHER — авто-разворот при закрытии GTA
+        // ══════════════════════════════════════════════
+        let _gtaWatcherInterval = null;
+
+        function startGtaWatcher() {
+            if (_gtaWatcherInterval) return;
+            _gtaWatcherInterval = setInterval(async () => {
+                try {
+                    if (window.pywebview && window.pywebview.api.is_gta_running) {
+                        const res = await window.pywebview.api.is_gta_running();
+                        if (res && res.was_running && !res.running) {
+                            // GTA только что закрылась — разворачиваем лаунчер
+                            if (window.pywebview.api.restore_window) {
+                                window.pywebview.api.restore_window();
+                            }
+                            clearInterval(_gtaWatcherInterval);
+                            _gtaWatcherInterval = null;
+                        }
+                    }
+                } catch {}
+            }, 3000);
+        }
+
+        // ══════════════════════════════════════════════
+        //  NEWS DRAWER — выдвижная панель новостей
+        // ══════════════════════════════════════════════
+        const NEWS_READ_KEY = 'arp_read_news_ids';
+        let _newsPanelOpen = false;
+        let _peekRunning = false;
+
+        function toggleNewsPanel() {
+            const panel = document.querySelector('.right-panel');
+            const iface = document.querySelector('.interface');
+            _newsPanelOpen = !_newsPanelOpen;
+            panel.classList.toggle('open', _newsPanelOpen);
+            iface.classList.toggle('news-open', _newsPanelOpen);
+            if (_newsPanelOpen) {
+                _markAllNewsRead();
+            }
+        }
+
+        /** Запустить 3 «подмигивания» панели новостей */
+        function startNewsPeek(times = 3, pauseMs = 1800) {
+            if (_peekRunning || _newsPanelOpen) return;
+            _peekRunning = true;
+            const panel = document.querySelector('.right-panel');
+            let done = 0;
+
+            function doPeek() {
+                if (_newsPanelOpen || done >= times) { _peekRunning = false; return; }
+                panel.classList.add('peek-anim');
+                setTimeout(() => {
+                    panel.classList.remove('peek-anim');
+                    done++;
+                    if (done < times && !_newsPanelOpen) {
+                        setTimeout(doPeek, pauseMs);
+                    } else {
+                        _peekRunning = false;
+                    }
+                }, 650);
+            }
+
+            // Первый peek через 2.5 секунды после загрузки
+            setTimeout(doPeek, 2500);
+        }
+
+        // --- Read-news storage (pywebview → localStorage fallback) ---
+        async function _getReadIds() {
+            try {
+                if (window.pywebview && window.pywebview.api.get_read_news_ids) {
+                    const res = await window.pywebview.api.get_read_news_ids();
+                    if (res && res.success) return res.ids || [];
+                }
+            } catch {}
+            // fallback
+            try { return JSON.parse(localStorage.getItem(NEWS_READ_KEY) || '[]'); }
+            catch { return []; }
+        }
+
+        async function _saveReadIds(ids) {
+            try {
+                if (window.pywebview && window.pywebview.api.save_read_news_ids) {
+                    await window.pywebview.api.save_read_news_ids(ids);
+                    return;
+                }
+            } catch {}
+            // fallback
+            try { localStorage.setItem(NEWS_READ_KEY, JSON.stringify(ids)); }
+            catch {}
+        }
+
+        async function _markAllNewsRead() {
+            const read = await _getReadIds();
+            document.querySelectorAll('.news-item[data-news-id]').forEach(el => {
+                if (!read.includes(el.dataset.newsId)) read.push(el.dataset.newsId);
+            });
+            await _saveReadIds(read);
+            await updateNewsBadge();
+        }
+
+        async function updateNewsBadge() {
+            const read = await _getReadIds();
+            const allItems = document.querySelectorAll('.news-item[data-news-id]');
+            let unreadCount = 0;
+            allItems.forEach(el => {
+                const isRead = read.includes(el.dataset.newsId);
+                el.classList.toggle('unread', !isRead);
+                if (!isRead) unreadCount++;
+            });
+            const badge = document.getElementById('newsUnreadBadge');
+            if (!badge) return unreadCount;
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+                badge.classList.add('show');
+            } else {
+                badge.classList.remove('show');
+            }
+            return unreadCount;
+        }
+
+        // Закрыть панель если пользователь кликает по фону (вне панели)
+        document.addEventListener('click', function(e) {
+            if (!_newsPanelOpen) return;
+            const panel = document.querySelector('.right-panel');
+            if (panel && !panel.contains(e.target)) {
+                _newsPanelOpen = false;
+                panel.classList.remove('open');
+                document.querySelector('.interface').classList.remove('news-open');
+            }
+        });
+
         // Инициализация
         async function init() {
             
@@ -2663,7 +3544,6 @@
             settingsBtn.addEventListener('click', openSettings);
             folderBtn.addEventListener('click', openFolderModal);
             nicknameInput.addEventListener('input', debounce(saveNickname, 500));
-            serverSelect.addEventListener('change', handleServerChange);
             window.addEventListener('resize', debounce(handleResize, 250));
 
             // Автообновление серверов каждые 30 секунд
@@ -2695,22 +3575,110 @@
             }
         }
 
+        // ── Custom server dropdown ──
+        let _csOpen = false;
+
+        function toggleServerDropdown() {
+            const wrap = document.getElementById('customServerSelect');
+            _csOpen = !_csOpen;
+            wrap.classList.toggle('open', _csOpen);
+        }
+
+        function closeServerDropdown() {
+            _csOpen = false;
+            document.getElementById('customServerSelect').classList.remove('open');
+        }
+
+        document.addEventListener('click', function(e) {
+            const wrap = document.getElementById('customServerSelect');
+            if (wrap && !wrap.contains(e.target)) closeServerDropdown();
+        });
+
+        function _getOnlineColor(ratio) {
+            // зелёный → жёлтый → красный
+            if (ratio < 0.5)  return `rgba(0, 210, 100, 0.8)`;
+            if (ratio < 0.8)  return `rgba(255, 185, 0, 0.85)`;
+            return `rgba(220, 60, 60, 0.85)`;
+        }
+
         function updateServerSelect() {
-            const savedServer = currentServer || serverSelect.value;
-            serverSelect.innerHTML = '';
+            const savedServer = currentServer || '';
+            const dropdown = document.getElementById('csDropdown');
+            const hiddenSelect = document.getElementById('serverSelect');
+            dropdown.innerHTML = '';
+            hiddenSelect.innerHTML = '';
 
             const sorted = [...serversData].sort((a, b) => a.number - b.number);
+
+            // Выбираем сохранённый сервер если задан, иначе первый
+            let selectedServer = sorted.find(s => String(s.number) === String(currentServer)) || sorted[0];
+
             sorted.forEach(server => {
-                const option = document.createElement('option');
-                option.value = server.number;
-                option.textContent = `${server.name} (${server.online}/${server.maxplayers})`;
-                serverSelect.appendChild(option);
+                const ratio = server.online / server.maxplayers;
+                const color = _getOnlineColor(ratio);
+                const pct = Math.min(100, Math.round(ratio * 100));
+
+                // Элемент дропдауна
+                const item = document.createElement('div');
+                item.className = 'cs-item' + (selectedServer && String(server.number) === String(selectedServer.number) ? ' selected' : '');
+                item.dataset.value = server.number;
+                const iconHtml = server.icon
+                    ? `<img class="cs-item-icon" src="${server.icon}" alt="" onerror="this.style.display='none'">`
+                    : `<span class="cs-item-num">#${server.number}</span>`;
+                const queueHtml = server.queue > 0 ? `<span style="font-size:10px;color:rgba(255,185,0,0.8);margin-left:4px;">⏳${server.queue}</span>` : '';
+                const recHtml = server.recomend ? `<span style="font-size:9px;color:rgba(0,210,100,0.8);margin-left:4px;">★</span>` : '';
+                item.innerHTML = `
+                    <div class="cs-item-top">
+                        ${iconHtml}
+                        <span class="cs-item-name">${server.name}${recHtml}</span>
+                        <span class="cs-item-count">${server.online}/${server.maxplayers}${queueHtml}</span>
+                    </div>
+                    <div class="cs-item-bar-wrap">
+                        <div class="cs-item-bar-fill" style="width:${pct}%;background:${color};"></div>
+                    </div>`;
+                item.addEventListener('click', () => selectServer(server));
+                dropdown.appendChild(item);
+
+                // Скрытый select для совместимости
+                const opt = document.createElement('option');
+                opt.value = server.number;
+                opt.textContent = `${server.name} (${server.online}/${server.maxplayers})`;
+                hiddenSelect.appendChild(opt);
             });
 
-            // Восстанавливаем выбранный сервер
-            if (savedServer) {
-                serverSelect.value = savedServer;
+            if (selectedServer) selectServer(selectedServer, true);
+        }
+
+        function selectServer(server, silent) {
+            const ratio = server.online / server.maxplayers;
+            const color = _getOnlineColor(ratio);
+
+            // Иконка или fallback-точка
+            const iconEl = document.getElementById('csTriggerIcon');
+            const dotEl  = document.getElementById('csTriggerDot');
+            if (server.icon) {
+                iconEl.src = server.icon;
+                iconEl.style.display = 'block';
+                dotEl.style.display  = 'none';
+            } else {
+                iconEl.style.display = 'none';
+                dotEl.style.display  = 'block';
+                dotEl.style.background = color;
+                dotEl.style.boxShadow  = `0 0 6px ${color}`;
             }
+
+            document.getElementById('csTriggerName').textContent = server.name;
+            document.getElementById('csTriggerOnline').textContent = `${server.online} / ${server.maxplayers}`;
+
+            document.querySelectorAll('.cs-item').forEach(el => {
+                el.classList.toggle('selected', String(el.dataset.value) === String(server.number));
+            });
+
+            const hiddenSelect = document.getElementById('serverSelect');
+            hiddenSelect.value = server.number;
+
+            currentServer = String(server.number);
+            if (!silent) closeServerDropdown();
         }
 
         // Загрузка новостей лаунчера с GitHub
@@ -2735,9 +3703,12 @@
                 launcherNewsDiv.innerHTML = '';
 
                 if (newsBlocks.length > 0) {
-                    newsBlocks.forEach(news => {
+                    newsBlocks.forEach((news, idx) => {
                         const newsItem = document.createElement('div');
                         newsItem.className = 'news-item';
+                        // Уникальный ID новости по заголовку + индексу
+                        const newsId = 'news_' + idx + '_' + (news.title || '').replace(/\W/g, '').substring(0, 20);
+                        newsItem.dataset.newsId = newsId;
                         newsItem.innerHTML = `
                             <div class="news-item-title">${news.title}</div>
                             <div class="news-item-content">${news.content}</div>
@@ -2757,6 +3728,12 @@
                         <small>${error.message}</small>
                     </div>
                 `;
+            }
+
+            // Обновляем бейдж и запускаем peek если есть непрочитанные
+            const unread = await updateNewsBadge();
+            if (unread > 0) {
+                startNewsPeek();
             }
         }
 
@@ -2838,8 +3815,12 @@
                             currentNickname = result.nickname;
                         }
                         if (result.server) {
-                            currentServer = result.server;
-                            serverSelect.value = result.server;
+                            currentServer = String(result.server);
+                            const hiddenSelect = document.getElementById('serverSelect');
+                            if (hiddenSelect) hiddenSelect.value = result.server;
+                            // Применяем к кастомному дропдауну если серверы уже загружены
+                            const saved = serversData.find(s => String(s.number) === String(result.server));
+                            if (saved) selectServer(saved, true);
                         }
                     }
                 }
@@ -2892,6 +3873,8 @@
                         // После сворачивания — скрываем оверлей и возвращаем панели
                         await new Promise(resolve => setTimeout(resolve, 400));
                         hideLaunchScreen();
+                        // Запускаем слежение за GTA — развернём окно когда игра закроется
+                        startGtaWatcher();
                     } else {
                         setLaunchStatus('Ошибка: ' + result.message, 0);
                         await new Promise(resolve => setTimeout(resolve, 1800));
@@ -2922,12 +3905,10 @@
 
         function showLaunchScreen(serverData) {
             const leftPanel  = document.querySelector('.left-panel');
-            const rightPanel = document.querySelector('.right-panel');
             const screen     = document.getElementById('launchScreen');
 
             setLaunchStatus('Подготовка...', 5);
             leftPanel.classList.add('slide-out');
-            rightPanel.classList.add('slide-out');
 
             // Показываем оверлей чуть позже чтобы анимация началась красиво
             setTimeout(() => {
@@ -2937,13 +3918,11 @@
 
         function hideLaunchScreen() {
             const leftPanel  = document.querySelector('.left-panel');
-            const rightPanel = document.querySelector('.right-panel');
             const screen     = document.getElementById('launchScreen');
 
             screen.classList.remove('visible');
             setTimeout(() => {
                 leftPanel.classList.remove('slide-out');
-                rightPanel.classList.remove('slide-out');
                 startBtn.disabled = false;
                 startBtn.classList.remove('start-btn-loading');
             }, 300);
@@ -2956,18 +3935,29 @@
             if (barEl && progress > 0) barEl.style.width = progress + '%';
         }
 
+        // ── Универсальный хелпер закрытия с анимацией ──
+        function _closeWithAnim(el, cb, duration = 200) {
+            if (!el) return;
+            el.classList.add('closing');
+            setTimeout(() => {
+                el.classList.remove('closing');
+                if (cb) cb();
+            }, duration);
+        }
+
         // Модальное окно папки
         function openFolderModal() {
             folderModal.style.display = 'flex';
         }
 
         function closeFolderModal() {
-            folderModal.style.display = 'none';
+            _closeWithAnim(folderModal, () => { folderModal.style.display = 'none'; });
         }
 
         // ---- МОДЫ (fullscreen) ----
         function openModsModal() {
             document.querySelector('.interface').style.display = 'none';
+            document.querySelector('.right-panel').style.display = 'none';
             const modal = document.getElementById('modsModal');
             modal.style.display = 'flex';
             if (document.getElementById('modsTabPatches').classList.contains('active')) {
@@ -2978,8 +3968,12 @@
         }
 
         function closeModsModal() {
-            document.getElementById('modsModal').style.display = 'none';
-            document.querySelector('.interface').style.display = 'flex';
+            const modal = document.getElementById('modsModal');
+            _closeWithAnim(modal, () => {
+                modal.style.display = 'none';
+                document.querySelector('.interface').style.display = 'flex';
+                document.querySelector('.right-panel').style.display = 'flex';
+            });
         }
 
         function switchModsTab(tab) {
@@ -3387,7 +4381,10 @@
 
         function closeScriptDetail(event, force) {
             if (!force && event && event.target !== document.getElementById('scriptDetailOverlay')) return;
-            document.getElementById('scriptDetailOverlay').classList.remove('open');
+            const overlay = document.getElementById('scriptDetailOverlay');
+            _closeWithAnim(overlay, () => {
+                overlay.classList.remove('open');
+            });
             _sdCurrentIdx = null;
         }
 
@@ -3789,7 +4786,10 @@
         };
 
         function closeInstallModal() {
-            document.getElementById('installOverlay').classList.remove('open');
+            const overlay = document.getElementById('installOverlay');
+            _closeWithAnim(overlay, () => {
+                overlay.classList.remove('open');
+            });
         }
 
         function _resetInstallModal() {
@@ -4307,8 +5307,10 @@
         }
 
         function closeSettings() {
-            settingsPanel.style.display = 'none';
-            checkboxGroup.innerHTML = '';
+            _closeWithAnim(settingsPanel, () => {
+                settingsPanel.style.display = 'none';
+                checkboxGroup.innerHTML = '';
+            });
         }
 
         async function saveSettings() {
@@ -4550,7 +5552,9 @@
         }
 
         function closeCRE() {
-            document.getElementById('creOverlay').classList.remove('open');
+            _closeWithAnim(document.getElementById('creOverlay'), () => {
+                document.getElementById('creOverlay').classList.remove('open');
+            });
         }
 
         function saveCRE() {
