@@ -14,7 +14,10 @@
         }
         
         :root {
-            --primary-color: rgba(0, 120, 212, 0.8);
+            --accent-rgb: 0, 120, 212;      /* dynamic (Monet-like) */
+            --accent2-rgb: 0, 180, 255;     /* dynamic (Monet-like) */
+            --surface-rgb: 11, 13, 20;      /* dynamic (Monet-like) */
+            --primary-color: rgba(var(--accent-rgb), 0.82);
             --secondary-color: rgba(93, 93, 93, 0.3);
             --text-color: rgba(255, 255, 255, 0.95);
             --shadow-color: rgba(0, 0, 0, 0.25);
@@ -68,7 +71,7 @@
         #drag-overlay .drag-icon {
             width: 80px;
             height: 80px;
-            border: 3px dashed rgba(0, 180, 255, 0.8);
+            border: 3px dashed rgba(var(--accent2-rgb), 0.8);
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -78,21 +81,21 @@
         #drag-overlay .drag-icon svg {
             width: 40px;
             height: 40px;
-            fill: rgba(0, 180, 255, 0.9);
+            fill: rgba(var(--accent2-rgb), 0.9);
         }
         #drag-overlay .drag-title {
             font-family: 'Montserrat Alternates', sans-serif;
             font-size: 22px;
             color: rgba(255, 255, 255, 0.95);
-            text-shadow: 0 0 20px rgba(0, 180, 255, 0.6);
+            text-shadow: 0 0 20px rgba(var(--accent2-rgb), 0.6);
         }
         #drag-overlay .drag-sub {
             font-size: 14px;
             color: rgba(255, 255, 255, 0.55);
         }
         @keyframes drag-pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 180, 255, 0.35); }
-            50%       { box-shadow: 0 0 0 12px rgba(0, 180, 255, 0); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(var(--accent2-rgb), 0.35); }
+            50%       { box-shadow: 0 0 0 12px rgba(var(--accent2-rgb), 0); }
         }
 
         /* Основной интерфейс */
@@ -173,7 +176,7 @@
             transform: translateY(-50%);
             width: 48px;
             height: 155px;
-            background: rgba(0, 100, 200, 0.55);
+            background: rgba(var(--accent-rgb), 0.42);
             border-radius: 10px 0 0 10px;
             display: flex;
             flex-direction: column;
@@ -189,8 +192,8 @@
         }
 
         .news-handle:hover {
-            background: rgba(0, 130, 230, 0.72);
-            box-shadow: -4px 0 18px rgba(0, 120, 212, 0.5);
+            background: rgba(var(--accent2-rgb), 0.58);
+            box-shadow: -4px 0 18px rgba(var(--accent-rgb), 0.42);
         }
 
         .news-handle-icon {
@@ -379,7 +382,7 @@
         .nickname-input:focus,
         .server-select:focus {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.2);
+            box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.22);
         }
 
         .nickname-input::placeholder {
@@ -408,7 +411,7 @@
         .start-btn {
             width: 100%;
             height: 50px;
-            background: linear-gradient(135deg, var(--primary-color), rgba(0, 80, 150, 0.8));
+            background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.88), rgba(var(--accent2-rgb), 0.72));
             border: none;
             border-radius: 8px;
             color: white;
@@ -417,7 +420,7 @@
             font-weight: bold;
             cursor: pointer;
             transition: all var(--transition-speed);
-            box-shadow: 0 4px 15px rgba(0, 120, 212, 0.3);
+            box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.30);
             margin-top: 10px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -427,7 +430,7 @@
 
         .start-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 120, 212, 0.4);
+            box-shadow: 0 6px 20px rgba(var(--accent-rgb), 0.40);
         }
 
         .start-btn:active {
@@ -1004,9 +1007,9 @@
             transition: all 0.2s;
         }
         .cre-bit-cell.on {
-            background: rgba(0,150,255,0.3);
-            color: rgba(140,210,255,0.95);
-            border: 1px solid rgba(0,150,255,0.35);
+            background: rgba(var(--accent2-rgb), 0.24);
+            color: rgba(255,255,255,0.92);
+            border: 1px solid rgba(var(--accent2-rgb), 0.32);
         }
         .cre-bit-cell.off {
             background: rgba(255,255,255,0.04);
@@ -1025,10 +1028,10 @@
             align-items: center;
             gap: 5px;
             padding: 3px 10px;
-            background: rgba(0, 120, 212, 0.2);
-            border: 1px solid rgba(0, 150, 255, 0.3);
+            background: rgba(var(--accent-rgb), 0.20);
+            border: 1px solid rgba(var(--accent2-rgb), 0.28);
             border-radius: 6px;
-            color: rgba(120, 195, 255, 0.9);
+            color: rgba(255, 255, 255, 0.86);
             font-family: 'Montserrat Alternates', sans-serif;
             font-size: 10px;
             cursor: pointer;
@@ -1037,8 +1040,8 @@
             margin-left: 8px;
         }
         .patch-cre-btn:hover {
-            background: rgba(0,140,255,0.3);
-            border-color: rgba(0,180,255,0.5);
+            background: rgba(var(--accent2-rgb), 0.26);
+            border-color: rgba(var(--accent2-rgb), 0.50);
         }
         .settings-panel {
             display: none;
@@ -1048,7 +1051,7 @@
             transform: translate(-50%, -50%);
             width: min(940px, 95vw);
             height: min(86vh, 680px);
-            background: rgba(11, 13, 20, 0.98);
+            background: rgba(var(--surface-rgb), 0.985);
             border-radius: 18px;
             padding: 0;
             box-shadow: 0 32px 90px rgba(0, 0, 0, 0.8);
@@ -1106,8 +1109,8 @@
         }
 
         .settings-nav-item.active {
-            background: rgba(0, 120, 212, 0.15);
-            color: rgba(120, 195, 255, 0.95);
+            background: rgba(var(--accent-rgb), 0.14);
+            color: rgba(255,255,255,0.92);
         }
 
         .settings-nav-item.active::before {
@@ -1115,7 +1118,7 @@
             position: absolute;
             left: 0; top: 8px; bottom: 8px;
             width: 3px;
-            background: rgba(0, 160, 255, 0.8);
+            background: rgba(var(--accent2-rgb), 0.82);
             border-radius: 0 2px 2px 0;
         }
 
@@ -1283,8 +1286,8 @@
         .checkbox-item input:checked ~ .s-toggle,
         .launch-item input:checked ~ .s-toggle,
         .s-toggle.on {
-            background: rgba(0, 155, 255, 0.6);
-            border-color: rgba(0,155,255,0.4);
+            background: rgba(var(--accent2-rgb), 0.55);
+            border-color: rgba(var(--accent2-rgb), 0.44);
         }
 
         .checkbox-item input:checked ~ .s-toggle::after,
@@ -1347,7 +1350,7 @@
         }
 
         .s-input:focus {
-            border-color: rgba(0, 140, 255, 0.5);
+            border-color: rgba(var(--accent2-rgb), 0.55);
             background: rgba(255,255,255,0.09);
         }
 
@@ -1355,8 +1358,8 @@
         .save-btn {
             width: calc(100% - 56px);
             height: 42px;
-            background: linear-gradient(135deg, rgba(0, 120, 212, 0.85), rgba(0, 80, 165, 0.85));
-            border: 1px solid rgba(0, 150, 255, 0.3);
+            background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.88), rgba(var(--accent2-rgb), 0.78));
+            border: 1px solid rgba(var(--accent2-rgb), 0.32);
             border-radius: 10px;
             color: white;
             font-family: 'Montserrat Alternates', sans-serif;
@@ -1370,9 +1373,9 @@
         }
 
         .save-btn:hover {
-            background: linear-gradient(135deg, rgba(0, 140, 240, 0.95), rgba(0, 100, 190, 0.95));
+            background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.98), rgba(var(--accent2-rgb), 0.92));
             transform: translateY(-1px);
-            box-shadow: 0 4px 18px rgba(0, 120, 212, 0.35);
+            box-shadow: 0 4px 18px rgba(var(--accent-rgb), 0.34);
         }
 
         /* ── Launch tab grid ── */
@@ -1513,9 +1516,9 @@
         }
 
         .s-btn.primary {
-            background: rgba(0, 120, 212, 0.3);
-            border-color: rgba(0, 140, 255, 0.35);
-            color: rgba(140, 200, 255, 0.95);
+            background: rgba(var(--accent-rgb), 0.28);
+            border-color: rgba(var(--accent2-rgb), 0.35);
+            color: rgba(220, 240, 255, 0.95);
         }
 
         .s-btn.danger {
@@ -1566,7 +1569,7 @@
         }
 
         .wp-card:hover { transform: scale(1.03); border-color: rgba(255,255,255,0.25); }
-        .wp-card-active { border-color: rgba(0,160,255,0.8) !important; }
+        .wp-card-active { border-color: rgba(var(--accent2-rgb), 0.8) !important; }
 
         .wp-thumb {
             width: 100%;
@@ -1588,7 +1591,7 @@
         .wp-check {
             position: absolute;
             top: 4px; right: 4px;
-            background: rgba(0,160,255,0.85);
+            background: rgba(var(--accent2-rgb), 0.85);
             color: #fff;
             border-radius: 50%;
             width: 18px; height: 18px;
@@ -1681,7 +1684,7 @@
             inset: 0;
             width: 100%;
             height: 100%;
-            background: rgba(12, 12, 18, 0.97);
+            background: rgba(var(--surface-rgb), 0.97);
             backdrop-filter: blur(18px);
             z-index: 500;
             flex-direction: column;
@@ -1835,10 +1838,10 @@
         .mods-install-btn {
             height: 32px;
             padding: 0 16px;
-            background: rgba(0, 140, 255, 0.25);
-            border: 1px solid rgba(0, 140, 255, 0.4);
+            background: rgba(var(--accent-rgb), 0.22);
+            border: 1px solid rgba(var(--accent2-rgb), 0.36);
             border-radius: 7px;
-            color: rgba(140, 200, 255, 0.95);
+            color: rgba(255, 255, 255, 0.92);
             font-family: 'Montserrat Alternates', sans-serif;
             font-size: 12px;
             cursor: pointer;
@@ -1847,8 +1850,8 @@
         }
 
         .mods-install-btn:hover:not(:disabled) {
-            background: rgba(0, 140, 255, 0.4);
-            border-color: rgba(0, 140, 255, 0.7);
+            background: rgba(var(--accent2-rgb), 0.32);
+            border-color: rgba(var(--accent2-rgb), 0.66);
             transform: translateY(-1px);
         }
 
@@ -2019,7 +2022,7 @@
             top: 20px;
             right: 20px;
             padding: 15px 20px;
-            background: rgba(0, 120, 212, 0.95);
+            background: rgba(var(--accent-rgb), 0.92);
             color: white;
             border-radius: 8px;
             font-family: 'Montserrat Alternates', sans-serif;
@@ -2495,7 +2498,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.65);
+            background: rgba(0,0,0,0.55);
             backdrop-filter: blur(6px);
             z-index: 1100;
             align-items: center;
@@ -2504,7 +2507,7 @@
         .profiles-overlay.open { display: flex; }
 
         .profiles-modal {
-            background: rgba(12, 14, 24, 0.99);
+            background: rgba(var(--surface-rgb), 0.99);
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 16px;
             width: min(500px, 92vw);
@@ -2554,8 +2557,8 @@
         }
 
         .profile-item.active-profile {
-            border-color: rgba(0, 140, 255, 0.5);
-            background: rgba(0, 100, 200, 0.1);
+            border-color: rgba(var(--accent2-rgb), 0.52);
+            background: rgba(var(--accent-rgb), 0.12);
         }
 
         .profile-item:hover { background: rgba(255,255,255,0.07); }
@@ -2614,11 +2617,11 @@
         }
 
         .profile-btn.apply {
-            background: rgba(0, 120, 212, 0.3);
-            border: 1px solid rgba(0, 140, 255, 0.4);
-            color: rgba(140, 210, 255, 0.9);
+            background: rgba(var(--accent-rgb), 0.26);
+            border: 1px solid rgba(var(--accent2-rgb), 0.40);
+            color: rgba(255,255,255,0.9);
         }
-        .profile-btn.apply:hover { background: rgba(0, 120, 212, 0.5); }
+        .profile-btn.apply:hover { background: rgba(var(--accent2-rgb), 0.38); }
 
         .profile-btn.del {
             background: rgba(180, 40, 40, 0.2);
@@ -2641,9 +2644,9 @@
             flex-shrink: 0;
         }
         .profiles-add-btn:hover {
-            background: rgba(0,120,212,0.1);
-            border-color: rgba(0,140,255,0.35);
-            color: rgba(140,210,255,0.8);
+            background: rgba(var(--accent-rgb), 0.10);
+            border-color: rgba(var(--accent2-rgb), 0.36);
+            color: rgba(255,255,255,0.82);
         }
 
         .profiles-empty {
@@ -5075,15 +5078,216 @@
         // ---- НАСТРОЙКИ ЛАУНЧЕРА ----
         let launcherSettings = { bg_image: null };
 
+        // ---- Monet-like dynamic theme from wallpaper ----
+        const _monetTheme = {
+            defaults: null,
+            lastKey: null,
+        };
+
+        function _getRootVar(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+
+        function _setRootVar(name, value) {
+            document.documentElement.style.setProperty(name, value);
+        }
+
+        function _ensureMonetDefaults() {
+            if (_monetTheme.defaults) return;
+            _monetTheme.defaults = {
+                '--accent-rgb': _getRootVar('--accent-rgb') || '0, 120, 212',
+                '--accent2-rgb': _getRootVar('--accent2-rgb') || '0, 180, 255',
+                '--surface-rgb': _getRootVar('--surface-rgb') || '11, 13, 20',
+                '--primary-color': _getRootVar('--primary-color') || 'rgba(0, 120, 212, 0.82)',
+                '--secondary-color': _getRootVar('--secondary-color') || 'rgba(93, 93, 93, 0.3)',
+                '--text-color': _getRootVar('--text-color') || 'rgba(255, 255, 255, 0.95)',
+                '--shadow-color': _getRootVar('--shadow-color') || 'rgba(0, 0, 0, 0.25)',
+            };
+        }
+
+        function _clearMonetTheme() {
+            _ensureMonetDefaults();
+            for (const [k, v] of Object.entries(_monetTheme.defaults)) _setRootVar(k, v);
+            _monetTheme.lastKey = null;
+        }
+
+        function _hashKeyForDataUrl(dataUrl) {
+            // fast-ish key; do not hash the entire base64 string
+            const s = String(dataUrl || '');
+            const sample = s.slice(0, 2048) + '|' + s.length;
+            let h = 5381;
+            for (let i = 0; i < sample.length; i++) h = ((h << 5) + h) ^ sample.charCodeAt(i);
+            return (h >>> 0).toString(16);
+        }
+
+        function _rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h = 0, s = 0;
+            const l = (max + min) / 2;
+            const d = max - min;
+            if (d !== 0) {
+                s = d / (1 - Math.abs(2 * l - 1));
+                switch (max) {
+                    case r: h = ((g - b) / d) % 6; break;
+                    case g: h = (b - r) / d + 2; break;
+                    default: h = (r - g) / d + 4; break;
+                }
+                h *= 60;
+                if (h < 0) h += 360;
+            }
+            return { h, s, l };
+        }
+
+        function _pickAccentsFromPixels(pixels) {
+            // pixels: Uint8ClampedArray RGBA
+            const bins = Array.from({ length: 24 }, () => ({ w: 0, r: 0, g: 0, b: 0 }));
+            let avg = { w: 0, r: 0, g: 0, b: 0 };
+
+            for (let i = 0; i < pixels.length; i += 4) {
+                const a = pixels[i + 3];
+                if (a < 200) continue;
+                const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+
+                const { h, s, l } = _rgbToHsl(r, g, b);
+                // ignore almost gray, too dark, too bright
+                if (s < 0.18 || l < 0.14 || l > 0.90) {
+                    avg.w += 1; avg.r += r; avg.g += g; avg.b += b;
+                    continue;
+                }
+                const bin = Math.max(0, Math.min(23, Math.floor(h / 15)));
+                const w = 0.35 + 0.65 * s; // prefer saturated pixels
+                bins[bin].w += w;
+                bins[bin].r += r * w;
+                bins[bin].g += g * w;
+                bins[bin].b += b * w;
+            }
+
+            const ranked = bins
+                .map((v, idx) => ({ idx, ...v }))
+                .filter(v => v.w > 20)
+                .sort((a, b) => b.w - a.w);
+
+            function toRgb(bin) {
+                return {
+                    r: Math.round(bin.r / bin.w),
+                    g: Math.round(bin.g / bin.w),
+                    b: Math.round(bin.b / bin.w),
+                };
+            }
+
+            if (ranked.length === 0) {
+                if (avg.w > 0) return { accent: { r: 0, g: 120, b: 212 }, accent2: { r: 0, g: 180, b: 255 } };
+                return { accent: { r: 0, g: 120, b: 212 }, accent2: { r: 0, g: 180, b: 255 } };
+            }
+
+            const accent = toRgb(ranked[0]);
+            // second accent: farthest hue bin (at least 3 bins apart)
+            let second = ranked.find(x => Math.abs(x.idx - ranked[0].idx) >= 3) || ranked[1] || ranked[0];
+            const accent2 = toRgb(second);
+            return { accent, accent2 };
+        }
+
+        async function _extractMonetFromDataUrl(dataUrl) {
+            return await new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        const maxSide = 96;
+                        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+                        const w = Math.max(1, Math.round(img.width * scale));
+                        const h = Math.max(1, Math.round(img.height * scale));
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+                        ctx.drawImage(img, 0, 0, w, h);
+                        const { data } = ctx.getImageData(0, 0, w, h);
+                        resolve(_pickAccentsFromPixels(data));
+                    } catch (e) {
+                        reject(e);
+                    }
+                };
+                img.onerror = reject;
+                img.src = dataUrl;
+            });
+        }
+
+        async function _applyMonetThemeForWallpaper(dataUrl) {
+            if (!dataUrl) {
+                _clearMonetTheme();
+                return;
+            }
+            _ensureMonetDefaults();
+
+            const key = _hashKeyForDataUrl(dataUrl);
+            if (_monetTheme.lastKey === key) return;
+            _monetTheme.lastKey = key;
+
+            // cache in localStorage to avoid recompute
+            const cacheKey = 'monetTheme:v2:' + key;
+            try {
+                const cached = localStorage.getItem(cacheKey);
+                if (cached) {
+                    const t = JSON.parse(cached);
+                    _setRootVar('--accent-rgb', t.accentRgb);
+                    _setRootVar('--accent2-rgb', t.accent2Rgb);
+                    if (t.surfaceRgb) _setRootVar('--surface-rgb', t.surfaceRgb);
+                    _setRootVar('--primary-color', t.primary);
+                    _setRootVar('--secondary-color', t.secondary);
+                    return;
+                }
+            } catch (e) {}
+
+            try {
+                const { accent, accent2 } = await _extractMonetFromDataUrl(dataUrl);
+                const accentRgb = `${accent.r}, ${accent.g}, ${accent.b}`;
+                const accent2Rgb = `${accent2.r}, ${accent2.g}, ${accent2.b}`;
+
+                // subtle tint for panels, keep it "glass" but wallpaper-dependent
+                const tint = (c) => Math.round(18 + c * 0.10);
+                const secondary = `rgba(${tint(accent.r)}, ${tint(accent.g)}, ${tint(accent.b)}, 0.36)`;
+                const primary = `rgba(${accent.r}, ${accent.g}, ${accent.b}, 0.82)`;
+                const surface = `${Math.round(10 + accent.r * 0.06)}, ${Math.round(12 + accent.g * 0.06)}, ${Math.round(18 + accent.b * 0.06)}`;
+
+                _setRootVar('--accent-rgb', accentRgb);
+                _setRootVar('--accent2-rgb', accent2Rgb);
+                _setRootVar('--surface-rgb', surface);
+                _setRootVar('--primary-color', primary);
+                _setRootVar('--secondary-color', secondary);
+
+                try {
+                    localStorage.setItem(cacheKey, JSON.stringify({ accentRgb, accent2Rgb, surfaceRgb: surface, primary, secondary }));
+                } catch (e) {}
+            } catch (e) {
+                // if extraction fails, keep defaults
+                _clearMonetTheme();
+            }
+        }
+
         function applyLauncherSettingsFromObj(s) {
             let dataUrl = s.bg_data || null;
             // Если bg_image это filename — ищем в загруженных обоях
             if (!dataUrl && s.bg_image) {
                 const found = _wallpapers.find(w => w.filename === s.bg_image);
                 if (found) dataUrl = found.data_url;
-                else if (s.bg_image.startsWith('data:')) dataUrl = s.bg_image; // "своя"
+                else dataUrl = _normalizeBgUrl(s.bg_image); // "своя" (data:/file:/путь)
             }
             applyBgImage(dataUrl);
+        }
+
+        function _normalizeBgUrl(value) {
+            if (!value) return null;
+            const v = String(value).trim();
+            if (!v) return null;
+            if (v.startsWith('data:') || v.startsWith('blob:') || v.startsWith('http:') || v.startsWith('https:') || v.startsWith('file:')) return v;
+            // Windows absolute path like C:\foo\bar.jpg
+            if (/^[a-zA-Z]:[\\/]/.test(v)) {
+                const withSlashes = v.replace(/\\/g, '/');
+                const encoded = withSlashes.split('/').map(encodeURIComponent).join('/');
+                return 'file:///' + encoded;
+            }
+            return v;
         }
 
         async function applyLauncherSettings() {
@@ -5100,7 +5304,10 @@
                 if (window.pywebview && window.pywebview.api.select_bg_image) {
                     const result = await window.pywebview.api.select_bg_image();
                     if (result.success) {
+                        // Some backends return a file-path or file:// URL here.
+                        // Store it in bg_data too so applyLauncherSettingsFromObj applies immediately.
                         launcherSettings.bg_image = result.data_url;
+                        launcherSettings.bg_data  = _normalizeBgUrl(result.data_url);
                         applyLauncherSettings();
                         renderWallpaperGrid();
                     } else if (result.message !== 'Отменено') {
@@ -5166,10 +5373,11 @@
 
             // Карточка "Своя"
             const isCustom = current && !_wallpapers.find(w => w.filename === current);
+            const customPreview = isCustom ? _normalizeBgUrl(launcherSettings.bg_data || current) : null;
             const customCard = document.createElement('div');
             customCard.className = 'wp-card' + (isCustom ? ' wp-card-active' : '');
             customCard.innerHTML = `
-                <div class="wp-thumb wp-thumb-custom" ${isCustom && current.startsWith('data:') ? `style="background-image:url('${current}')"` : ''}>
+                <div class="wp-thumb wp-thumb-custom" ${customPreview ? `style="background-image:url('${customPreview}')"` : ''}>
                     ${!isCustom ? '🖼️' : '<div class="wp-check">✓</div>'}
                 </div>
                 <div class="wp-label">Своя</div>`;
@@ -5192,13 +5400,15 @@
 
         function applyBgImage(dataUrl) {
             const container = document.getElementById('container');
-            if (dataUrl) {
-                container.style.backgroundImage = `url('${dataUrl}')`;
+            const normalized = _normalizeBgUrl(dataUrl);
+            if (normalized) {
+                container.style.backgroundImage = `url('${normalized}')`;
                 container.style.backgroundSize = 'cover';
                 container.style.backgroundPosition = 'center';
             } else {
                 container.style.backgroundImage = '';
             }
+            _applyMonetThemeForWallpaper(normalized);
         }
 
         // Вызывается один раз при старте — загружает настройки из Python и применяет
