@@ -5139,6 +5139,35 @@
             return { h, s, l };
         }
 
+        // Обратное преобразование HSL → RGB
+        function _hslToRgb(h, s, l) {
+            const c = (1 - Math.abs(2 * l - 1)) * s;
+            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            const m = l - c / 2;
+            let r = 0, g = 0, b = 0;
+            if      (h < 60)  { r = c; g = x; }
+            else if (h < 120) { r = x; g = c; }
+            else if (h < 180) { g = c; b = x; }
+            else if (h < 240) { g = x; b = c; }
+            else if (h < 300) { r = x; b = c; }
+            else               { r = c; b = x; }
+            return {
+                r: Math.round((r + m) * 255),
+                g: Math.round((g + m) * 255),
+                b: Math.round((b + m) * 255),
+            };
+        }
+
+        // Поднимает яркость/насыщенность до минимального порога не меняя оттенок.
+        // Используется только для accent2 (переключатели), чтобы они не пропадали на тусклых обоях.
+        function _boostToggleAccent(r, g, b, minL = 0.50, minS = 0.62) {
+            let { h, s, l } = _rgbToHsl(r, g, b);
+            let changed = false;
+            if (s < minS) { s = minS; changed = true; }
+            if (l < minL) { l = minL; changed = true; }
+            return changed ? _hslToRgb(h, s, l) : { r, g, b };
+        }
+
         function _pickAccentsFromPixels(pixels) {
             // pixels: Uint8ClampedArray RGBA
             const bins = Array.from({ length: 24 }, () => ({ w: 0, r: 0, g: 0, b: 0 }));
@@ -5225,7 +5254,8 @@
             _monetTheme.lastKey = key;
 
             // cache in localStorage to avoid recompute
-            const cacheKey = 'monetTheme:v2:' + key;
+            // v3 — инвалидирует старый кеш (добавлен буст переключателей)
+            const cacheKey = 'monetTheme:v3:' + key;
             try {
                 const cached = localStorage.getItem(cacheKey);
                 if (cached) {
@@ -5240,8 +5270,11 @@
             } catch (e) {}
 
             try {
-                const { accent, accent2 } = await _extractMonetFromDataUrl(dataUrl);
-                const accentRgb = `${accent.r}, ${accent.g}, ${accent.b}`;
+                const { accent, accent2: accent2Raw } = await _extractMonetFromDataUrl(dataUrl);
+                // accent оставляем как есть (кнопки, рамки — пусть соответствуют обоям)
+                // accent2 бустим, чтобы переключатели были видны даже на тёмных/тусклых обоях
+                const accent2 = _boostToggleAccent(accent2Raw.r, accent2Raw.g, accent2Raw.b);
+                const accentRgb  = `${accent.r}, ${accent.g}, ${accent.b}`;
                 const accent2Rgb = `${accent2.r}, ${accent2.g}, ${accent2.b}`;
 
                 // subtle tint for panels, keep it "glass" but wallpaper-dependent
