@@ -25,7 +25,10 @@ class ArizonaLauncher:
         defaults = {'last_nickname': '', 'last_server': 15, 'game_path': '', 'launcher_path': '',
                     'launch_params': {'memory': 4096, 'widescreen': False, 'texture_mode': False, 'color_depth_16': False,
                                       'allow_hdr': False, 'enable_grass': False, 'ldo': False, 'seasons': False,
-                                      'graphics': False, 'auth_cef_enable': False, 'window_mode': True, 'cdn': '1,1,1'},
+                                      'graphics': False, 'auth_cef_enable': False, 'window_mode': True, 'cdn': '1,1,1',
+                                      # v7 параметры
+                                      'enable_new_grass': False, 'old_window': False, 'use_d3dx9_43': False,
+                                      'show_dialog_ids': False, 'offcef': False, 'modern_scale': False},
                     'launcher_settings': {'bg_image': None}}
         if os.path.exists(self.config_path):
             try:
@@ -66,9 +69,12 @@ class ArizonaLauncher:
             gta = game_dir / "gta_sa.exe"
             if gta.exists():
                 found_gta = gta
-                launch = game_dir / "ArizonaLauncher6_byAIR.exe"
-                if launch.exists():
-                    found_launcher = launch
+                launch_v7 = game_dir / "ArizonaLauncher7.0_byAIR.exe"
+                launch_v6 = game_dir / "ArizonaLauncher6_byAIR.exe"
+                if launch_v7.exists():
+                    found_launcher = launch_v7
+                elif launch_v6.exists():
+                    found_launcher = launch_v6
                 break
 
         if found_gta: self.game_path = self.config['game_path'] = str(found_gta)
@@ -90,6 +96,45 @@ class ArizonaLauncher:
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess): pass
         time.sleep(1)
 
+    def get_launcher_version(self):
+        """Возвращает 'v7' или 'v6' в зависимости от установленного лаунчера.
+        Логика:
+        1. Если есть папка preloading_plugins с файлами (dll и конфиг)
+        2. Проверяем какой лаунчер установлен в корневой папке игры
+        3. Если найден v7 -> возвращаем 'v7', если v6 -> 'v6'
+        4. Если лаунчера нет или папки preloading нет -> 'v6' (по умолчанию)
+        """
+        logger.info("[get_launcher_version] Определение версии лаунчера")
+        
+        if not self.game_path:
+            logger.info("[get_launcher_version] game_path не установлен, возвращаем v6 по умолчанию")
+            return "v6"
+        
+        game_dir = os.path.dirname(self.game_path)
+        plugins_dir = os.path.join(game_dir, "preloading_plugins")
+        
+        logger.info(f"[get_launcher_version] Проверка папки: {plugins_dir}")
+        
+        # Проверяем наличие папки preloading_plugins с файлами
+        if os.path.isdir(plugins_dir) and os.listdir(plugins_dir):
+            logger.info(f"[get_launcher_version] Папка preloading_plugins найдена, файлов: {len(os.listdir(plugins_dir))}")
+            # Проверяем какой лаунчер установлен
+            launcher_v7 = os.path.join(game_dir, "ArizonaLauncher7.0_byAIR.exe")
+            launcher_v6 = os.path.join(game_dir, "ArizonaLauncher6_byAIR.exe")
+            
+            if os.path.exists(launcher_v7):
+                logger.info(f"[get_launcher_version] Найден лаунчер v7: {launcher_v7}")
+                return "v7"
+            elif os.path.exists(launcher_v6):
+                logger.info(f"[get_launcher_version] Найден лаунчер v6: {launcher_v6}")
+                return "v6"
+            else:
+                logger.info("[get_launcher_version] Лаунчер не найден, возвращаем v6 по умолчанию")
+        else:
+            logger.info("[get_launcher_version] Папка preloading_plugins не найдена или пуста, возвращаем v6 по умолчанию")
+        
+        return "v6"
+
     def launch_game(self, nickname, server_data=None, launch_params=None):
         if not self.launcher_path or not os.path.exists(self.launcher_path):
             return {"success": False, "message": "Launcher not found"}
@@ -99,13 +144,39 @@ class ArizonaLauncher:
         srv_ip = server_data.get('ip', 'payson.arizona-rp.com') if server_data else 'payson.arizona-rp.com'
         srv_port = server_data.get('port', 7777) if server_data else 7777
         params = launch_params or self.config.get('launch_params', {})
+        is_v7 = self.get_launcher_version() == "v7"
+
         cmd = [self.launcher_path, "-c", "-h", srv_ip, "-p", str(srv_port), "-mem", str(params.get('memory', 4096)),
                "-n", nickname, "-arizona", "-x"]
-        flags = {'widescreen': '-widescreen', 'texture_mode': '-t', 'color_depth_16': '-16bpp', 'allow_hdr': '-allow_hdr',
-                 'enable_grass': '-enable_grass', 'ldo': '-ldo', 'seasons': '-seasons', 'graphics': '-graphics',
-                 'auth_cef_enable': '-auth_cef_enable', 'window_mode': '-window'}
-        for k, v in flags.items():
+
+        # Общие флаги для v6 и v7
+        common_flags = {
+            'widescreen': '-widescreen', 'texture_mode': '-t', 'color_depth_16': '-16bpp',
+            'allow_hdr': '-allow_hdr', 'enable_grass': '-enable_grass', 'ldo': '-ldo',
+            'seasons': '-seasons', 'graphics': '-graphics', 'auth_cef_enable': '-auth_cef_enable',
+        }
+        for k, v in common_flags.items():
             if params.get(k, False): cmd.append(v)
+
+        # Оконный режим: -window и -old_window взаимоисключающие
+        # old_window доступен только в v7
+        if is_v7 and params.get('old_window', False):
+            cmd.append('-old_window')
+        elif params.get('window_mode', False):
+            cmd.append('-window')
+
+        # Флаги только для v7
+        if is_v7:
+            v7_flags = {
+                'enable_new_grass': '-enable_new_grass',
+                'use_d3dx9_43':     '-use_d3dx9_43',
+                'show_dialog_ids':  '-show_dialog_ids',
+                'offcef':           '-offcef',
+                'modern_scale':     '-modern_scale',
+            }
+            for k, v in v7_flags.items():
+                if params.get(k, False): cmd.append(v)
+
         cmd.extend(["-cdn", params.get('cdn', '1,1,1')])
         try:
             self.kill_all_launchers()
@@ -256,13 +327,159 @@ class WebViewApp:
         return {"running": running, "was_running": was}
 
     def restore_window(self):
+        """Разворачивает окно лаунчера. Останавливает трей если активен."""
         try:
+            # Остановить трей если активен
+            if getattr(self, '_tray_icon', None):
+                try: self._tray_icon.stop()
+                except Exception: pass
+                self._tray_icon = None
+
             wins = webview.windows
             if wins:
-                wins[0].restore()
+                try: wins[0].show()
+                except Exception: pass
+                try: wins[0].restore()
+                except Exception: pass
+
+            # Форсируем вывод на передний план через win32gui
+            try:
+                import win32gui, win32con
+                def _bring_to_front(hwnd, _):
+                    title = win32gui.GetWindowText(hwnd)
+                    if 'Arizona RP Launcher' in title:
+                        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+                        win32gui.SetForegroundWindow(hwnd)
+                        win32gui.BringWindowToTop(hwnd)
+                win32gui.EnumWindows(_bring_to_front, None)
+            except ImportError:
+                pass
+            except Exception as e:
+                logger.warning(f"restore_window win32 error: {e}")
+
+            return {"success": True}
+        except Exception as e:
+            logger.error(f"restore_window error: {e}")
+            return {"success": False, "message": str(e)}
+
+    def minimize_to_tray(self):
+        """Сворачивает в системный трей. Если pystray/Pillow не установлены — обычный minimize."""
+        try:
+            import pystray
+            from PIL import Image, ImageDraw
+        except ImportError:
+            logger.info("pystray/Pillow не установлены, используем обычный minimize")
+            return self.minimize_window()
+
+        wins = webview.windows
+        if not wins:
+            return {"success": False, "message": "No window"}
+
+        # Иконка 64x64: синий круг с буквой A
+        img = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        draw.ellipse([2, 2, 62, 62], fill=(0, 120, 212, 255))
+        try:
+            from PIL import ImageFont
+            font = ImageFont.truetype("arial.ttf", 30)
+            draw.text((17, 12), "A", fill=(255, 255, 255, 255), font=font)
+        except Exception:
+            draw.rectangle([20, 42, 44, 46], fill=(255, 255, 255, 255))  # fallback: горизонтальная черта
+            draw.polygon([(32, 12), (20, 44), (44, 44)], outline=(255, 255, 255, 255))
+
+        _self = self
+
+        def _on_open(icon, item):
+            icon.stop()
+            _self._tray_icon = None
+            _self.restore_window()
+
+        def _on_quit(icon, item):
+            icon.stop()
+            _self._tray_icon = None
+            try:
+                wins = webview.windows
+                if wins: wins[0].destroy()
+            except Exception: pass
+
+        menu = pystray.Menu(
+            pystray.MenuItem("Открыть лаунчер", _on_open, default=True),
+            pystray.MenuItem("Выход", _on_quit),
+        )
+        icon = pystray.Icon("ArzLauncher", img, "Arizona RP Launcher", menu)
+        self._tray_icon = icon
+
+        # Скрываем окно
+        try:
+            wins[0].hide()
+        except Exception:
+            wins[0].minimize()
+
+        import threading
+        threading.Thread(target=icon.run, daemon=True).start()
+        logger.info("minimize_to_tray: трей запущен")
+        return {"success": True}
+
+    def check_tray_support(self):
+        """Проверяет наличие pystray и Pillow."""
+        try:
+            import pystray
+            from PIL import Image
+            return {"success": True, "available": True}
+        except ImportError:
+            return {"success": True, "available": False}
+    def get_debug_info(self):
+        """Возвращает диагностическую информацию для Debug-вкладки."""
+        try:
+            profiles = self.launcher.config.get('profiles', [])
+            active_id = self.launcher.config.get('active_profile_id', None)
+            active_name = next((p.get('name') for p in profiles if p.get('id') == active_id), None)
+            return {
+                "success": True,
+                "data": {
+                    "config_path":         self.launcher.config_path,
+                    "docs_path":           self.launcher.documents_path,
+                    "game_path":           self.launcher.game_path or "",
+                    "launcher_path":       self.launcher.launcher_path or "",
+                    "patches_path":        self.launcher.patches_path or "",
+                    "profiles_count":      len(profiles),
+                    "active_profile_name": active_name or "нет",
+                }
+            }
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+
+    def open_data_folder(self):
+        """Открывает папку данных лаунчера в проводнике."""
+        try:
+            path = self.launcher.documents_path
+            os.makedirs(path, exist_ok=True)
+            if sys.platform == 'win32':
+                os.startfile(path)
+            elif sys.platform == 'darwin':
+                subprocess.Popen(['open', path])
+            else:
+                subprocess.Popen(['xdg-open', path])
             return {"success": True}
         except Exception as e:
             return {"success": False, "message": str(e)}
+
+    def open_log_file(self):
+        """Открывает файл лога в Блокноте."""
+        try:
+            log_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "arizona_launcher.log")
+            if not os.path.exists(log_path):
+                return {"success": False, "message": "Файл лога не найден"}
+            if sys.platform == 'win32':
+                subprocess.Popen(["notepad", log_path])
+            elif sys.platform == 'darwin':
+                subprocess.Popen(["open", log_path])
+            else:
+                subprocess.Popen(["xdg-open", log_path])
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "message": str(e)}
+
     def get_profiles(self):
         profiles = self.launcher.config.get('profiles', [])
         active_id = self.launcher.config.get('active_profile_id', None)
@@ -285,14 +502,21 @@ class WebViewApp:
                 "last_nickname": self.launcher.config.get('last_nickname', ''),
                 "last_server": self.launcher.config.get('last_server', 15),
                 "launch_params": self.launcher.config.get('launch_params', {}),
-                "paths_configured": bool(self.launcher.launcher_path and self.launcher.game_path)}
+                "paths_configured": bool(self.launcher.launcher_path and self.launcher.game_path),
+                "launcher_version": self.launcher.get_launcher_version()}
+
+    def get_launcher_version(self):
+        """Возвращает версию установленного лаунчера для JS."""
+        return {"success": True, "version": self.launcher.get_launcher_version()}
 
     def get_saved_data(self):
         """Возвращает сохраненные данные (никнейм, сервер)"""
         return {
             "success": True,
             "nickname": self.launcher.config.get('last_nickname', ''),
-            "server": self.launcher.config.get('last_server', 15)
+            "server": self.launcher.config.get('last_server', 15),
+            "game_path": self.launcher.game_path or '',
+            "paths_configured": bool(self.launcher.launcher_path and self.launcher.game_path)
         }
     def get_read_news_ids(self):
         """Возвращает список прочитанных ID новостей"""
@@ -365,14 +589,21 @@ class WebViewApp:
           needs_install — нужна установка лаунчера/патчер архива
           no_game     — gta_sa.exe не найден
         """
-        game_exe     = os.path.join(folder_path, "gta_sa.exe")
-        launcher_exe = os.path.join(folder_path, "ArizonaLauncher6_byAIR.exe")
-        plugins_dir  = os.path.join(folder_path, "preloading_plugins")
+        game_exe    = os.path.join(folder_path, "gta_sa.exe")
+        launcher_v6 = os.path.join(folder_path, "ArizonaLauncher6_byAIR.exe")
+        launcher_v7 = os.path.join(folder_path, "ArizonaLauncher7.0_byAIR.exe")
+        plugins_dir = os.path.join(folder_path, "preloading_plugins")
 
         if not os.path.exists(game_exe):
             return {"status": "no_game", "folder": folder_path}
 
-        has_launcher = os.path.exists(launcher_exe)
+        # Лаунчер найден если установлена любая из версий (v6 или v7)
+        launcher_exe = ""
+        if os.path.exists(launcher_v7):
+            launcher_exe = launcher_v7
+        elif os.path.exists(launcher_v6):
+            launcher_exe = launcher_v6
+        has_launcher = bool(launcher_exe)
         has_plugins  = os.path.isdir(plugins_dir) and bool(os.listdir(plugins_dir))
 
         if has_launcher and has_plugins:
@@ -387,10 +618,97 @@ class WebViewApp:
         return {"status": "needs_install", "folder": folder_path,
                 "missing": missing,
                 "game_exe": game_exe,
-                "launcher_exe": launcher_exe if has_launcher else ""}
+                "launcher_exe": launcher_exe}
+
+    def get_install_action(self, folder_path):
+        """Определяет какое действие нужно выполнить для установки.
+        Возвращает:
+        - action: 'none' | 'choose_version' | 'install_preloading_only' | 'install_launcher_only'
+        - has_launcher: bool
+        - has_preloading: bool
+        - launcher_version: 'v6' | 'v7' | None
+        """
+        logger.info(f"[get_install_action] Начало проверки папки: {folder_path}")
+        
+        game_exe    = os.path.join(folder_path, "gta_sa.exe")
+        launcher_v6 = os.path.join(folder_path, "ArizonaLauncher6_byAIR.exe")
+        launcher_v7 = os.path.join(folder_path, "ArizonaLauncher7.0_byAIR.exe")
+        plugins_dir = os.path.join(folder_path, "preloading_plugins")
+
+        if not os.path.exists(game_exe):
+            logger.error(f"[get_install_action] gta_sa.exe не найден в {folder_path}")
+            return {"action": "error", "message": "gta_sa.exe не найден"}
+
+        has_v6 = os.path.exists(launcher_v6)
+        has_v7 = os.path.exists(launcher_v7)
+        has_launcher = has_v6 or has_v7
+        has_preloading = os.path.isdir(plugins_dir) and bool(os.listdir(plugins_dir))
+        launcher_version = 'v7' if has_v7 else ('v6' if has_v6 else None)
+
+        logger.info(f"[get_install_action] Статус проверки:")
+        logger.info(f"  - has_v6: {has_v6}")
+        logger.info(f"  - has_v7: {has_v7}")
+        logger.info(f"  - has_preloading: {has_preloading}")
+        logger.info(f"  - launcher_version: {launcher_version}")
+
+        # Логика определения действия:
+        # 1. Есть preloading + v7 -> ничего не делать
+        if has_preloading and has_v7:
+            logger.info("[get_install_action] Результат: Лаунчер v7 уже установлен (action: none)")
+            return {
+                "action": "none",
+                "message": "Лаунчер v7 уже установлен",
+                "has_launcher": True,
+                "has_preloading": True,
+                "launcher_version": "v7"
+            }
+
+        # 2. Есть preloading + v6 -> ничего не делать
+        if has_preloading and has_v6:
+            logger.info("[get_install_action] Результат: Лаунчер v6 уже установлен (action: none)")
+            return {
+                "action": "none",
+                "message": "Лаунчер v6 уже установлен",
+                "has_launcher": True,
+                "has_preloading": True,
+                "launcher_version": "v6"
+            }
+
+        # 3. Нет preloading + есть лаунчер (v6 или v7) -> установить только preloading
+        if not has_preloading and has_launcher:
+            logger.info(f"[get_install_action] Результат: Требуется установка preloading_plugins (action: install_preloading_only, launcher: {launcher_version})")
+            return {
+                "action": "install_preloading_only",
+                "message": "Требуется установка папки preloading_plugins",
+                "has_launcher": True,
+                "has_preloading": False,
+                "launcher_version": launcher_version
+            }
+
+        # 4. Есть preloading + нет лаунчера -> предложить выбор версии (установить только лаунчер)
+        if has_preloading and not has_launcher:
+            logger.info("[get_install_action] Результат: Требуется установка лаунчера (action: install_launcher_only)")
+            return {
+                "action": "install_launcher_only",
+                "message": "Выберите версию лаунчера для установки",
+                "has_launcher": False,
+                "has_preloading": True,
+                "launcher_version": None
+            }
+
+        # 5. Нет ничего -> предложить выбор версии (полная установка)
+        logger.info("[get_install_action] Результат: Требуется полная установка (action: choose_version)")
+        return {
+            "action": "choose_version",
+            "message": "Выберите версию лаунчера для установки",
+            "has_launcher": False,
+            "has_preloading": False,
+            "launcher_version": None
+        }
 
     def select_game_path(self):
         """Открыть диалог выбора папки с игрой"""
+        logger.info("[select_game_path] Открытие диалога выбора папки")
         try:
             from PyQt5.QtWidgets import QFileDialog
             app = self._qt_app()
@@ -401,35 +719,77 @@ class WebViewApp:
                 QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks
             )
             if not folder_path:
+                logger.info("[select_game_path] Пользователь отменил выбор папки")
                 return {"success": False, "message": "Папка не выбрана"}
 
+            logger.info(f"[select_game_path] Выбрана папка: {folder_path}")
             check = self._check_game_folder(folder_path)
 
             if check["status"] == "no_game":
+                logger.error(f"[select_game_path] gta_sa.exe не найден в {folder_path}")
                 return {"success": False, "message": "gta_sa.exe не найден в выбранной папке"}
 
-            if check["status"] == "needs_install":
-                # Сохраняем game_path уже сейчас, launcher установим позже
-                self.launcher.set_game_paths(check["game_exe"], check.get("launcher_exe", ""))
-                return {
-                    "success": False,
-                    "needs_install": True,
-                    "folder": folder_path,
-                    "missing": check["missing"],
-                    "message": "Требуется установка компонентов"
-                }
-
-            # Всё хорошо
-            self.launcher.set_game_paths(check["game_exe"], check["launcher_exe"])
-            return {"success": True, "message": f"Путь установлен: {folder_path}"}
+            # Сохраняем путь к игре независимо от наличия лаунчера
+            logger.info(f"[select_game_path] Сохранение путей: game_exe={check['game_exe']}, launcher_exe={check.get('launcher_exe', 'нет')}")
+            self.launcher.set_game_paths(check["game_exe"], check.get("launcher_exe", ""))
+            
+            # Получаем информацию о необходимых действиях
+            logger.info("[select_game_path] Вызов get_install_action для определения необходимых действий")
+            install_info = self.get_install_action(folder_path)
+            
+            logger.info(f"[select_game_path] Успешно завершено. Action: {install_info.get('action')}")
+            return {
+                "success": True, 
+                "message": f"Путь установлен: {folder_path}",
+                "folder": folder_path,
+                "install_info": install_info
+            }
         except Exception as e:
-            logger.error(f"Error selecting game path: {e}")
+            logger.error(f"[select_game_path] Ошибка: {e}", exc_info=True)
             return {"success": False, "message": str(e)}
 
-    def download_and_install_launcher(self, folder_path):
+    def get_install_action_api(self, folder_path):
+        """API метод для получения информации о необходимых действиях установки"""
+        logger.info(f"[get_install_action_api] Вызов для папки: {folder_path}")
+        try:
+            install_info = self.get_install_action(folder_path)
+            logger.info(f"[get_install_action_api] Результат: {install_info.get('action')}")
+            return {
+                "success": True,
+                "install_info": install_info
+            }
+        except Exception as e:
+            logger.error(f"[get_install_action_api] Ошибка: {e}", exc_info=True)
+            return {"success": False, "message": str(e)}
+
+    def download_and_install_launcher(self, folder_path, version='v6', install_type='choose_version'):
         """Скачивает архив лаунчера с GitHub и устанавливает в папку игры.
+           version: 'v6' — ArizonaLauncher6_byAIR, 'v7' — ArizonaLauncher7_byAIR
+           install_type: 'choose_version' — полная установка
+                        'install_preloading_only' — только папка preloading_plugins
+                        'install_launcher_only' — только лаунчер
            Отправляет прогресс через JS-событие."""
-        GITHUB_RELEASE_URL = "https://raw.githubusercontent.com/worteng/ArizonaLauncher/refs/heads/main/others/arizonapatcher.zip"
+        logger.info(f"[download_and_install_launcher] ========== НАЧАЛО УСТАНОВКИ ==========")
+        logger.info(f"[download_and_install_launcher] Параметры:")
+        logger.info(f"  - folder_path: {folder_path}")
+        logger.info(f"  - version: {version}")
+        logger.info(f"  - install_type: {install_type}")
+        
+        VERSIONS = {
+            "v6": {
+                "url": "https://raw.githubusercontent.com/worteng/ArizonaLauncher/refs/heads/main/others/arizonapatcher.zip",
+                "exe_names": ["arizonalauncher6_byair.exe"],
+            },
+            "v7": {
+                "url": "https://raw.githubusercontent.com/worteng/ArizonaLauncher/refs/heads/main/others/arizonapatchesV2.zip",
+                "exe_names": ["arizonalauncher7.0_byair.exe"],
+            },
+        }
+        ver = VERSIONS.get(version, VERSIONS["v6"])
+        GITHUB_RELEASE_URL = ver["url"]
+        TARGET_EXE_NAMES   = ver["exe_names"]
+        logger.info(f"[download_and_install_launcher] URL для скачивания: {GITHUB_RELEASE_URL}")
+        logger.info(f"[download_and_install_launcher] Целевые exe файлы: {TARGET_EXE_NAMES}")
         import zipfile, tempfile, shutil
 
         def _send(stage, progress=0, message=""):
@@ -443,19 +803,24 @@ class WebViewApp:
                 logger.warning(f"_send progress error: {ex}")
 
         try:
+            logger.info("[download_and_install_launcher] Этап 1: Скачивание архива")
             _send("download", 0, "Подключение к GitHub...")
 
             # 1. Качаем архив с прогрессом
             resp = requests.get(GITHUB_RELEASE_URL, stream=True, timeout=60, verify=False,
                                 headers={"User-Agent": "Mozilla/5.0"})
             if resp.status_code != 200:
+                logger.error(f"[download_and_install_launcher] Ошибка HTTP: {resp.status_code}")
                 _send("error", 0, f"Ошибка загрузки: HTTP {resp.status_code}")
                 return {"success": False, "message": f"HTTP {resp.status_code}"}
 
             total = int(resp.headers.get("content-length", 0))
             downloaded = 0
+            logger.info(f"[download_and_install_launcher] Размер архива: {total / 1024 / 1024:.2f} МБ")
 
             tmp_zip = os.path.join(tempfile.gettempdir(), "arizona_launcher_install.zip")
+            logger.info(f"[download_and_install_launcher] Временный файл: {tmp_zip}")
+            
             with open(tmp_zip, "wb") as f:
                 for chunk in resp.iter_content(chunk_size=65536):
                     if chunk:
@@ -465,112 +830,156 @@ class WebViewApp:
                         mb = downloaded / 1024 / 1024
                         _send("download", pct, f"Скачано {mb:.1f} МБ...")
 
+            logger.info(f"[download_and_install_launcher] Скачивание завершено: {downloaded / 1024 / 1024:.2f} МБ")
+            logger.info("[download_and_install_launcher] Этап 2: Распаковка архива")
             _send("extract", 82, "Распаковка архива...")
 
-            # 2. Распаковываем
-            tmp_dir = os.path.join(tempfile.gettempdir(), "arizona_launcher_extract")
-            if os.path.exists(tmp_dir):
-                shutil.rmtree(tmp_dir, ignore_errors=True)
-            os.makedirs(tmp_dir, exist_ok=True)
-
+            # 2. Распаковываем архив в зависимости от типа установки
+            extracted_count = 0
+            skipped_count = 0
             with zipfile.ZipFile(tmp_zip, 'r') as zf:
-                zf.extractall(tmp_dir)
+                logger.info(f"[download_and_install_launcher] Файлов в архиве: {len(zf.infolist())}")
+                for member in zf.infolist():
+                    filename = os.path.basename(member.filename)
+                    if not filename:  # это папка внутри архива
+                        continue
+                    
+                    # Проверяем что это файл из preloading_plugins
+                    is_preloading = "preloading_plugins" in member.filename.replace("\\", "/")
+                    is_exe = filename.lower().endswith(".exe")
+                    
+                    # Логика установки в зависимости от типа:
+                    should_extract = False
+                    
+                    if install_type == 'install_preloading_only':
+                        # Устанавливаем только preloading_plugins
+                        should_extract = is_preloading
+                    elif install_type == 'install_launcher_only':
+                        # Устанавливаем только лаунчер (exe файлы)
+                        should_extract = is_exe
+                    else:
+                        # Полная установка (всё)
+                        should_extract = True
+                    
+                    if not should_extract:
+                        skipped_count += 1
+                        continue
+                    
+                    # preloading_plugins — сохраняем структуру
+                    if is_preloading:
+                        rel = member.filename.replace("\\", "/")
+                        idx = rel.find("preloading_plugins")
+                        dest_rel = rel[idx:]  # "preloading_plugins/file.ext"
+                        dest_path = os.path.join(folder_path, dest_rel)
+                        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+                        with zf.open(member) as src, open(dest_path, "wb") as dst:
+                            shutil.copyfileobj(src, dst)
+                        logger.info(f"[download_and_install_launcher] Извлечён (preloading): {dest_rel}")
+                        extracted_count += 1
+                    else:
+                        dest_path = os.path.join(folder_path, filename)
+                        with zf.open(member) as src, open(dest_path, "wb") as dst:
+                            shutil.copyfileobj(src, dst)
+                        logger.info(f"[download_and_install_launcher] Извлечён: {filename}")
+                        extracted_count += 1
 
+                        # Как только записали .exe — сразу в исключения Defender'а
+                        if is_exe and filename.lower() in TARGET_EXE_NAMES:
+                            launcher_dest = dest_path
+                            self._add_defender_exclusion(launcher_dest)
+                            logger.info(f"[download_and_install_launcher] Defender exclusion добавлен: {launcher_dest}")
+
+            logger.info(f"[download_and_install_launcher] Распаковка завершена:")
+            logger.info(f"  - Извлечено файлов: {extracted_count}")
+            logger.info(f"  - Пропущено файлов: {skipped_count}")
+            logger.info("[download_and_install_launcher] Этап 3: Финализация установки")
             _send("install", 90, "Установка файлов...")
 
-            # 3. Ищем ArizonaLauncher6_byAIR.exe рекурсивно в распакованном
-            launcher_src = None
-            for root, dirs, files in os.walk(tmp_dir):
-                for fname in files:
-                    if fname.lower() == "arizonalauncher6_byair.exe":
-                        launcher_src = os.path.join(root, fname)
+            # 3. Проверяем что .exe нашёлся
+            logger.info("[download_and_install_launcher] Проверка наличия exe файла")
+            launcher_dest_check = None
+            for exe_name in TARGET_EXE_NAMES:
+                candidate = os.path.join(folder_path, os.path.basename(exe_name))
+                # ищем без учёта регистра
+                for f in os.listdir(folder_path):
+                    if f.lower() == exe_name:
+                        launcher_dest_check = os.path.join(folder_path, f)
+                        logger.info(f"[download_and_install_launcher] Найден exe: {f}")
                         break
-                if launcher_src:
+                if launcher_dest_check:
                     break
 
-            if not launcher_src:
-                # Если не нашли точное имя — берём любой .exe
-                for root, dirs, files in os.walk(tmp_dir):
-                    for fname in files:
-                        if fname.lower().endswith(".exe"):
-                            launcher_src = os.path.join(root, fname)
-                            break
-                    if launcher_src:
+            if not launcher_dest_check:
+                logger.warning("[download_and_install_launcher] Целевой exe не найден, ищем любой exe")
+                # Fallback: любой новый .exe в папке
+                for f in os.listdir(folder_path):
+                    if f.lower().endswith(".exe") and f.lower() != "gta_sa.exe":
+                        launcher_dest_check = os.path.join(folder_path, f)
+                        logger.info(f"[download_and_install_launcher] Найден альтернативный exe: {f}")
                         break
 
-            if not launcher_src:
-                _send("error", 0, "ArizonaLauncher6_byAIR.exe не найден в архиве")
-                return {"success": False, "message": "Исполняемый файл не найден в архиве"}
+            if not launcher_dest_check:
+                logger.error("[download_and_install_launcher] Исполняемый файл лаунчера не найден после распаковки")
+                _send("error", 0, "Исполняемый файл лаунчера не найден после распаковки")
+                return {"success": False, "message": "Исполняемый файл не найден"}
 
-            launcher_dest = os.path.join(folder_path, "ArizonaLauncher6_byAIR.exe")
-            shutil.copy2(launcher_src, launcher_dest)
+            launcher_dest = launcher_dest_check
+            logger.info(f"[download_and_install_launcher] Финальный путь к лаунчеру: {launcher_dest}")
 
-            # 4. Копируем все файлы рядом с .exe (DLL и т.п.)
-            src_dir = os.path.dirname(launcher_src)
-            for fname in os.listdir(src_dir):
-                src_file = os.path.join(src_dir, fname)
-                if os.path.isfile(src_file) and src_file != launcher_src:
-                    shutil.copy2(src_file, os.path.join(folder_path, fname))
-
-            # 5. Копируем preloading_plugins из архива (если есть), иначе создаём пустую
+            # 4. Убеждаемся что preloading_plugins существует
             plugins_dir = os.path.join(folder_path, "preloading_plugins")
-            plugins_src = None
-            for root, dirs, files in os.walk(tmp_dir):
-                if os.path.basename(root).lower() == "preloading_plugins":
-                    plugins_src = root
-                    break
-
-            if plugins_src:
-                _send("install", 94, "Копирование preloading_plugins...")
-                if os.path.exists(plugins_dir):
-                    # Копируем файлы поверх, не удаляя существующие
-                    for fname in os.listdir(plugins_src):
-                        src_file = os.path.join(plugins_src, fname)
-                        if os.path.isfile(src_file):
-                            shutil.copy2(src_file, os.path.join(plugins_dir, fname))
-                else:
-                    shutil.copytree(plugins_src, plugins_dir)
-                logger.info(f"preloading_plugins скопирован из архива в {plugins_dir}")
-            else:
+            if not os.path.isdir(plugins_dir):
+                logger.info(f"[download_and_install_launcher] Создание папки preloading_plugins: {plugins_dir}")
                 os.makedirs(plugins_dir, exist_ok=True)
+            else:
+                logger.info(f"[download_and_install_launcher] Папка preloading_plugins уже существует")
 
             _send("install", 97, "Финализация...")
 
-            # 6. Устанавливаем пути
+            # 5. Устанавливаем пути
             game_exe = os.path.join(folder_path, "gta_sa.exe")
+            logger.info(f"[download_and_install_launcher] Сохранение путей: game_exe={game_exe}, launcher={launcher_dest}")
             self.launcher.set_game_paths(game_exe, launcher_dest)
 
-            # 7. Добавляем в исключения Windows Defender
-            _send("install", 98, "Добавление в исключения антивируса...")
-            self._add_defender_exclusion(launcher_dest)
-
-            # Чистка
+            # Чистка только zip-архива (tmp_dir больше не используется)
             try:
                 os.remove(tmp_zip)
-                shutil.rmtree(tmp_dir, ignore_errors=True)
-            except Exception:
-                pass
+                logger.info(f"[download_and_install_launcher] Временный архив удалён: {tmp_zip}")
+            except Exception as e:
+                logger.warning(f"[download_and_install_launcher] Не удалось удалить временный архив: {e}")
 
             _send("done", 100, "Установка завершена!")
-            logger.info(f"download_and_install_launcher: установлен в {folder_path}")
+            logger.info(f"[download_and_install_launcher] ========== УСТАНОВКА ЗАВЕРШЕНА УСПЕШНО ==========")
+            logger.info(f"[download_and_install_launcher] Установлено в: {folder_path}")
             return {"success": True, "message": "Лаунчер успешно установлен"}
 
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.ConnectionError as e:
+            logger.error(f"[download_and_install_launcher] Ошибка подключения: {e}")
             _send("error", 0, "Нет подключения к интернету")
             return {"success": False, "message": "Нет подключения к интернету"}
-        except requests.exceptions.Timeout:
+        except requests.exceptions.Timeout as e:
+            logger.error(f"[download_and_install_launcher] Тайм-аут: {e}")
             _send("error", 0, "Тайм-аут соединения")
             return {"success": False, "message": "Тайм-аут соединения"}
         except Exception as e:
-            logger.error(f"download_and_install_launcher error: {e}")
+            logger.error(f"[download_and_install_launcher] ========== ОШИБКА УСТАНОВКИ ==========")
+            logger.error(f"[download_and_install_launcher] {e}", exc_info=True)
             _send("error", 0, str(e))
             return {"success": False, "message": str(e)}
 
-    def start_launcher_install(self, folder_path):
-        """Запускает скачивание и установку лаунчера в фоновом потоке"""
+    def start_launcher_install(self, folder_path, version='v6', install_type='choose_version'):
+        """Запускает скачивание и установку лаунчера в фоновом потоке
+        install_type: 'choose_version', 'install_preloading_only', 'install_launcher_only'
+        """
+        logger.info(f"[start_launcher_install] Запуск установки:")
+        logger.info(f"  - folder_path: {folder_path}")
+        logger.info(f"  - version: {version}")
+        logger.info(f"  - install_type: {install_type}")
+        
         def run():
-            self.download_and_install_launcher(folder_path)
+            self.download_and_install_launcher(folder_path, version, install_type)
         Thread(target=run, daemon=True).start()
+        logger.info("[start_launcher_install] Фоновый поток установки запущен")
         return {"success": True, "message": "Загрузка начата"}
 
 
@@ -965,29 +1374,82 @@ class WebViewApp:
             return {"success": False, "message": str(e)}
 
     def fetch_moonloader_catalog(self):
-        """Загружает moonloader.txt с GitHub и парсит список скриптов"""
-        MOONLOADER_URL = "https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader.txt"
+        """Загружает lua.txt из ArzLaunchRepo и парсит список скриптов"""
+        MOONLOADER_URL = "https://raw.githubusercontent.com/worteng/ArzLaunchRepo/main/Lua/lua.txt"
+        FALLBACK_URL   = "https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/moonloader.txt"
+        for url in (MOONLOADER_URL, FALLBACK_URL):
+            try:
+                logger.info(f"fetch_moonloader_catalog: запрос {url}")
+                resp = requests.get(url, timeout=10, headers={"Cache-Control": "no-cache"}, verify=False)
+                logger.info(f"fetch_moonloader_catalog: статус {resp.status_code}")
+                if resp.status_code != 200:
+                    continue
+                scripts = self._parse_catalog_txt(resp.text)
+                if scripts:
+                    logger.info(f"fetch_moonloader_catalog: {len(scripts)} скриптов из {url}")
+                    return {"success": True, "data": scripts}
+            except Exception as e:
+                logger.warning(f"fetch_moonloader_catalog {url}: {e}")
+        return {"success": False, "message": "Нет соединения с GitHub или каталог пуст"}
+
+
+    def fetch_community_themes(self):
+        """Загружает themes.txt из ArzLaunchRepo."""
+        THEMES_URL = "https://raw.githubusercontent.com/worteng/ArzLaunchRepo/main/Themes/themes.txt"
         try:
-            logger.info(f"fetch_moonloader_catalog: запрос {MOONLOADER_URL}")
-            resp = requests.get(MOONLOADER_URL, timeout=10, headers={"Cache-Control": "no-cache"}, verify=False)
-            logger.info(f"fetch_moonloader_catalog: статус {resp.status_code}, размер {len(resp.text)} байт")
+            resp = requests.get(THEMES_URL, timeout=10, headers={"Cache-Control": "no-cache"}, verify=False)
             if resp.status_code == 404:
-                return {"success": False, "message": "Файл moonloader.txt не найден на GitHub (404). Создай его в репозитории."}
+                return {"success": False, "message": "themes.txt ещё не создан в репозитории"}
             if resp.status_code != 200:
-                return {"success": False, "message": f"GitHub вернул HTTP {resp.status_code}"}
-            scripts = self._parse_catalog_txt(resp.text)
-            logger.info(f"fetch_moonloader_catalog: распарсено {len(scripts)} скриптов")
-            if len(scripts) == 0:
-                return {"success": False, "message": "moonloader.txt найден, но не содержит блоков [script]"}
-            return {"success": True, "data": scripts}
-        except requests.exceptions.ConnectionError:
-            return {"success": False, "message": "Нет подключения к интернету"}
-        except requests.exceptions.Timeout:
-            return {"success": False, "message": "Превышено время ожидания (GitHub не отвечает)"}
+                return {"success": False, "message": f"HTTP {resp.status_code}"}
+            themes = self._parse_catalog_txt(resp.text)
+            logger.info(f"fetch_community_themes: {len(themes)} тем")
+            return {"success": True, "data": themes}
         except Exception as e:
-            logger.error(f"fetch_moonloader_catalog error: {e}")
+            logger.error(f"fetch_community_themes error: {e}")
             return {"success": False, "message": str(e)}
 
+    def download_community_theme(self, json_url):
+        """Скачивает JSON темы и, если есть wallpaper_url, скачивает обои и возвращает base64."""
+        import base64, mimetypes
+        try:
+            resp = requests.get(json_url, timeout=15, verify=False)
+            if resp.status_code != 200:
+                return {"success": False, "message": f"Ошибка загрузки темы: HTTP {resp.status_code}"}
+            theme = resp.json()
+
+            # Скачиваем обои если есть ссылка
+            wallpaper_data = theme.get("wallpaper")  # может быть уже base64
+            if not wallpaper_data and theme.get("wallpaper_url"):
+                try:
+                    wp_resp = requests.get(theme["wallpaper_url"], timeout=20, verify=False)
+                    if wp_resp.status_code == 200:
+                        content_type = wp_resp.headers.get("Content-Type", "image/jpeg").split(";")[0]
+                        b64 = base64.b64encode(wp_resp.content).decode("utf-8")
+                        wallpaper_data = f"data:{content_type};base64,{b64}"
+                except Exception as e:
+                    logger.warning(f"download_community_theme wallpaper error: {e}")
+
+            theme["wallpaper_data"] = wallpaper_data
+            return {"success": True, "theme": theme}
+        except Exception as e:
+            logger.error(f"download_community_theme error: {e}")
+            return {"success": False, "message": str(e)}
+
+    def open_telegram_share(self):
+        """Открывает Telegram-бота для отправки скрипта/темы в комьюнити."""
+        BOT_USERNAME = "ARZLaunchBot"
+        url = f"https://t.me/{BOT_USERNAME}"
+        try:
+            if sys.platform == "win32":
+                os.startfile(url)
+            elif sys.platform == "darwin":
+                subprocess.Popen(["open", url])
+            else:
+                subprocess.Popen(["xdg-open", url])
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "message": str(e), "url": url}
 
     def install_moonloader_script(self, url, filename):
         """Скачивает скрипт и кладёт в moonloader/"""
@@ -1408,7 +1870,7 @@ def main():
             logger.info("Авто-обнаружение: игра не найдена, пользователь укажет вручную")
 
     def _on_loaded():
-        """После загрузки страницы проверяем состояние игры."""
+        """После загрузки страницы открываем панель первого запуска."""
         import time as _t, json as _json
         _t.sleep(0.8)
         try:
@@ -1417,30 +1879,25 @@ def main():
                 return
             w = wins[0]
 
-            if not auto_found:
-                w.evaluate_js(
-                    "showNotification('📂 Игра не найдена — укажите путь в меню папок', 'error')"
-                )
-                return
+            data = {
+                "auto_found": auto_found,
+                "game_path": str(app.launcher.game_path or "").replace("\\", "\\\\"),
+                "check_status": "not_found",
+                "folder": "",
+                "missing": []
+            }
 
-            game_dir = str(Path(app.launcher.game_path).parent)
-            check = app._check_game_folder(game_dir)
+            if auto_found and app.launcher.game_path:
+                game_dir = str(Path(app.launcher.game_path).parent)
+                check = app._check_game_folder(game_dir)
+                data["check_status"] = check["status"]
+                data["folder"]       = check.get("folder", game_dir).replace("\\", "\\\\")
+                data["missing"]      = check.get("missing", [])
 
-            if check["status"] == "ok":
-                safe_dir = game_dir.replace("\\", "\\\\")
-                w.evaluate_js(
-                    f"showNotification('✅ Игра найдена: {safe_dir}', 'success')"
-                )
-            elif check["status"] == "needs_install":
-                payload = _json.dumps({
-                    "folder": check["folder"].replace("\\", "\\\\"),
-                    "missing": check["missing"]
-                })
-                w.evaluate_js(
-                    f"window._autoInstallPrompt && window._autoInstallPrompt({payload})"
-                )
+            payload = _json.dumps(data)
+            w.evaluate_js(f"window._flStart && window._flStart({payload})")
         except Exception as ex:
-            logger.warning(f"_on_loaded notify error: {ex}")
+            logger.warning(f"_on_loaded error: {ex}")
 
     try:
         window = webview.create_window('Arizona RP Launcher', 'index.html', js_api=app, width=1285, height=732,

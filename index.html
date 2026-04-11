@@ -726,6 +726,7 @@
             display: flex;
             gap: 12px;
             align-items: flex-start;
+            margin-bottom: 4px;
         }
 
         .install-av-icon { font-size: 22px; flex-shrink: 0; line-height: 1; }
@@ -794,6 +795,62 @@
         }
 
         .install-footer .s-btn { flex: 1; height: 42px; font-size: 13px; }
+
+        /* Radio-карточки выбора версии */
+        .install-ver-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            user-select: none;
+        }
+        .install-ver-card:hover {
+            border-color: rgba(var(--accent-rgb), 0.5);
+            background: rgba(var(--accent-rgb), 0.08);
+        }
+        .install-ver-card.selected {
+            border-color: rgba(var(--accent2-rgb), 0.7);
+            background: rgba(var(--accent-rgb), 0.15);
+        }
+        .install-ver-radio {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.65);
+            flex-shrink: 0;
+            position: relative;
+            transition: border-color 0.2s;
+        }
+        .install-ver-card.selected .install-ver-radio {
+            border-color: rgba(var(--accent2-rgb), 0.9);
+        }
+        .install-ver-card.selected .install-ver-radio::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border-radius: 50%;
+            background: rgba(var(--accent2-rgb), 0.95);
+        }
+        .install-ver-name {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            color: rgba(255,255,255,0.92);
+            margin-bottom: 2px;
+        }
+        .install-ver-desc {
+            font-size: 11px;
+            color: rgba(255,255,255,0.42);
+        }
+        .install-ver-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
         .cre-overlay {
             display: none;
             position: fixed;
@@ -1454,6 +1511,137 @@
             width: 120px;
             flex-shrink: 0;
         }
+
+        /* CDN toggle buttons */
+        .cdn-btn-group {
+            display: flex;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
+        .cdn-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 7px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.35);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.18s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cdn-btn:hover {
+            border-color: rgba(var(--accent2-rgb), 0.45);
+            background: rgba(var(--accent-rgb), 0.12);
+            color: rgba(255,255,255,0.65);
+        }
+
+        .cdn-btn.active {
+            background: rgba(var(--accent-rgb), 0.35);
+            border-color: rgba(var(--accent2-rgb), 0.6);
+            color: rgba(255,255,255,0.95);
+            box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.28);
+        }
+
+        /* CDN input row — column layout */
+        .cdn-input-row {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 7px;
+        }
+
+        .cdn-row-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cdn-hint {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.38);
+            line-height: 1.5;
+            padding: 0 2px;
+        }
+
+        .cdn-hint b {
+            color: rgba(var(--accent2-rgb), 0.65);
+            font-weight: 600;
+        }
+
+        /* v7 section divider */
+        .launch-section-divider {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 10px 4px 4px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .launch-section-divider span {
+            background: rgba(80,220,140,0.15);
+            border: 1px solid rgba(80,220,140,0.3);
+            color: rgba(80,220,140,0.85);
+            font-size: 9px;
+            padding: 1px 7px;
+            border-radius: 20px;
+        }
+
+        /* Vulkan incompatibility warning under toggle */
+        .launch-vulkan-warn {
+            display: none;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(255,185,60,0.85);
+            background: rgba(255,185,60,0.07);
+            border: 1px solid rgba(255,185,60,0.2);
+            border-radius: 6px;
+            padding: 5px 9px;
+            margin: 2px 0 4px 42px;
+            line-height: 1.5;
+        }
+
+        .launch-vulkan-warn.visible { display: block; }
+
+        /* Window mode radio group */
+        .window-mode-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .window-mode-group .launch-item {
+            border-radius: 0;
+        }
+
+        .window-mode-group .launch-item:first-child {
+            border-radius: 9px 9px 0 0;
+        }
+
+        .window-mode-group .launch-item:last-child {
+            border-radius: 0 0 9px 9px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+
+        /* v7 Vulkan pair container */
+        #v7_vulkanPair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
         #checkboxGroup {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -2048,6 +2236,17 @@
             to {
                 transform: translateX(0);
                 opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
             }
         }
 
@@ -2649,12 +2848,967 @@
             color: rgba(255,255,255,0.82);
         }
 
+        /* ── Profiles hover menu (top-left) ── */
+        #profilesHoverWidget {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 500;
+        }
+
+        /* Кнопка установки лаунчера */
+        #installLauncherBtn {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            margin-left: 120px;
+            z-index: 499;
+            height: 34px;
+            padding: 0 13px;
+            background: rgba(255, 165, 0, 0.15);
+            border: 1px solid rgba(255, 165, 0, 0.35);
+            border-radius: 8px;
+            color: rgba(255, 200, 80, 0.95);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.18s;
+            user-select: none;
+            white-space: nowrap;
+            animation: pulse-warning 2s ease-in-out infinite;
+        }
+
+        #installLauncherBtn:hover {
+            background: rgba(255, 165, 0, 0.25);
+            border-color: rgba(255, 165, 0, 0.55);
+            transform: translateY(-1px);
+        }
+
+        #installLauncherBtn.show {
+            display: flex;
+        }
+
+        @keyframes pulse-warning {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.4); }
+            50% { box-shadow: 0 0 12px 2px rgba(255, 165, 0, 0.6); }
+        }
+
+        .ph-trigger {
+            height: 34px;
+            padding: 0 13px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.13);
+            border-radius: 8px;
+            color: rgba(255,255,255,0.85);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.18s, border-color 0.18s;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        .ph-trigger:hover, .ph-trigger.active {
+            background: rgba(var(--accent-rgb), 0.22);
+            border-color: rgba(var(--accent2-rgb), 0.35);
+        }
+
+        .ph-active-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: rgba(var(--accent2-rgb), 0.9);
+            box-shadow: 0 0 6px rgba(var(--accent2-rgb), 0.6);
+            display: none;
+            flex-shrink: 0;
+        }
+        .ph-active-dot.show { display: block; }
+
+        .ph-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            min-width: 260px;
+            background: rgba(12, 14, 22, 0.97);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            backdrop-filter: blur(16px);
+            max-height: 420px;
+            overflow-y: auto;
+            animation: phDropIn 0.18s cubic-bezier(0.34,1.3,0.64,1);
+        }
+
+        @keyframes phDropIn {
+            from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .ph-dropdown::-webkit-scrollbar { width: 5px; }
+        .ph-dropdown::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+
+        .ph-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: default;
+            transition: background 0.14s;
+        }
+        .ph-item:hover { background: rgba(255,255,255,0.05); }
+        .ph-item.ph-active { background: rgba(var(--accent-rgb), 0.13); border: 1px solid rgba(var(--accent2-rgb), 0.2); }
+
+        .ph-item-icon { font-size: 16px; flex-shrink: 0; }
+
+        .ph-item-info { flex: 1; min-width: 0; }
+        .ph-item-name {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.88);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .ph-item-meta {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            margin-top: 1px;
+        }
+        .ph-item-active-badge {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 9px;
+            color: rgba(var(--accent2-rgb), 0.9);
+            background: rgba(var(--accent-rgb), 0.18);
+            border: 1px solid rgba(var(--accent2-rgb), 0.3);
+            border-radius: 5px;
+            padding: 1px 6px;
+            flex-shrink: 0;
+        }
+
+        .ph-item-btns { display: flex; gap: 4px; flex-shrink: 0; }
+
+        .ph-btn {
+            height: 26px;
+            padding: 0 9px;
+            border-radius: 6px;
+            border: none;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .ph-btn.apply {
+            background: rgba(var(--accent-rgb), 0.22);
+            border: 1px solid rgba(var(--accent2-rgb), 0.35);
+            color: rgba(255,255,255,0.88);
+        }
+        .ph-btn.apply:hover { background: rgba(var(--accent2-rgb), 0.35); }
+        .ph-btn.del {
+            background: rgba(160,30,30,0.18);
+            border: 1px solid rgba(200,60,60,0.25);
+            color: rgba(255,120,120,0.75);
+        }
+        .ph-btn.del:hover { background: rgba(200,50,50,0.35); }
+
+        .ph-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.06);
+            margin: 3px 2px;
+            flex-shrink: 0;
+        }
+
+        .ph-empty {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.22);
+            text-align: center;
+            padding: 16px 0 8px;
+        }
+
+        .ph-create-btn {
+            width: 100%;
+            height: 34px;
+            background: rgba(255,255,255,0.04);
+            border: 1px dashed rgba(255,255,255,0.13);
+            border-radius: 8px;
+            color: rgba(255,255,255,0.45);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.18s;
+            flex-shrink: 0;
+        }
+        .ph-create-btn:hover {
+            background: rgba(var(--accent-rgb), 0.10);
+            border-color: rgba(var(--accent2-rgb), 0.32);
+            color: rgba(255,255,255,0.8);
+        }
+
+        /* ── Debug tab styles ── */
+        .debug-section-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.28);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 12px 0 6px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 6px;
+        }
+
+        .debug-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 7px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            min-height: 32px;
+        }
+        .debug-row:last-child { border-bottom: none; }
+
+        .debug-label {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            flex: 0 0 120px;
+            padding-top: 2px;
+        }
+
+        .debug-value {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: rgba(200,230,255,0.75);
+            flex: 1;
+            word-break: break-all;
+            line-height: 1.5;
+        }
+
+        /* ── Community themes ── */
+        .ct-section-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.28);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 14px 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .ct-refresh-btn {
+            height: 24px;
+            padding: 0 10px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            color: rgba(255,255,255,0.45);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+        .ct-refresh-btn:hover {
+            background: rgba(var(--accent-rgb), 0.15);
+            border-color: rgba(var(--accent2-rgb), 0.3);
+            color: rgba(255,255,255,0.8);
+        }
+
+        .ct-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .ct-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            cursor: default;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .ct-card:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
+        .ct-card.ct-active {
+            background: rgba(var(--accent-rgb), 0.1);
+            border-color: rgba(var(--accent2-rgb), 0.3);
+        }
+
+        .ct-preview {
+            width: 64px;
+            height: 40px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.05);
+            flex-shrink: 0;
+            overflow: hidden;
+            position: relative;
+        }
+        .ct-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .ct-preview-colors {
+            width: 100%;
+            height: 100%;
+            display: flex;
+        }
+        .ct-preview-colors span { flex: 1; }
+
+        .ct-info { flex: 1; min-width: 0; }
+        .ct-name {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.88);
+        }
+        .ct-meta {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            margin-top: 2px;
+        }
+
+        .ct-apply-btn {
+            height: 28px;
+            padding: 0 12px;
+            border-radius: 7px;
+            border: 1px solid rgba(var(--accent2-rgb), 0.35);
+            background: rgba(var(--accent-rgb), 0.18);
+            color: rgba(255,255,255,0.88);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+        .ct-apply-btn:hover { background: rgba(var(--accent2-rgb), 0.32); }
+        .ct-apply-btn:disabled { opacity: 0.5; cursor: default; }
+
+        .ct-status {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            min-height: 14px;
+            flex-shrink: 0;
+        }
+
+        /* ── Share button in mods ── */
+        .mods-share-btn {
+            height: 30px;
+            padding: 0 12px;
+            background: rgba(0, 136, 204, 0.18);
+            border: 1px solid rgba(0, 160, 230, 0.3);
+            border-radius: 8px;
+            color: rgba(100, 200, 255, 0.9);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.18s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .mods-share-btn:hover {
+            background: rgba(0, 160, 230, 0.28);
+            border-color: rgba(0, 180, 255, 0.5);
+        }
+
         .profiles-empty {
             text-align: center;
             padding: 30px 0;
             font-family: 'Montserrat Alternates', sans-serif;
             font-size: 12px;
             color: rgba(255,255,255,0.2);
+        }
+
+        /* ══════════════════════════════════════════
+           FIRST LAUNCH PANEL
+        ══════════════════════════════════════════ */
+        .fl-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.82);
+            backdrop-filter: blur(12px);
+            z-index: 1300;
+            align-items: center;
+            justify-content: center;
+        }
+        .fl-overlay.open { display: flex; }
+        .fl-overlay.closing { animation: overlayFadeOut 0.25s ease forwards; }
+        .fl-overlay.closing .fl-modal { animation: creOut 0.25s cubic-bezier(0.4, 0, 1, 1) forwards; }
+
+        .fl-modal {
+            background: rgba(11, 13, 20, 0.99);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 22px;
+            width: min(520px, 94vw);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 36px 110px rgba(0,0,0,0.9);
+            animation: creIn 0.38s cubic-bezier(0.34, 1.3, 0.64, 1);
+            overflow: hidden;
+            max-height: 90vh;
+        }
+
+        /* Top bar: dots + skip */
+        .fl-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .fl-steps-dots { display: flex; gap: 6px; align-items: center; }
+        .fl-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            transition: all 0.25s;
+        }
+        .fl-dot.active {
+            background: rgba(var(--accent2-rgb), 0.85);
+            width: 22px;
+            border-radius: 4px;
+            box-shadow: 0 0 8px rgba(var(--accent2-rgb), 0.4);
+        }
+        .fl-dot.done { background: rgba(var(--accent-rgb), 0.45); }
+
+        .fl-skip-top {
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.28);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: color 0.15s, background 0.15s;
+        }
+        .fl-skip-top:hover { color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.05); }
+
+        /* Body */
+        .fl-body {
+            padding: 28px 28px 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* Footer */
+        .fl-footer {
+            display: flex;
+            gap: 10px;
+            padding: 16px 28px 24px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .fl-btn-back {
+            width: 42px; height: 42px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            color: rgba(255,255,255,0.45);
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.18s;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .fl-btn-back:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
+        .fl-btn-next {
+            flex: 1; height: 42px;
+            background: linear-gradient(135deg, rgba(var(--accent-rgb),0.88), rgba(var(--accent2-rgb),0.72));
+            border: 1px solid rgba(var(--accent2-rgb),0.3);
+            border-radius: 10px;
+            color: white;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px; font-weight: bold;
+            cursor: pointer;
+            transition: all 0.18s;
+            letter-spacing: 0.3px;
+        }
+        .fl-btn-next:hover { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(var(--accent-rgb),0.34); }
+
+        /* Step 0: Welcome */
+        .fl-welcome {
+            display: flex; flex-direction: column;
+            align-items: center; text-align: center; gap: 12px;
+            padding: 16px 0 8px;
+        }
+        .fl-welcome-logo { font-size: 56px; line-height: 1; filter: drop-shadow(0 0 24px rgba(var(--accent2-rgb),0.5)); }
+        .fl-welcome-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 22px; font-weight: 700;
+            color: rgba(255,255,255,0.95);
+        }
+        .fl-welcome-ver {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(var(--accent2-rgb),0.65);
+            letter-spacing: 1.5px; text-transform: uppercase;
+        }
+        .fl-welcome-desc {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px; color: rgba(255,255,255,0.45);
+            line-height: 1.7; max-width: 340px; margin-top: 4px;
+        }
+
+        /* Step 1: Game detection */
+        .fl-game-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 16px; color: rgba(255,255,255,0.9);
+            margin-bottom: 16px;
+        }
+        .fl-game-card {
+            padding: 16px 18px;
+            border-radius: 12px;
+            border: 1px solid;
+            display: flex; align-items: flex-start; gap: 14px;
+            margin-bottom: 12px;
+        }
+        .fl-game-card.ok    { background: rgba(0,180,80,0.07);  border-color: rgba(0,200,100,0.2); }
+        .fl-game-card.warn  { background: rgba(255,165,0,0.07); border-color: rgba(255,165,0,0.25); }
+        .fl-game-card.error { background: rgba(220,50,50,0.07);  border-color: rgba(255,80,80,0.2); }
+        .fl-game-card-icon  { font-size: 26px; flex-shrink: 0; line-height: 1; margin-top: 1px; }
+        .fl-game-card-text  { flex: 1; min-width: 0; }
+        .fl-game-card-head  {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px; font-weight: 600;
+            color: rgba(255,255,255,0.9); margin-bottom: 4px;
+        }
+        .fl-game-card-sub {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px; color: rgba(255,255,255,0.4);
+            line-height: 1.6; word-break: break-all;
+        }
+        .fl-manual-btn {
+            width: 100%; height: 38px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 9px;
+            color: rgba(255,255,255,0.55);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px; cursor: pointer;
+            transition: all 0.18s; margin-top: 4px;
+        }
+        .fl-manual-btn:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.8); }
+        .fl-install-btn {
+            width: 100%; height: 38px;
+            background: rgba(255,165,0,0.12);
+            border: 1px solid rgba(255,165,0,0.3);
+            border-radius: 9px;
+            color: rgba(255,200,80,0.9);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px; cursor: pointer;
+            transition: all 0.18s; margin-top: 8px;
+        }
+        .fl-install-btn:hover { background: rgba(255,165,0,0.2); }
+
+        /* Step 2: Features grid */
+        .fl-features-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 16px; color: rgba(255,255,255,0.9);
+            margin-bottom: 14px;
+        }
+        .fl-features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .fl-feature-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 14px 14px 12px;
+            display: flex; flex-direction: column; gap: 5px;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .fl-feature-card:hover {
+            background: rgba(var(--accent-rgb),0.07);
+            border-color: rgba(var(--accent2-rgb),0.18);
+        }
+        .fl-feature-icon { font-size: 22px; line-height: 1; }
+        .fl-feature-name {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px; font-weight: 600;
+            color: rgba(255,255,255,0.88);
+        }
+        .fl-feature-desc {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px; color: rgba(255,255,255,0.38);
+            line-height: 1.5;
+        }
+
+        /* Step 3: Wallpapers */
+        .fl-wp-hint {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px; color: rgba(255,255,255,0.35);
+            margin: -8px 0 12px; line-height: 1.5;
+        }
+        .fl-wp-empty {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px; color: rgba(255,255,255,0.3);
+            text-align: center; padding: 20px 0;
+        }
+        .fl-wp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+            gap: 8px;
+            max-height: 210px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+        .fl-wp-card {
+            display: flex; flex-direction: column;
+            align-items: center; gap: 5px;
+            cursor: pointer;
+        }
+        .fl-wp-thumb {
+            width: 100%; aspect-ratio: 16/9;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid transparent;
+            background-size: cover; background-position: center;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            transition: border-color 0.18s, transform 0.15s;
+            position: relative;
+            overflow: hidden;
+        }
+        .fl-wp-card:hover .fl-wp-thumb {
+            border-color: rgba(var(--accent2-rgb), 0.4);
+            transform: scale(1.03);
+        }
+        .fl-wp-active .fl-wp-thumb {
+            border-color: rgba(var(--accent2-rgb), 0.85);
+            box-shadow: 0 0 10px rgba(var(--accent2-rgb), 0.3);
+        }
+        .fl-wp-none { color: rgba(255,255,255,0.2); font-size: 18px; }
+        .fl-wp-custom { font-size: 18px; border: 1px dashed rgba(255,255,255,0.15); background: rgba(255,255,255,0.03); }
+        .fl-wp-check {
+            position: absolute; inset: 0;
+            background: rgba(var(--accent-rgb), 0.35);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; color: white;
+        }
+        .fl-wp-name {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px; color: rgba(255,255,255,0.45);
+            text-align: center; max-width: 100%;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+
+        /* Step 3: Done */
+        .fl-done {
+            display: flex; flex-direction: column;
+            align-items: center; text-align: center; gap: 14px;
+            padding: 20px 0 8px;
+        }
+        .fl-done-icon {
+            font-size: 54px; line-height: 1;
+            filter: drop-shadow(0 0 20px rgba(0,220,120,0.5));
+        }
+        .fl-done-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 20px; font-weight: 700;
+            color: rgba(255,255,255,0.95);
+        }
+        .fl-done-sub {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px; color: rgba(255,255,255,0.4);
+            line-height: 1.7; max-width: 320px;
+        }
+
+        /* ══════════════════════════════════════════
+           CSO EDITOR
+        ══════════════════════════════════════════ */
+        .cso-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.78);
+            backdrop-filter: blur(10px);
+            z-index: 1200;
+            align-items: center;
+            justify-content: center;
+        }
+        .cso-overlay.open { display: flex; }
+        .cso-overlay.closing { animation: overlayFadeOut 0.25s ease forwards; }
+        .cso-overlay.closing .cso-modal { animation: creOut 0.25s cubic-bezier(0.4,0,1,1) forwards; }
+
+        .cso-modal {
+            background: rgba(11,13,20,0.99);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 18px;
+            width: min(680px, 95vw);
+            height: min(80vh, 640px);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 32px 100px rgba(0,0,0,0.85);
+            animation: creIn 0.35s cubic-bezier(0.34,1.3,0.64,1);
+            overflow: hidden;
+        }
+
+        .cso-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            flex-shrink: 0;
+        }
+        .cso-header-left { display: flex; align-items: center; gap: 10px; }
+        .cso-header-right { display: flex; align-items: center; gap: 8px; }
+
+        .cso-back-btn {
+            width: 32px; height: 32px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: rgba(255,255,255,0.7);
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .cso-back-btn:hover { background: rgba(255,255,255,0.1); }
+
+        .cso-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 15px;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .cso-count {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.3);
+            padding: 3px 8px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 10px;
+        }
+
+        .cso-add-btn {
+            height: 30px;
+            padding: 0 12px;
+            background: rgba(var(--accent-rgb),0.2);
+            border: 1px solid rgba(var(--accent2-rgb),0.3);
+            border-radius: 8px;
+            color: rgba(var(--accent2-rgb),0.9);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .cso-add-btn:hover { background: rgba(var(--accent-rgb),0.35); }
+
+        .cso-search-bar {
+            padding: 10px 16px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            flex-shrink: 0;
+        }
+        .cso-search-input {
+            width: 100%;
+            height: 34px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: white;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            padding: 0 12px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .cso-search-input:focus { border-color: rgba(var(--accent2-rgb),0.4); }
+
+        .cso-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        /* LIST VIEW */
+        .cso-list { display: flex; flex-direction: column; }
+
+        .cso-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            transition: background 0.12s;
+        }
+        .cso-item:hover { background: rgba(255,255,255,0.04); }
+
+        .cso-item-thumb {
+            width: 44px; height: 44px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.07);
+            overflow: hidden;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .cso-item-thumb img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .cso-item-thumb-fallback {
+            font-family: 'Courier New', monospace;
+            font-size: 9px;
+            color: rgba(255,255,255,0.25);
+            text-align: center;
+        }
+
+        .cso-item-info { flex: 1; min-width: 0; }
+        .cso-item-model {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            color: rgba(255,255,255,0.88);
+        }
+        .cso-item-params {
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            color: rgba(255,255,255,0.28);
+            margin-top: 2px;
+        }
+
+        .cso-item-badge {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 9px;
+            padding: 2px 7px;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+        .cso-item-badge.invisible {
+            background: rgba(80,80,255,0.12);
+            border: 1px solid rgba(100,100,255,0.25);
+            color: rgba(150,150,255,0.8);
+        }
+        .cso-item-badge.dist-only {
+            background: rgba(0,180,80,0.1);
+            border: 1px solid rgba(0,200,100,0.2);
+            color: rgba(80,220,120,0.8);
+        }
+
+        .cso-item-arrow {
+            color: rgba(255,255,255,0.15);
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        /* DETAIL VIEW */
+        .cso-detail {
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .cso-detail-preview {
+            width: 100%;
+            height: 180px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .cso-detail-preview img {
+            max-width: 100%; max-height: 100%;
+            object-fit: contain;
+        }
+        .cso-detail-preview-placeholder {
+            display: flex; flex-direction: column;
+            align-items: center; gap: 6px; text-align: center;
+        }
+        .cso-detail-preview-placeholder .cso-ph-id {
+            font-family: 'Courier New', monospace;
+            font-size: 28px;
+            color: rgba(255,255,255,0.15);
+            font-weight: bold;
+        }
+        .cso-detail-preview-placeholder .cso-ph-label {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.2);
+        }
+
+        .cso-detail-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .cso-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .cso-field.full-width { grid-column: 1 / -1; }
+        .cso-field-label {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10px;
+            color: rgba(255,255,255,0.38);
+        }
+        .cso-field-input {
+            height: 34px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 7px;
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 0 10px;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .cso-field-input:focus { border-color: rgba(var(--accent2-rgb),0.5); background: rgba(255,255,255,0.09); }
+
+        .cso-move-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 9px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .cso-move-toggle input { display: none; }
+        .cso-move-toggle-label {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            color: rgba(255,255,255,0.65);
+        }
+        .cso-move-fields { display: none; }
+        .cso-move-fields.visible { display: contents; }
+
+        .cso-footer {
+            display: flex;
+            gap: 8px;
+            padding: 12px 20px 16px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            flex-shrink: 0;
         }
 
     </style>
@@ -2671,12 +3825,28 @@
         <div class="drag-sub" id="dragSub">Файл будет установлен автоматически</div>
     </div>
 
+    <!-- ── Profiles hover menu ── -->
+    <div id="profilesHoverWidget">
+        <div class="ph-trigger" id="phTrigger">
+            <span>👤</span>
+            <span>Профили</span>
+            <div class="ph-active-dot" id="phActiveDot"></div>
+        </div>
+        <div class="ph-dropdown" id="phDropdown" style="display:none;"></div>
+    </div>
+
+    <!-- ── Install launcher button ── -->
+    <button id="installLauncherBtn" onclick="openInstallLauncherFlow()">
+        <span>⚠️</span>
+        <span>Установить лаунчер</span>
+    </button>
+
     <div id="container">
         <div class="interface">
             <div class="left-panel">
                 <div class="header">
                     <div class="title">Arizona RP</div>
-                    <div class="subtitle">Launcher v0.0.8</div>
+                    <div class="subtitle">Launcher v0.0.9</div>
                 </div>
 
                 <div class="nickname-section">
@@ -2721,9 +3891,7 @@
                     <button class="icon-btn" id="modsBtn" title="Моды" onclick="openModsModal()">
                         🧩 Моды
                     </button>
-                    <button class="icon-btn" title="Профили" onclick="openProfilesModal()">
-                        👤 Профили
-                    </button>
+
                 </div>
             </div>
 
@@ -2787,6 +3955,10 @@
                 <button id="tabBtnLauncher" class="settings-nav-item" onclick="switchTab('launcher')">
                     <span class="snav-icon">🎨</span> Лаунчер
                 </button>
+                <div class="settings-nav-divider"></div>
+                <button id="tabBtnDebug" class="settings-nav-item" onclick="switchTab('debug')">
+                    <span class="snav-icon">🐛</span> Debug
+                </button>
             </div>
 
             <!-- Правая часть -->
@@ -2799,12 +3971,18 @@
                 <!-- Патчи -->
                 <div id="patchesTab" class="settings-tab-content active">
                     <div id="checkboxGroup"></div>
+                    <div style="margin-top:10px;">
+                        <button class="s-btn" style="width:100%;" onclick="openCsoEditor()">
+                            📦 Редактировать CustomStaticObjects
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Запуск -->
                 <div id="launchTab" class="settings-tab-content">
 
-                    <div class="launch-grid">
+                    <div class="launch-grid" id="launchGrid">
+                        <!-- Оконный режим -->
                         <label class="launch-item">
                             <input type="checkbox" id="windowModeCheck">
                             <div class="s-toggle"></div>
@@ -2813,6 +3991,7 @@
                                 <span class="launch-item-flag">-window</span>
                             </div>
                         </label>
+
                         <label class="launch-item">
                             <input type="checkbox" id="widescreenCheck">
                             <div class="s-toggle"></div>
@@ -2865,7 +4044,7 @@
                             <input type="checkbox" id="enableGrassCheck">
                             <div class="s-toggle"></div>
                             <div class="launch-item-text">
-                                <span class="launch-item-name">Больше растительности</span>
+                                <span class="launch-item-name">Растительность</span>
                                 <span class="launch-item-flag">-enable_grass</span>
                             </div>
                         </label>
@@ -2873,7 +4052,7 @@
                             <input type="checkbox" id="ldoCheck">
                             <div class="s-toggle"></div>
                             <div class="launch-item-text">
-                                <span class="launch-item-name">Оптимизация для HDD</span>
+                                <span class="launch-item-name">Предзагрузка всего в ОЗУ</span>
                                 <span class="launch-item-flag">-ldo</span>
                             </div>
                         </label>
@@ -2885,6 +4064,80 @@
                                 <span class="launch-item-flag">-seasons</span>
                             </div>
                         </label>
+
+                        <!-- ── v7 параметры (скрыты до определения версии) ── -->
+                        <div class="launch-section-divider" id="v7SectionDivider" style="display:none;grid-column:1/-1;">
+                            Только для версии 7.0 <span>v7</span>
+                        </div>
+
+                        <label class="launch-item" id="v7_enableNewGrass" style="display:none;">
+                            <input type="checkbox" id="enableNewGrassCheck">
+                            <div class="s-toggle"></div>
+                            <div class="launch-item-text">
+                                <span class="launch-item-name">Новая растительность</span>
+                                <span class="launch-item-flag">-enable_new_grass</span>
+                            </div>
+                        </label>
+
+                        <label class="launch-item" id="v7_offcef" style="display:none;">
+                            <input type="checkbox" id="offcefCheck">
+                            <div class="s-toggle"></div>
+                            <div class="launch-item-text">
+                                <span class="launch-item-name">Отключить CEF</span>
+                                <span class="launch-item-flag">-offcef</span>
+                            </div>
+                        </label>
+
+                        <label class="launch-item" id="v7_oldWindow" style="display:none;">
+                            <input type="checkbox" id="oldWindowCheck">
+                            <div class="s-toggle"></div>
+                            <div class="launch-item-text">
+                                <span class="launch-item-name">Эксклюзивный оконный</span>
+                                <span class="launch-item-flag">-old_window</span>
+                            </div>
+                        </label>
+
+                        <label class="launch-item" id="v7_showDialogIds" style="display:none;">
+                            <input type="checkbox" id="showDialogIdsCheck">
+                            <div class="s-toggle"></div>
+                            <div class="launch-item-text">
+                                <span class="launch-item-name">Показывать ID диалогов</span>
+                                <span class="launch-item-flag">-show_dialog_ids</span>
+                            </div>
+                        </label>
+
+                        <!-- modern_scale — несовместим с Vulkan -->
+                        <div id="v7_vulkanPair" style="display:none;grid-column:1/-1;">
+                            <div id="v7_modernScale">
+                                <label class="launch-item">
+                                    <input type="checkbox" id="modernScaleCheck" onchange="onVulkanIncompatChange('modernScaleWarn', this.checked)">
+                                    <div class="s-toggle"></div>
+                                    <div class="launch-item-text">
+                                        <span class="launch-item-name">Modern Scale (аналог DLSS)</span>
+                                        <span class="launch-item-flag">-modern_scale</span>
+                                    </div>
+                                </label>
+                                <div class="launch-vulkan-warn" id="modernScaleWarn">
+                                    ⚠️ Несовместимо с VKDX модом. Удалите данный мод!
+                                </div>
+                            </div>
+
+                            <!-- use_d3dx9_43 — несовместим с Vulkan -->
+                            <div id="v7_useD3dx9">
+                                <label class="launch-item">
+                                    <input type="checkbox" id="useD3dx9Check" onchange="onVulkanIncompatChange('useD3dx9Warn', this.checked)">
+                                    <div class="s-toggle"></div>
+                                    <div class="launch-item-text">
+                                        <span class="launch-item-name">Новый D3DX9</span>
+                                        <span class="launch-item-flag">-use_d3dx9_43</span>
+                                    </div>
+                                </label>
+                                <div class="launch-vulkan-warn" id="useD3dx9Warn">
+                                    ⚠️ Несовместимо с VKDX модом. Удалите данный мод!
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="launch-inputs">
@@ -2899,10 +4152,18 @@
                                 <option value="5120">5120</option>
                             </select>
                         </div>
-                        <div class="launch-input-row">
-                            <span class="launch-input-label">CDN</span>
-                            <span class="launch-item-flag" style="flex:1">-cdn</span>
-                            <input type="text" id="cdnInput" placeholder="1,1,1" class="s-input">
+                        <div class="launch-input-row cdn-input-row">
+                            <div class="cdn-row-top">
+                                <span class="launch-input-label">CDN</span>
+                                <span class="launch-item-flag" style="flex:1">-cdn</span>
+                                <div class="cdn-btn-group">
+                                    <button class="cdn-btn" id="cdnBtn0" onclick="toggleCdnBtn(0)">1</button>
+                                    <button class="cdn-btn" id="cdnBtn1" onclick="toggleCdnBtn(1)">2</button>
+                                    <button class="cdn-btn" id="cdnBtn2" onclick="toggleCdnBtn(2)">3</button>
+                                </div>
+                                <input type="hidden" id="cdnInput" value="1,1,1">
+                            </div>
+                            <div class="cdn-hint">Серверы иконок: <b>1</b> — резервный, <b>0</b> — основной. Если иконки не загружаются — попробуй разные комбинации.</div>
                         </div>
                     </div>
 
@@ -2950,6 +4211,59 @@
                 <div id="launcherTab" class="settings-tab-content">
                     <div class="wp-section-title">🖼️ ОБОИ</div>
                     <div id="wallpaperGrid" class="wallpaper-grid"></div>
+
+                    <div class="ct-section-title">
+                        <span>🎨 ТЕМЫ КОМЬЮНИТИ</span>
+                        <button class="ct-refresh-btn" onclick="loadCommunityThemes()">🔄 Загрузить</button>
+                    </div>
+                    <div class="ct-status" id="ctStatus">Нажми «Загрузить» чтобы получить темы с ArzLaunchRepo</div>
+                    <div class="ct-grid" id="ctGrid"></div>
+                </div>
+
+                <!-- Debug -->
+                <div id="debugTab" class="settings-tab-content">
+
+                    <div class="debug-section-title">🖥️ Лаунчер</div>
+                    <div class="debug-row">
+                        <span class="debug-label">Версия</span>
+                        <span class="debug-value">v0.0.9</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Конфиг</span>
+                        <span class="debug-value" id="dbgConfigPath">—</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Папка данных</span>
+                        <span class="debug-value" id="dbgDocsPath">—</span>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:8px;flex-shrink:0;">
+                        <button class="s-btn" style="flex:1;" onclick="openDataFolder()">📂 Открыть папку данных</button>
+                        <button class="s-btn" style="flex:1;" onclick="openLogFile()">📋 Открыть лог</button>
+                    </div>
+
+                    <div class="debug-section-title" style="margin-top:10px;">🎮 Игра</div>
+                    <div class="debug-row">
+                        <span class="debug-label">gta_sa.exe</span>
+                        <span class="debug-value" id="dbgGamePath">—</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Лаунчер AIR</span>
+                        <span class="debug-value" id="dbgLauncherPath">—</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Патчи</span>
+                        <span class="debug-value" id="dbgPatchesPath">—</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Профили</span>
+                        <span class="debug-value" id="dbgProfilesCount">—</span>
+                    </div>
+
+                    <div class="debug-section-title" style="margin-top:10px;">🛠️ Действия</div>
+                    <div style="display:flex;gap:8px;flex-shrink:0;">
+                        <button class="s-btn" style="flex:1;" onclick="openFirstLaunch()">🚀 Первый запуск</button>
+                    </div>
+
                 </div>
 
                 <button class="save-btn" onclick="saveSettings()">💾 Сохранить настройки</button>
@@ -2973,7 +4287,12 @@
         <div class="mods-modal" id="modsModal">
             <div class="mods-modal-header">
                 <div class="mods-modal-title">🧩 Моды</div>
-                <button class="close-btn" onclick="closeModsModal()">×</button>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <button class="mods-share-btn" onclick="openTelegramShare()" title="Поделиться скриптом или темой с комьюнити">
+                        📤 Поделиться с комьюнити
+                    </button>
+                    <button class="close-btn" onclick="closeModsModal()">×</button>
+                </div>
             </div>
 
             <div class="mods-modal-tabs">
@@ -3109,17 +4428,16 @@
                     </div>
                 </div>
 
-                <!-- Предупреждение об антивирусе -->
+                <!-- Предупреждение об антивирусе / выбор версии -->
                 <div class="install-av-warning" id="installAvWarning">
-                    <div class="install-av-icon">🛡️</div>
+                    <div class="install-av-icon">📦</div>
                     <div class="install-av-text">
-                        <div class="install-av-title">Рекомендуется отключить антивирус</div>
+                        <div class="install-av-title">Выберите версию лаунчера</div>
                         <div class="install-av-desc">
-                            Антивирус может ложно срабатывать на загружаемый файл
-                            <b style="color:rgba(255,200,80,0.9)">ArizonaLauncher6_byAIR.exe</b>
-                            и блокировать установку.<br><br>
-                            Рекомендуется временно отключить антивирус или добавить папку игры
-                            в исключения <b>до начала установки</b>.
+                            <b>v6</b> — стабильная версия (<b style="color:rgba(255,200,80,0.9)">ArizonaLauncher6_byAIR.exe</b>)<br>
+                            <b>v7</b> — новая версия с дополнительными возможностями<br><br>
+                            Антивирус может ложно срабатывать на загружаемый файл.
+                            Рекомендуется временно отключить антивирус или добавить папку игры в исключения <b>до начала установки</b>.
                         </div>
                     </div>
                 </div>
@@ -3135,8 +4453,30 @@
                     </div>
                 </div>
 
+                <!-- Radio-карточки выбора версии -->
+                <div id="installVersionPicker" style="display:none; padding: 12px 24px 16px; flex-direction:column; gap:8px;">
+                    <label class="install-ver-card" id="installVerCardV6" onclick="_selectInstallVer('v6')">
+                        <div class="install-ver-radio" id="installVerRadioV6"></div>
+                        <div class="install-ver-info">
+                            <div class="install-ver-name">📦 v6 — Стабильная</div>
+                            <div class="install-ver-desc">ArizonaLauncher6_byAIR.exe · проверенная версия</div>
+                        </div>
+                    </label>
+                    <label class="install-ver-card" id="installVerCardV7" onclick="_selectInstallVer('v7')">
+                        <div class="install-ver-radio" id="installVerRadioV7"></div>
+                        <div class="install-ver-info">
+                            <div class="install-ver-name">🚀 v7 — Новая</div>
+                            <div class="install-ver-desc">Дополнительные возможности · активная разработка</div>
+                        </div>
+                    </label>
+                </div>
+
                 <div class="install-footer">
                     <button class="s-btn" id="installCancelBtn" onclick="closeInstallModal()">Отмена</button>
+                    <!-- Скрытые кнопки (нужны для совместимости с логикой openInstallModalWithAction) -->
+                    <button class="s-btn primary" id="installV6Btn" style="display:none;" onclick="startLauncherInstallVersion('v6')">📦 Установить v6</button>
+                    <button class="s-btn primary" id="installV7Btn" style="display:none;" onclick="startLauncherInstallVersion('v7')">🚀 Установить v7</button>
+                    <!-- Обычная кнопка установки (когда версия уже определена или выбрана через radio) -->
                     <button class="s-btn primary" id="installStartBtn" onclick="startLauncherInstall()">
                         ⬇️ Понял, скачать и установить
                     </button>
@@ -3179,6 +4519,43 @@
                     <div class="profiles-list" id="profilesList"></div>
                     <button class="profiles-add-btn" onclick="createProfile()">＋ Создать профиль из текущих настроек</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- CSO Editor Modal -->
+        <div class="cso-overlay" id="csoOverlay">
+            <div class="cso-modal">
+                <div class="cso-header">
+                    <div class="cso-header-left">
+                        <button class="cso-back-btn" id="csoBackBtn" onclick="_csoBackToList()" style="display:none">←</button>
+                        <div class="cso-title" id="csoTitle">📦 CustomStaticObjects</div>
+                    </div>
+                    <div class="cso-header-right">
+                        <span class="cso-count" id="csoCount"></span>
+                        <button class="cso-add-btn" id="csoAddBtn" onclick="_csoAdd()">＋ Добавить</button>
+                        <button class="close-btn" onclick="closeCsoEditor()">×</button>
+                    </div>
+                </div>
+                <div class="cso-search-bar" id="csoSearchBar">
+                    <input type="text" id="csoSearch" placeholder="🔍 Поиск по model ID..." class="cso-search-input" oninput="_csoFilter()">
+                </div>
+                <div class="cso-body" id="csoBody"></div>
+                <div class="cso-footer" id="csoFooter" style="display:none">
+                    <button class="s-btn primary" onclick="_csoSaveDetail()">💾 Применить</button>
+                    <button class="s-btn" onclick="_csoDeleteCurrent()" style="color:rgba(255,80,80,0.8);border-color:rgba(255,80,80,0.2);">🗑 Удалить</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- First Launch Panel -->
+        <div class="fl-overlay" id="flOverlay">
+            <div class="fl-modal">
+                <div class="fl-top-bar">
+                    <div class="fl-steps-dots" id="flDots"></div>
+                    <button class="fl-skip-top" onclick="closeFirstLaunch()">Пропустить</button>
+                </div>
+                <div class="fl-body" id="flBody"></div>
+                <div class="fl-footer" id="flFooter"></div>
             </div>
         </div>
 
@@ -3825,10 +5202,26 @@
                             const saved = serversData.find(s => String(s.number) === String(result.server));
                             if (saved) selectServer(saved, true);
                         }
+                        
+                        // Проверяем наличие лаунчера и показываем кнопку установки если нужно
+                        checkLauncherInstallation(result.paths_configured);
                     }
                 }
             } catch (error) {
                 console.error('Ошибка загрузки сохраненных данных:', error);
+            }
+        }
+
+        // Проверка установки лаунчера и показ кнопки
+        function checkLauncherInstallation(pathsConfigured) {
+            const installBtn = document.getElementById('installLauncherBtn');
+            if (!installBtn) return;
+            
+            // Показываем кнопку если пути не настроены
+            if (!pathsConfigured) {
+                installBtn.classList.add('show');
+            } else {
+                installBtn.classList.remove('show');
             }
         }
 
@@ -3870,7 +5263,9 @@
                         await new Promise(resolve => setTimeout(resolve, 3000));
                         setLaunchStatus('Игра запущена! Сворачивание...', 95);
                         await new Promise(resolve => setTimeout(resolve, 600));
-                        if (window.pywebview.api.minimize_window) {
+                        if (window.pywebview.api.minimize_to_tray) {
+                            window.pywebview.api.minimize_to_tray();
+                        } else if (window.pywebview.api.minimize_window) {
                             window.pywebview.api.minimize_window();
                         }
                         // После сворачивания — скрываем оверлей и возвращаем панели
@@ -3939,7 +5334,7 @@
         }
 
         // ── Универсальный хелпер закрытия с анимацией ──
-        function _closeWithAnim(el, cb, duration = 200) {
+        function _closeWithAnim(el, cb, duration = 260) {
             if (!el) return;
             el.classList.add('closing');
             setTimeout(() => {
@@ -4778,8 +6173,135 @@
         let _installFolder = '';
 
         function openInstallModal(folder, missing) {
-            _installFolder = folder || '';
+            // Если folder не передан, пытаемся получить из _flData
+            _installFolder = folder || (_flData && _flData.folder) || '';
             _resetInstallModal();
+
+            // Показываем выбор версии через radio-карточки
+            document.getElementById('installModalTitle').textContent = '⬇️ Выбор версии лаунчера';
+            document.getElementById('installAvWarning').innerHTML = `
+                <div class="install-av-icon">🛡️</div>
+                <div class="install-av-text">
+                    <div class="install-av-title">Рекомендуется отключить антивирус</div>
+                    <div class="install-av-desc">Антивирус может ложно срабатывать на загружаемый файл и блокировать установку. Добавьте папку игры в исключения <b>до начала установки</b>.</div>
+                </div>`;
+            // Показываем radio-карточки, скрываем footer-кнопки версий
+            document.getElementById('installVersionPicker').style.display = 'flex';
+            document.getElementById('installStartBtn').style.display = 'none';
+            document.getElementById('installV6Btn').style.display = 'none';
+            document.getElementById('installV7Btn').style.display = 'none';
+            // Сбрасываем выбор версии
+            _selectInstallVer(null);
+
+            document.getElementById('installOverlay').classList.add('open');
+        }
+
+        function _selectInstallVer(ver) {
+            _selectedVersion = ver;
+            ['v6','v7'].forEach(v => {
+                const card = document.getElementById('installVerCard' + v.charAt(0).toUpperCase() + v.slice(1));
+                if (card) card.classList.toggle('selected', v === ver);
+            });
+            // Показываем/скрываем кнопку установки
+            const startBtn = document.getElementById('installStartBtn');
+            if (ver) {
+                startBtn.style.display = '';
+                startBtn.textContent = `⬇️ Установить ${ver === 'v6' ? 'v6 (Стабильная)' : 'v7 (Новая)'}`;
+            } else {
+                startBtn.style.display = 'none';
+            }
+        }
+
+        // Функция для кнопки "Установить лаунчер"
+        async function openInstallLauncherFlow() {
+            // Проверяем есть ли уже установленный путь к игре
+            try {
+                if (window.pywebview && window.pywebview.api.get_saved_data) {
+                    const result = await window.pywebview.api.get_saved_data();
+                    if (result.success && result.game_path) {
+                        // Путь к игре есть, получаем информацию о необходимых действиях
+                        const gamePath = result.game_path;
+                        const folderPath = gamePath.substring(0, gamePath.lastIndexOf('\\'));
+                        
+                        if (window.pywebview.api.get_install_action_api) {
+                            const actionResult = await window.pywebview.api.get_install_action_api(folderPath);
+                            if (actionResult.success) {
+                                openInstallModalWithAction(folderPath, actionResult.install_info);
+                                return;
+                            }
+                        }
+                    }
+                    // Путь к игре не найден — открываем модал установки, чтобы пользователь выбрал папку
+                    openInstallModal();
+                    return;
+                }
+            } catch (e) {
+                console.error('Error checking install action:', e);
+            }
+            
+            // pywebview недоступен — открываем модал установки напрямую
+            openInstallModal();
+        }
+
+        // Новая функция для открытия модального окна с учётом действия
+        let _installAction = null;
+        function openInstallModalWithAction(folder, installInfo) {
+            _installFolder = folder;
+            _installAction = installInfo;
+            _resetInstallModal();
+            
+            // Настраиваем модальное окно в зависимости от действия
+            const title = document.getElementById('installModalTitle');
+            const warning = document.getElementById('installAvWarning');
+            const startBtn = document.getElementById('installStartBtn');
+            const v6Btn = document.getElementById('installV6Btn');
+            const v7Btn = document.getElementById('installV7Btn');
+            
+            if (installInfo.action === 'choose_version') {
+                // Нужно выбрать версию для полной установки
+                title.textContent = '⬇️ Выбор версии лаунчера';
+                warning.innerHTML = `
+                    <div class="install-av-icon">📦</div>
+                    <div class="install-av-text">
+                        <div class="install-av-title">Выберите версию для установки</div>
+                        <div class="install-av-desc">v6 — стабильная версия<br>v7 — новая версия с дополнительными возможностями</div>
+                    </div>`;
+                // Показываем radio-карточки, скрываем футер-кнопки версий
+                document.getElementById('installVersionPicker').style.display = 'flex';
+                startBtn.style.display = 'none';
+                v6Btn.style.display = 'none';
+                v7Btn.style.display = 'none';
+                _selectInstallVer(null);
+            } else if (installInfo.action === 'install_preloading_only') {
+                // Установить только папку preloading
+                title.textContent = '⬇️ Установка preloading_plugins';
+                warning.innerHTML = `
+                    <div class="install-av-icon">📁</div>
+                    <div class="install-av-text">
+                        <div class="install-av-title">Требуется установка папки preloading_plugins</div>
+                        <div class="install-av-desc">Лаунчер ${installInfo.launcher_version} уже установлен. Будет установлена только папка preloading_plugins.</div>
+                    </div>`;
+                startBtn.style.display = '';
+                startBtn.textContent = '⬇️ Установить preloading_plugins';
+                v6Btn.style.display = 'none';
+                v7Btn.style.display = 'none';
+            } else if (installInfo.action === 'install_launcher_only') {
+                // Установить только лаунчер (выбор версии)
+                title.textContent = '⬇️ Выбор версии лаунчера';
+                warning.innerHTML = `
+                    <div class="install-av-icon">🚀</div>
+                    <div class="install-av-text">
+                        <div class="install-av-title">Выберите версию лаунчера</div>
+                        <div class="install-av-desc">Папка preloading_plugins уже установлена. Выберите версию лаунчера для установки.</div>
+                    </div>`;
+                // Показываем radio-карточки, скрываем футер-кнопки версий
+                document.getElementById('installVersionPicker').style.display = 'flex';
+                startBtn.style.display = 'none';
+                v6Btn.style.display = 'none';
+                v7Btn.style.display = 'none';
+                _selectInstallVer(null);
+            }
+            
             document.getElementById('installOverlay').classList.add('open');
         }
 
@@ -4804,6 +6326,9 @@
             document.getElementById('installProgressMsg').textContent = 'Подготовка...';
             document.getElementById('installProgressPct').textContent = '0%';
             document.getElementById('installStartBtn').style.display = '';
+            document.getElementById('installV6Btn').style.display = 'none';
+            document.getElementById('installV7Btn').style.display = 'none';
+            document.getElementById('installVersionPicker').style.display = 'none';
             document.getElementById('installCancelBtn').textContent = 'Отмена';
             document.getElementById('installCloseBtn').style.display = '';
             ['istep-warn','istep-dl','istep-inst','istep-done'].forEach((id,i) => {
@@ -4812,10 +6337,52 @@
             });
         }
 
+        // Функция для установки с выбором версии
+        let _selectedVersion = 'v6';
+        async function startLauncherInstallVersion(version) {
+            _selectedVersion = version;
+            // Скрываем кнопки выбора версии
+            document.getElementById('installV6Btn').style.display = 'none';
+            document.getElementById('installV7Btn').style.display = 'none';
+            // Запускаем установку
+            await startLauncherInstall();
+        }
+
         async function startLauncherInstall() {
-            if (!_installFolder) return;
-            // Скрываем предупреждение, показываем прогресс
+            if (!_installFolder) {
+                // Сначала пробуем взять сохранённый путь из конфига
+                if (window.pywebview && window.pywebview.api.get_saved_data) {
+                    try {
+                        const saved = await window.pywebview.api.get_saved_data();
+                        if (saved.success && saved.game_path) {
+                            const gp = saved.game_path;
+                            const sep = gp.lastIndexOf('\\') >= 0 ? '\\' : '/';
+                            _installFolder = gp.substring(0, gp.lastIndexOf(sep));
+                        }
+                    } catch(e) {}
+                }
+            }
+            if (!_installFolder) {
+                // Путь не найден в конфиге — просим пользователя выбрать вручную
+                if (window.pywebview && window.pywebview.api.select_game_path) {
+                    showNotification('Выберите папку с игрой (gta_sa.exe)', 'info');
+                    const result = await window.pywebview.api.select_game_path();
+                    if (!result.success || !result.folder) {
+                        showNotification('Выберите папку с игрой для установки', 'error');
+                        return;
+                    }
+                    _installFolder = result.folder;
+                    if (result.install_info) {
+                        _installAction = result.install_info;
+                    }
+                } else {
+                    showNotification('Сначала укажите путь к игре в настройках', 'error');
+                    return;
+                }
+            }
+            // Скрываем предупреждение, карточки версий, показываем прогресс
             document.getElementById('installAvWarning').style.display = 'none';
+            document.getElementById('installVersionPicker').style.display = 'none';
             document.getElementById('installProgressWrap').classList.add('visible');
             document.getElementById('installStartBtn').style.display = 'none';
             document.getElementById('installCloseBtn').style.display = 'none';
@@ -4839,7 +6406,17 @@
                     document.getElementById('installModalTitle').textContent = '✅ Установка завершена';
                     document.getElementById('installCancelBtn').textContent = 'Закрыть';
                     document.getElementById('installCancelBtn').disabled = false;
+                    // Скрываем карточки выбора версии — они не нужны после установки
+                    document.getElementById('installVersionPicker').style.display = 'none';
+                    document.getElementById('installAvWarning').style.display = 'none';
+                    // Скрываем кнопку "Установить лаунчер" на главном экране
+                    checkLauncherInstallation(true);
                     showNotification('✅ Лаунчер установлен!', 'success');
+                    if (_flInstallPending) {
+                        // Обновляем статус игры и вернёмся в FL после закрытия
+                        if (_flData) _flData.check_status = 'ok';
+                        _flInstallPending = false;
+                    }
                 } else if (data.stage === 'error') {
                     fill.classList.add('error');
                     document.getElementById('installModalTitle').textContent = '❌ Ошибка установки';
@@ -4855,7 +6432,10 @@
 
             try {
                 if (window.pywebview && window.pywebview.api.start_launcher_install) {
-                    await window.pywebview.api.start_launcher_install(_installFolder);
+                    // Определяем версию и тип установки
+                    const version = _selectedVersion || 'v6';
+                    const installType = _installAction ? _installAction.action : 'choose_version';
+                    await window.pywebview.api.start_launcher_install(_installFolder, version, installType);
                 }
             } catch(e) {
                 showNotification('Ошибка запуска установки', 'error');
@@ -4897,12 +6477,28 @@
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
             notification.textContent = message;
+            notification.style.cursor = 'pointer';
             document.body.appendChild(notification);
 
-            setTimeout(() => {
-                notification.style.animation = 'slideIn 0.3s ease-out reverse';
+            let isClosing = false;
+            let autoCloseTimer = null;
+
+            const closeNotification = () => {
+                if (isClosing) return;
+                isClosing = true;
+                
+                // Отменяем автозакрытие если оно ещё не сработало
+                if (autoCloseTimer) clearTimeout(autoCloseTimer);
+                
+                notification.style.animation = 'slideOut 0.3s ease-out forwards';
                 setTimeout(() => notification.remove(), 300);
-            }, 3000);
+            };
+
+            // Закрытие по клику
+            notification.addEventListener('click', closeNotification);
+
+            // Автозакрытие через 3 секунды
+            autoCloseTimer = setTimeout(closeNotification, 3000);
         }
 
         function handleResize() {
@@ -4949,6 +6545,7 @@
                 launch:  { btn: 'tabBtnLaunch',  content: 'launchTab',   title: '🚀 Параметры запуска' },
                 import:  { btn: 'tabBtnImport',  content: 'importTab',   title: '📦 Импорт / Экспорт' },
                 launcher:{ btn: 'tabBtnLauncher',content: 'launcherTab', title: '🎨 Лаунчер' },
+                debug:   { btn: 'tabBtnDebug',   content: 'debugTab',    title: '🐛 Debug' },
             };
             const t = tabMap[tabName];
             if (t) {
@@ -4959,6 +6556,7 @@
                 const titleEl = document.getElementById('settingsPanelTitle');
                 if (titleEl) titleEl.textContent = t.title;
                 if (tabName === 'import') loadBackupsList();
+                if (tabName === 'debug')  loadDebugInfo();
             }
         }
 
@@ -5520,33 +7118,80 @@
             } catch (e) {
             }
 
-            // 4. Грузим параметры запуска
+            // 4. Грузим параметры запуска + определяем версию лаунчера
             try {
                 if (window.pywebview && window.pywebview.api && window.pywebview.api.read_launch_params) {
                     const params = await window.pywebview.api.read_launch_params();
                     if (params && typeof params === 'object') {
-                        document.getElementById('windowModeCheck').checked  = params.window_mode !== false;
-                        document.getElementById('widescreenCheck').checked  = !!params.widescreen;
-                        document.getElementById('graphicsCheck').checked    = !!params.graphics;
-                        document.getElementById('authCefCheck').checked     = !!params.auth_cef_enable;
-                        document.getElementById('textureModeCheck').checked = !!params.texture_mode;
+                        document.getElementById('windowModeCheck').checked   = params.window_mode !== false;
+                        document.getElementById('widescreenCheck').checked   = !!params.widescreen;
+                        document.getElementById('graphicsCheck').checked     = !!params.graphics;
+                        document.getElementById('authCefCheck').checked      = !!params.auth_cef_enable;
+                        document.getElementById('textureModeCheck').checked  = !!params.texture_mode;
                         document.getElementById('colorDepth16Check').checked = !!params.color_depth_16;
-                        document.getElementById('allowHdrCheck').checked    = !!params.allow_hdr;
-                        document.getElementById('enableGrassCheck').checked = !!params.enable_grass;
-                        document.getElementById('ldoCheck').checked         = !!params.ldo;
-                        document.getElementById('seasonsCheck').checked     = !!params.seasons;
-                        document.getElementById('memoryInput').value        = params.memory || 4096;
-                        document.getElementById('cdnInput').value           = params.cdn || '1,1,1';
+                        document.getElementById('allowHdrCheck').checked     = !!params.allow_hdr;
+                        document.getElementById('enableGrassCheck').checked  = !!params.enable_grass;
+                        document.getElementById('ldoCheck').checked          = !!params.ldo;
+                        document.getElementById('seasonsCheck').checked      = !!params.seasons;
+                        document.getElementById('memoryInput').value         = params.memory || 4096;
+                        setCdnBtns(params.cdn || '1,1,1');
+
+                        // v7 параметры
+                        document.getElementById('oldWindowCheck').checked       = !!params.old_window;
+                        document.getElementById('enableNewGrassCheck').checked  = !!params.enable_new_grass;
+                        document.getElementById('offcefCheck').checked          = !!params.offcef;
+                        document.getElementById('showDialogIdsCheck').checked   = !!params.show_dialog_ids;
+                        document.getElementById('modernScaleCheck').checked     = !!params.modern_scale;
+                        document.getElementById('useD3dx9Check').checked        = !!params.use_d3dx9_43;
+
+                        // Показываем предупреждения о Vulkan если уже включены
+                        onVulkanIncompatChange('modernScaleWarn', !!params.modern_scale);
+                        onVulkanIncompatChange('useD3dx9Warn',    !!params.use_d3dx9_43);
                     }
-                } else {
                 }
-            } catch (e) {
-            }
+            } catch (e) {}
+
+            // Определяем версию лаунчера и показываем нужные элементы
+            let _launcherVer = 'v6';
+            try {
+                if (window.pywebview && window.pywebview.api.get_launcher_version) {
+                    const vr = await window.pywebview.api.get_launcher_version();
+                    if (vr && vr.success) _launcherVer = vr.version;
+                }
+            } catch (e) {}
+            _applyLauncherVersionUI(_launcherVer);
 
             // 5. Рендер и показ — ВСЕГДА
             switchTab('patches');
             renderCheckboxes();
             settingsPanel.style.display = 'flex';
+        }
+
+        // ── Версия лаунчера: показать/скрыть v7 элементы ──
+        function _applyLauncherVersionUI(version) {
+            const isV7 = version === 'v7';
+            // v7 секция
+            const v7Els = ['v7SectionDivider','v7_enableNewGrass','v7_offcef','v7_oldWindow','v7_showDialogIds'];
+            v7Els.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = isV7 ? '' : 'none';
+            });
+            // Modern Scale + D3DX9 — пара в 2 колонки
+            const vulkanPair = document.getElementById('v7_vulkanPair');
+            if (vulkanPair) vulkanPair.style.display = isV7 ? 'grid' : 'none';
+            // В v7 old_window и window_mode взаимоисключающие — вешаем слушатели
+            if (isV7) {
+                const wmCheck  = document.getElementById('windowModeCheck');
+                const owCheck  = document.getElementById('oldWindowCheck');
+                wmCheck.onchange  = () => { if (wmCheck.checked)  owCheck.checked = false; };
+                owCheck.onchange  = () => { if (owCheck.checked)  wmCheck.checked = false; };
+            }
+        }
+
+        // Показать/скрыть предупреждение о Vulkan под переключателем
+        function onVulkanIncompatChange(warnId, isChecked) {
+            const el = document.getElementById(warnId);
+            if (el) el.classList.toggle('visible', isChecked);
         }
 
         function closeSettings() {
@@ -5567,19 +7212,31 @@
             });
 
             // Собираем параметры запуска игры
+            const isV7 = document.getElementById('v7SectionDivider').style.display !== 'none';
+            // Оконный режим: в v7 old_window и window_mode взаимоисключающие
+            const oldWindowOn  = isV7 && document.getElementById('oldWindowCheck').checked;
+            const windowModeOn = !oldWindowOn && document.getElementById('windowModeCheck').checked;
+
             const launchParams = {
-                window_mode:    document.getElementById('windowModeCheck').checked,
-                widescreen:     document.getElementById('widescreenCheck').checked,
-                graphics:       document.getElementById('graphicsCheck').checked,
+                window_mode:     windowModeOn,
+                old_window:      oldWindowOn,
+                widescreen:      document.getElementById('widescreenCheck').checked,
+                graphics:        document.getElementById('graphicsCheck').checked,
                 auth_cef_enable: document.getElementById('authCefCheck').checked,
-                texture_mode:   document.getElementById('textureModeCheck').checked,
-                color_depth_16: document.getElementById('colorDepth16Check').checked,
-                allow_hdr:      document.getElementById('allowHdrCheck').checked,
-                enable_grass:   document.getElementById('enableGrassCheck').checked,
-                ldo:            document.getElementById('ldoCheck').checked,
-                seasons:        document.getElementById('seasonsCheck').checked,
-                memory:         parseInt(document.getElementById('memoryInput').value) || 4096,
-                cdn:            document.getElementById('cdnInput').value || '1,1,1'
+                texture_mode:    document.getElementById('textureModeCheck').checked,
+                color_depth_16:  document.getElementById('colorDepth16Check').checked,
+                allow_hdr:       document.getElementById('allowHdrCheck').checked,
+                enable_grass:    document.getElementById('enableGrassCheck').checked,
+                ldo:             document.getElementById('ldoCheck').checked,
+                seasons:         document.getElementById('seasonsCheck').checked,
+                memory:          parseInt(document.getElementById('memoryInput').value) || 4096,
+                cdn:             getCdnValue(),
+                // v7
+                enable_new_grass: isV7 && document.getElementById('enableNewGrassCheck').checked,
+                offcef:           isV7 && document.getElementById('offcefCheck').checked,
+                show_dialog_ids:  isV7 && document.getElementById('showDialogIdsCheck').checked,
+                modern_scale:     isV7 && document.getElementById('modernScaleCheck').checked,
+                use_d3dx9_43:     isV7 && document.getElementById('useD3dx9Check').checked,
             };
 
             try {
@@ -5607,6 +7264,7 @@
 
                     if (patchesOk && paramsOk) {
                         showNotification('Настройки сохранены', 'success');
+                        _autosaveToActiveProfile(patchesData, launchParams);
                         closeSettings();
                     }
                 } else {
@@ -5878,6 +7536,807 @@
             });
         }
 
+        // ══════════════════════════════════════════════
+        //  AUTOSAVE TO ACTIVE PROFILE
+        // ══════════════════════════════════════════════
+        async function _autosaveToActiveProfile(patches, launchParams) {
+            if (!_activeProfileId) return;
+            const idx = _profiles.findIndex(p => p.id === _activeProfileId);
+            if (idx === -1) return;
+            _profiles[idx].patches = JSON.parse(JSON.stringify(patches));
+            _profiles[idx].launch_params = JSON.parse(JSON.stringify(launchParams));
+            await _saveProfiles();
+        }
+
+        // ══════════════════════════════════════════════
+        //  PROFILES HOVER MENU
+        // ══════════════════════════════════════════════
+        (function () {
+            const widget   = document.getElementById('profilesHoverWidget');
+            const trigger  = document.getElementById('phTrigger');
+            const dropdown = document.getElementById('phDropdown');
+            const activeDot = document.getElementById('phActiveDot');
+            let _open = false;
+            let _leaveTimer = null;
+
+            function _cancelLeave() {
+                if (_leaveTimer) { clearTimeout(_leaveTimer); _leaveTimer = null; }
+            }
+
+            async function openMenu() {
+                _cancelLeave();
+                if (_open) return;
+                await _loadProfiles();
+                _renderHoverProfiles();
+                dropdown.style.display = 'flex';
+                trigger.classList.add('active');
+                _open = true;
+            }
+
+            function closeMenu() {
+                dropdown.style.display = 'none';
+                trigger.classList.remove('active');
+                _open = false;
+            }
+
+            function scheduleClose() {
+                _cancelLeave();
+                _leaveTimer = setTimeout(closeMenu, 180);
+            }
+
+            widget.addEventListener('mouseenter', openMenu);
+            widget.addEventListener('mouseleave', scheduleClose);
+
+            function _renderHoverProfiles() {
+                dropdown.innerHTML = '';
+
+                // Обновляем точку активного профиля
+                activeDot.classList.toggle('show', !!_activeProfileId);
+
+                if (_profiles.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.className = 'ph-empty';
+                    empty.textContent = 'Нет профилей';
+                    dropdown.appendChild(empty);
+                } else {
+                    _profiles.forEach(p => {
+                        const isActive = p.id === _activeProfileId;
+                        const luaCount = (p.lua_enabled || []).length;
+                        const meta = `Lua: ${luaCount} скр.` + (p.launch_params ? ` · ${p.launch_params.memory || 4096} МБ` : '');
+
+                        const item = document.createElement('div');
+                        item.className = 'ph-item' + (isActive ? ' ph-active' : '');
+                        item.innerHTML = `
+                            <span class="ph-item-icon">${p.icon || '👤'}</span>
+                            <div class="ph-item-info">
+                                <div class="ph-item-name">${p.name}</div>
+                                <div class="ph-item-meta">${meta}</div>
+                            </div>
+                            ${isActive ? '<span class="ph-item-active-badge">✓ Активен</span>' : ''}
+                            <div class="ph-item-btns">
+                                <button class="ph-btn apply" onclick="phApply('${p.id}')">▶</button>
+                                <button class="ph-btn del" onclick="phDelete('${p.id}')">🗑</button>
+                            </div>`;
+                        dropdown.appendChild(item);
+                    });
+                    const div = document.createElement('div');
+                    div.className = 'ph-divider';
+                    dropdown.appendChild(div);
+                }
+
+                const createBtn = document.createElement('button');
+                createBtn.className = 'ph-create-btn';
+                createBtn.textContent = '＋ Создать профиль';
+                createBtn.onclick = () => { closeMenu(); createProfile(); };
+                dropdown.appendChild(createBtn);
+            }
+
+            // Экспортируем функции для кнопок в innerHTML
+            window.phApply = async function(id) {
+                await applyProfile(id);
+                activeDot.classList.toggle('show', !!_activeProfileId);
+                _renderHoverProfiles();
+            };
+            window.phDelete = async function(id) {
+                await deleteProfile(id);
+                activeDot.classList.toggle('show', !!_activeProfileId);
+                _renderHoverProfiles();
+            };
+
+            // После createProfile обновляем точку
+            const _origCreate = createProfile;
+            window.createProfile = async function() {
+                await _origCreate();
+                activeDot.classList.toggle('show', !!_activeProfileId);
+            };
+        })();
+
+        // ══════════════════════════════════════════════
+        //  DEBUG TAB
+        // ══════════════════════════════════════════════
+        async function loadDebugInfo() {
+            try {
+                if (window.pywebview && window.pywebview.api.get_debug_info) {
+                    const r = await window.pywebview.api.get_debug_info();
+                    if (r && r.success) {
+                        const d = r.data;
+                        _setDebugEl('dbgConfigPath',   d.config_path   || '—');
+                        _setDebugEl('dbgDocsPath',     d.docs_path     || '—');
+                        _setDebugEl('dbgGamePath',     d.game_path     || '(не задан)');
+                        _setDebugEl('dbgLauncherPath', d.launcher_path || '(не задан)');
+                        _setDebugEl('dbgPatchesPath',  d.patches_path  || '(не задан)');
+                        _setDebugEl('dbgProfilesCount', d.profiles_count + ' профил(ей) · активный: ' + (d.active_profile_name || 'нет'));
+                        return;
+                    }
+                }
+            } catch(e) {}
+            // Fallback: данные из JS
+            _setDebugEl('dbgConfigPath',   'Доступно только в приложении');
+            _setDebugEl('dbgDocsPath',     'Доступно только в приложении');
+            _setDebugEl('dbgGamePath',     'Доступно только в приложении');
+            _setDebugEl('dbgLauncherPath', 'Доступно только в приложении');
+            _setDebugEl('dbgPatchesPath',  'Доступно только в приложении');
+            _setDebugEl('dbgProfilesCount', _profiles.length + ' профил(ей)');
+        }
+
+        function _setDebugEl(id, val) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = val;
+        }
+
+        async function openDataFolder() {
+            try {
+                if (window.pywebview && window.pywebview.api.open_data_folder) {
+                    const r = await window.pywebview.api.open_data_folder();
+                    if (!r.success) showNotification('Ошибка: ' + r.message, 'error');
+                } else {
+                    showNotification('Доступно только в приложении', 'error');
+                }
+            } catch(e) { showNotification('Ошибка', 'error'); }
+        }
+
+        async function openLogFile() {
+            try {
+                if (window.pywebview && window.pywebview.api.open_log_file) {
+                    const r = await window.pywebview.api.open_log_file();
+                    if (!r.success) showNotification('Ошибка: ' + r.message, 'error');
+                } else {
+                    showNotification('Доступно только в приложении', 'error');
+                }
+            } catch(e) { showNotification('Ошибка', 'error'); }
+        }
+
+        // ══════════════════════════════════════════════
+        //  COMMUNITY THEMES
+        // ══════════════════════════════════════════════
+        let _ctThemes = [];
+        let _activeCommunityThemeId = null;
+
+        async function loadCommunityThemes() {
+            const grid   = document.getElementById('ctGrid');
+            const status = document.getElementById('ctStatus');
+            if (!grid || !status) return;
+
+            status.textContent = '⏳ Загрузка тем с ArzLaunchRepo...';
+            grid.innerHTML = '';
+            _ctThemes = [];
+
+            let themes = null;
+
+            try {
+                if (window.pywebview && window.pywebview.api.fetch_community_themes) {
+                    const r = await window.pywebview.api.fetch_community_themes();
+                    if (r && r.success) themes = r.data;
+                }
+            } catch(e) {}
+
+            // Fallback: прямой fetch (браузер / разработка)
+            if (!themes) {
+                try {
+                    const resp = await fetch('https://raw.githubusercontent.com/worteng/ArzLaunchRepo/main/Themes/themes.txt', { cache: 'no-store' });
+                    if (resp.ok) themes = parsConfigsTxt(await resp.text());
+                } catch(e) {}
+            }
+
+            if (!themes || themes.length === 0) {
+                status.textContent = '❌ Нет тем или нет соединения с GitHub';
+                return;
+            }
+
+            _ctThemes = themes;
+            status.textContent = `Найдено тем: ${themes.length}`;
+            _renderCommunityThemes();
+        }
+
+        function _renderCommunityThemes() {
+            const grid = document.getElementById('ctGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            _ctThemes.forEach((t, idx) => {
+                const isActive = t.name === _activeCommunityThemeId;
+                const card = document.createElement('div');
+                card.className = 'ct-card' + (isActive ? ' ct-active' : '');
+
+                // Превью: если есть preview — картинка, иначе полосы из цветов
+                const previewHtml = t.preview
+                    ? `<div class="ct-preview"><img src="${t.preview}" onerror="this.parentNode.innerHTML='<div class=\\'ct-preview-colors\\'></div>'" loading="lazy"></div>`
+                    : `<div class="ct-preview"><div class="ct-preview-colors">
+                        ${t.accent  ? `<span style="background:rgb(${t.accent})"></span>`  : ''}
+                        ${t.accent2 ? `<span style="background:rgb(${t.accent2})"></span>` : ''}
+                        ${t.surface ? `<span style="background:rgb(${t.surface})"></span>` : ''}
+                       </div></div>`;
+
+                card.innerHTML = `
+                    ${previewHtml}
+                    <div class="ct-info">
+                        <div class="ct-name">${t.name || 'Без названия'}</div>
+                        <div class="ct-meta">от ${t.author || '?'}${t.description ? ' · ' + t.description : ''}</div>
+                    </div>
+                    ${isActive ? '<span style="font-size:10px;color:rgba(var(--accent2-rgb),0.9);">✓ Активна</span>' : ''}
+                    <button class="ct-apply-btn" id="ctBtn_${idx}" onclick="applyCommunityTheme(${idx})">
+                        ${isActive ? '✓ Активна' : '▶ Применить'}
+                    </button>`;
+                grid.appendChild(card);
+            });
+        }
+
+        async function applyCommunityTheme(idx) {
+            const t = _ctThemes[idx];
+            if (!t || !t.url) {
+                showNotification('У темы нет ссылки на файл', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('ctBtn_' + idx);
+            if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+
+            let theme = null;
+
+            try {
+                if (window.pywebview && window.pywebview.api.download_community_theme) {
+                    const r = await window.pywebview.api.download_community_theme(t.url);
+                    if (r && r.success) theme = r.theme;
+                    else throw new Error(r && r.message || 'Ошибка загрузки');
+                } else {
+                    // Браузер: прямой fetch
+                    const resp = await fetch(t.url, { cache: 'no-store' });
+                    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                    theme = await resp.json();
+                }
+            } catch(e) {
+                if (btn) { btn.disabled = false; btn.textContent = '▶ Применить'; }
+                showNotification('Ошибка загрузки темы: ' + e.message, 'error');
+                return;
+            }
+
+            // Применяем цвета
+            if (theme.accent)  _setRootVar('--accent-rgb',  theme.accent);
+            if (theme.accent2) _setRootVar('--accent2-rgb', theme.accent2);
+            if (theme.surface) _setRootVar('--surface-rgb', theme.surface);
+            if (theme.accent) {
+                const [r,g,b] = theme.accent.split(',').map(Number);
+                _setRootVar('--primary-color',   `rgba(${r}, ${g}, ${b}, 0.82)`);
+                _setRootVar('--secondary-color', `rgba(${Math.round(18+r*0.1)}, ${Math.round(18+g*0.1)}, ${Math.round(18+b*0.1)}, 0.36)`);
+            }
+
+            // Применяем обои
+            const wallpaper = theme.wallpaper_data || theme.wallpaper;
+            if (wallpaper) {
+                launcherSettings.bg_data  = wallpaper;
+                launcherSettings.bg_image = 'community_theme_' + (theme.name || idx);
+                applyBgImage(wallpaper);
+                try {
+                    if (window.pywebview && window.pywebview.api.save_launcher_settings) {
+                        window.pywebview.api.save_launcher_settings(launcherSettings);
+                    }
+                } catch(e) {}
+            }
+
+            _activeCommunityThemeId = theme.name || t.name;
+            _renderCommunityThemes();
+            showNotification('✓ Тема «' + (theme.name || t.name) + '» применена', 'success');
+        }
+
+        // ══════════════════════════════════════════════
+        //  TELEGRAM SHARE
+        // ══════════════════════════════════════════════
+        async function openTelegramShare() {
+            try {
+                if (window.pywebview && window.pywebview.api.open_telegram_share) {
+                    const r = await window.pywebview.api.open_telegram_share();
+                    if (!r.success && r.url) {
+                        window.open(r.url, '_blank');
+                    }
+                } else {
+                    window.open('https://t.me/ARZLaunchBot', '_blank');
+                }
+            } catch(e) {
+                showNotification('Не удалось открыть Telegram', 'error');
+            }
+        }
+
+        // ══════════════════════════════════════════════
+        //  CDN TOGGLE BUTTONS
+        // ══════════════════════════════════════════════
+        function toggleCdnBtn(idx) {
+            const btn = document.getElementById('cdnBtn' + idx);
+            if (!btn) return;
+            const nowActive = !btn.classList.contains('active');
+            btn.classList.toggle('active', nowActive);
+            btn.textContent = nowActive ? '1' : '0';
+            document.getElementById('cdnInput').value = getCdnValue();
+        }
+
+        function getCdnValue() {
+            return [0, 1, 2].map(i => {
+                const btn = document.getElementById('cdnBtn' + i);
+                return (btn && btn.classList.contains('active')) ? '1' : '0';
+            }).join(',');
+        }
+
+        function setCdnBtns(val) {
+            const parts = (val || '1,1,1').split(',');
+            [0, 1, 2].forEach(i => {
+                const btn = document.getElementById('cdnBtn' + i);
+                if (!btn) return;
+                const isActive = (parts[i] || '1') === '1';
+                btn.classList.toggle('active', isActive);
+                btn.textContent = isActive ? '1' : '0';
+            });
+            document.getElementById('cdnInput').value = val || '1,1,1';
+        }
+
+        // ══════════════════════════════════════════════
+        //  FIRST LAUNCH PANEL
+        // ══════════════════════════════════════════════
+        let _flStep = 0;
+        let _flData = null;
+        let _flInstallPending = false;
+        const FL_TOTAL = 5;
+
+        const FL_FEATURES = [
+            { icon: '👤', name: 'Профили',    desc: 'Создайте свой профиль, который запоминает включённые скрипты' },
+            { icon: '🎨', name: 'Темы Monet', desc: 'Автопостроение цветовой схемы под цвета выбранных обоев' },
+            { icon: '📰', name: 'Новости',    desc: 'Актуальные новости о лаунчере прямо в главном экране' },
+            { icon: '🔧', name: 'Параметры',  desc: 'Настройка ArizonaPatches, параметров запуска и других опций' },
+            { icon: '🧩', name: 'Моды',       desc: 'Lua-скрипты и моды прямо из репозитория сообщества' },
+            { icon: '☁️', name: 'Community',  desc: 'Темы и скрипты от других игроков через GitHub' },
+        ];
+
+        // Вызывается из Python при первом запуске
+        window._flStart = async function(data) {
+            _flData = data;
+            _flStep = 0;
+            // Грузим обои заранее чтобы шаг выбора обоев был готов
+            if (_wallpapers.length === 0) await loadWallpapers();
+            _flRender();
+            document.getElementById('flOverlay').classList.add('open');
+        };
+
+        function openFirstLaunch() {
+            if (!_flData) {
+                _flData = { auto_found: false, check_status: 'not_found', game_path: '', folder: '', missing: [] };
+            }
+            _flStep = 0;
+            _flRender();
+            document.getElementById('flOverlay').classList.add('open');
+        }
+
+        function closeFirstLaunch() {
+            _closeWithAnim(document.getElementById('flOverlay'), () => {
+                document.getElementById('flOverlay').classList.remove('open');
+            });
+        }
+
+        function _flRender() {
+            // Dots
+            const dots = document.getElementById('flDots');
+            if (dots) {
+                dots.innerHTML = '';
+                for (let i = 0; i < FL_TOTAL; i++) {
+                    const d = document.createElement('div');
+                    d.className = 'fl-dot' + (i === _flStep ? ' active' : (i < _flStep ? ' done' : ''));
+                    dots.appendChild(d);
+                }
+            }
+            // Skip button: hide on last step
+            const skip = document.querySelector('.fl-skip-top');
+            if (skip) skip.style.display = _flStep === FL_TOTAL - 1 ? 'none' : '';
+
+            // Body
+            document.getElementById('flBody').innerHTML = _flBodyHtml();
+            // Footer
+            document.getElementById('flFooter').innerHTML = _flFooterHtml();
+        }
+
+        function _flBodyHtml() {
+            if (_flStep === 0) return `
+                <div class="fl-welcome">
+                    <div class="fl-welcome-logo">🎮</div>
+                    <div class="fl-welcome-title">Добро пожаловать!</div>
+                    <div class="fl-welcome-ver">Arizona RP Launcher · v0.0.9</div>
+                    <div class="fl-welcome-desc">Неофициальный лаунчер с расширенными возможностями: профили, темы, моды и многое другое. Давай быстро настроим всё для тебя.</div>
+                </div>`;
+
+            if (_flStep === 1) {
+                const d = _flData || {};
+                let cardHtml = '';
+                if (d.check_status === 'ok' || d.check_status === 'needs_install') {
+                    cardHtml = `<div class="fl-game-card ok">
+                        <div class="fl-game-card-icon">✅</div>
+                        <div class="fl-game-card-text">
+                            <div class="fl-game-card-head">Игра найдена</div>
+                            <div class="fl-game-card-sub">${d.folder || d.game_path || '—'}</div>
+                        </div>
+                    </div>`;
+                } else {
+                    cardHtml = `<div class="fl-game-card error">
+                        <div class="fl-game-card-icon">❌</div>
+                        <div class="fl-game-card-text">
+                            <div class="fl-game-card-head">Игра не найдена автоматически</div>
+                            <div class="fl-game-card-sub">Укажи папку с gta_sa.exe вручную</div>
+                        </div>
+                    </div>`;
+                }
+                return `<div class="fl-game-title">🔍 Обнаружение игры</div>
+                    ${cardHtml}
+                    <button class="fl-manual-btn" onclick="_flSelectManual()">📂 Указать путь вручную</button>`;
+            }
+
+            if (_flStep === 2) {
+                const cards = FL_FEATURES.map(f => `
+                    <div class="fl-feature-card">
+                        <div class="fl-feature-icon">${f.icon}</div>
+                        <div class="fl-feature-name">${f.name}</div>
+                        <div class="fl-feature-desc">${f.desc}</div>
+                    </div>`).join('');
+                return `<div class="fl-features-title">✨ Возможности лаунчера</div>
+                    <div class="fl-features-grid">${cards}</div>`;
+            }
+
+            if (_flStep === 3) {
+                // Build wallpaper grid HTML
+                let wpCards = '';
+                if (_wallpapers && _wallpapers.length > 0) {
+                    _wallpapers.forEach((wp, i) => {
+                        const active = launcherSettings.bg_image === wp.filename;
+                        wpCards += `<div class="fl-wp-card${active ? ' fl-wp-active' : ''}" onclick="_flApplyWallpaper(${i})">
+                            <div class="fl-wp-thumb" style="background-image:url('${wp.data_url}')">
+                                ${active ? '<div class="fl-wp-check">✓</div>' : ''}
+                            </div>
+                            <div class="fl-wp-name">${wp.name}</div>
+                        </div>`;
+                    });
+                }
+                // None card
+                const noneActive = !launcherSettings.bg_image;
+                wpCards = `<div class="fl-wp-card${noneActive ? ' fl-wp-active' : ''}" onclick="_flClearWallpaper()">
+                    <div class="fl-wp-thumb fl-wp-none">${noneActive ? '<div class="fl-wp-check">✓</div>' : '✕'}</div>
+                    <div class="fl-wp-name">Без обоев</div>
+                </div>` + wpCards;
+                // Custom card
+                wpCards += `<div class="fl-wp-card" onclick="_flPickCustomWallpaper()">
+                    <div class="fl-wp-thumb fl-wp-custom">🖼️</div>
+                    <div class="fl-wp-name">Своя</div>
+                </div>`;
+
+                const noWp = (!_wallpapers || _wallpapers.length === 0);
+                return `<div class="fl-features-title">🖼️ Выбери обои</div>
+                    <div class="fl-wp-hint">Monet автоматически подберёт цветовую схему под обои</div>
+                    ${noWp
+                        ? `<div class="fl-wp-empty">Готовых обоев нет — добавь в папку <code>wallpapers/</code> или выбери своё фото</div>`
+                        : `<div class="fl-wp-grid" id="flWpGrid">${wpCards}</div>`
+                    }
+                    <button class="fl-manual-btn" style="margin-top:10px;" onclick="_flPickCustomWallpaper()">📂 Выбрать своё фото</button>`;
+            }
+
+            if (_flStep === 4) {
+                return `<div class="fl-done">
+                    <div class="fl-done-icon">🎉</div>
+                    <div class="fl-done-title">Всё готово!</div>
+                    <div class="fl-done-sub">Лаунчер настроен и готов к работе. Приятной игры на Arizona RP!</div>
+                </div>`;
+            }
+            return '';
+        }
+
+        function _flFooterHtml() {
+            const isFirst = _flStep === 0;
+            const isLast  = _flStep === FL_TOTAL - 1;
+            const backBtn = isFirst ? '' : `<button class="fl-btn-back" onclick="_flPrev()">←</button>`;
+            const nextLabel = isLast ? '🚀 Начать' : 'Далее →';
+            return `${backBtn}<button class="fl-btn-next" onclick="_flNext()">${nextLabel}</button>`;
+        }
+
+        function _flNext() {
+            if (_flStep < FL_TOTAL - 1) { _flStep++; _flRender(); }
+            else closeFirstLaunch();
+        }
+        function _flPrev() {
+            if (_flStep > 0) { _flStep--; _flRender(); }
+        }
+
+        async function _flSelectManual() {
+            try {
+                if (window.pywebview && window.pywebview.api.select_game_path) {
+                    const r = await window.pywebview.api.select_game_path();
+                    if (r.success) {
+                        _flData = { auto_found: true, check_status: 'ok', game_path: r.message, folder: r.folder, missing: [] };
+                        _flRender();
+                        showNotification('✅ Путь к игре установлен', 'success');
+                        
+                        // Проверяем что нужно установить
+                        const installInfo = r.install_info;
+                        if (installInfo.action === 'none') {
+                            // Всё уже установлено, ничего не делаем
+                            showNotification('✅ ' + installInfo.message, 'success');
+                            setTimeout(() => closeFirstLaunch(), 500);
+                        } else {
+                            // Нужна установка - открываем модальное окно
+                            setTimeout(() => {
+                                closeFirstLaunch();
+                                openInstallModalWithAction(r.folder, installInfo);
+                            }, 500);
+                        }
+                    } else if (r.message && r.message !== 'Папка не выбрана') {
+                        showNotification(r.message, 'error');
+                    }
+                } else {
+                    showNotification('Доступно только в приложении', 'error');
+                }
+            } catch(e) { showNotification('Ошибка', 'error'); }
+        }
+
+        function _flApplyWallpaper(idx) {
+            const wp = _wallpapers[idx];
+            if (!wp) return;
+            applyLocalWallpaper(wp);
+            _flRender(); // re-render to update active state
+        }
+
+        function _flClearWallpaper() {
+            clearBgImage();
+            _flRender();
+        }
+
+        async function _flPickCustomWallpaper() {
+            try {
+                if (window.pywebview && window.pywebview.api.select_bg_image) {
+                    const r = await window.pywebview.api.select_bg_image();
+                    if (r && r.success) {
+                        launcherSettings.bg_image = r.data_url;
+                        launcherSettings.bg_data  = r.data_url;
+                        applyBgImage(r.data_url);
+                        try { window.pywebview.api.save_launcher_settings(launcherSettings); } catch(e) {}
+                        _flRender();
+                    }
+                } else { showNotification('Доступно только в приложении', 'error'); }
+            } catch(e) { showNotification('Ошибка', 'error'); }
+        }
+
+        function _flTriggerInstall() {
+            const d = _flData || {};
+            // Не закрываем FL-панель — прячем её за install modal
+            // После установки она вернётся с обновлённым статусом
+            _flInstallPending = true;
+            openInstallModal(d.folder, d.missing);
+        }
+
+        // ══════════════════════════════════════════════
+        //  CSO EDITOR (CustomStaticObjects)
+        // ══════════════════════════════════════════════
+        let _csoList = [];       // working copy
+        let _csoCurrentIdx = -1; // index in detail view
+        let _csoFilterText = '';
+        const CSO_IMG_BASE = 'https://dev.prineside.com/gtasa/model/';
+
+        function openCsoEditor() {
+            // Deep copy from patchesData
+            _csoList = JSON.parse(JSON.stringify(patchesData.CustomStaticObjects || []));
+            _csoCurrentIdx = -1;
+            _csoFilterText = '';
+            const searchEl = document.getElementById('csoSearch');
+            if (searchEl) searchEl.value = '';
+            _csoShowList();
+            document.getElementById('csoOverlay').classList.add('open');
+        }
+
+        function closeCsoEditor() {
+            _closeWithAnim(document.getElementById('csoOverlay'), () => {
+                document.getElementById('csoOverlay').classList.remove('open');
+            });
+        }
+
+        function _csoShowList() {
+            _csoCurrentIdx = -1;
+            document.getElementById('csoTitle').textContent = '📦 CustomStaticObjects';
+            document.getElementById('csoBackBtn').style.display = 'none';
+            document.getElementById('csoAddBtn').style.display = '';
+            document.getElementById('csoSearchBar').style.display = '';
+            document.getElementById('csoFooter').style.display = 'none';
+            _csoRenderList();
+        }
+
+        function _csoFilter() {
+            _csoFilterText = (document.getElementById('csoSearch').value || '').trim().toLowerCase();
+            _csoRenderList();
+        }
+
+        function _csoRenderList() {
+            const body = document.getElementById('csoBody');
+            const countEl = document.getElementById('csoCount');
+
+            const filtered = _csoList
+                .map((item, idx) => ({ item, idx }))
+                .filter(({ item }) => {
+                    if (!_csoFilterText) return true;
+                    return String(item.model).includes(_csoFilterText);
+                });
+
+            countEl.textContent = `${_csoList.length} объектов`;
+
+            if (_csoList.length === 0) {
+                body.innerHTML = '<div style="text-align:center;padding:40px 20px;font-family:Montserrat Alternates,sans-serif;font-size:13px;color:rgba(255,255,255,0.25);">Список пуст — нажми ＋ Добавить</div>';
+                return;
+            }
+            if (filtered.length === 0) {
+                body.innerHTML = '<div style="text-align:center;padding:40px 20px;font-family:Montserrat Alternates,sans-serif;font-size:13px;color:rgba(255,255,255,0.25);">Ничего не найдено</div>';
+                return;
+            }
+
+            const html = filtered.map(({ item, idx }) => {
+                const hasMove = item.xmove !== undefined;
+                const badge = hasMove
+                    ? '<span class="cso-item-badge invisible">невидимый</span>'
+                    : '<span class="cso-item-badge dist-only">дистанция</span>';
+                const params = hasMove
+                    ? `dist: ${item.dist} · move: ${item.xmove}, ${item.ymove}, ${item.zmove}`
+                    : `dist: ${item.dist}`;
+                return `
+                <div class="cso-item" onclick="_csoOpenDetail(${idx})">
+                    <div class="cso-item-thumb" id="csothumb_${idx}">
+                        <img src="${CSO_IMG_BASE}${item.model}.png"
+                             onerror="_csoImgFail(this, ${item.model})"
+                             loading="lazy"
+                             style="width:100%;height:100%;object-fit:cover;">
+                    </div>
+                    <div class="cso-item-info">
+                        <div class="cso-item-model">Model #${item.model}</div>
+                        <div class="cso-item-params">${params}</div>
+                    </div>
+                    ${badge}
+                    <div class="cso-item-arrow">›</div>
+                </div>`;
+            }).join('');
+
+            body.innerHTML = `<div class="cso-list">${html}</div>`;
+        }
+
+        function _csoImgFail(img, model) {
+            const thumb = img.parentNode;
+            thumb.innerHTML = `<div class="cso-item-thumb-fallback">#${model}</div>`;
+        }
+
+        function _csoOpenDetail(idx) {
+            _csoCurrentIdx = idx;
+            const item = _csoList[idx];
+
+            document.getElementById('csoTitle').textContent = `Model #${item.model}`;
+            document.getElementById('csoBackBtn').style.display = 'flex';
+            document.getElementById('csoAddBtn').style.display = 'none';
+            document.getElementById('csoSearchBar').style.display = 'none';
+            document.getElementById('csoFooter').style.display = 'flex';
+
+            const hasMove = item.xmove !== undefined;
+            const moveChecked = hasMove ? 'checked' : '';
+            const moveVisible = hasMove ? 'visible' : '';
+            const mx = item.xmove ?? 20000;
+            const my = item.ymove ?? 20000;
+            const mz = item.zmove ?? 20000;
+
+            document.getElementById('csoBody').innerHTML = `
+            <div class="cso-detail">
+                <div class="cso-detail-preview" id="csoDetailPreview">
+                    <img src="${CSO_IMG_BASE}${item.model}.png"
+                         onerror="_csoDetailImgFail(this, ${item.model})"
+                         style="max-width:100%;max-height:100%;object-fit:contain;">
+                </div>
+                <div class="cso-detail-fields">
+                    <div class="cso-field full-width">
+                        <div class="cso-field-label">Model ID</div>
+                        <input class="cso-field-input" id="csoFModel" type="number" value="${item.model}" min="0">
+                    </div>
+                    <div class="cso-field full-width">
+                        <div class="cso-field-label">dist — дистанция загрузки</div>
+                        <input class="cso-field-input" id="csoFDist" type="number" step="any" value="${item.dist}">
+                    </div>
+                    <label class="cso-move-toggle full-width" style="grid-column:1/-1;">
+                        <input type="checkbox" id="csoFMoveEnabled" ${moveChecked} onchange="_csoToggleMove()">
+                        <div class="s-toggle"></div>
+                        <span class="cso-move-toggle-label">Переместить объект (xmove / ymove / zmove)</span>
+                    </label>
+                    <div class="cso-move-fields ${moveVisible}" id="csoMoveFields">
+                        <div class="cso-field">
+                            <div class="cso-field-label">xmove</div>
+                            <input class="cso-field-input" id="csoFX" type="number" value="${mx}">
+                        </div>
+                        <div class="cso-field">
+                            <div class="cso-field-label">ymove</div>
+                            <input class="cso-field-input" id="csoFY" type="number" value="${my}">
+                        </div>
+                        <div class="cso-field full-width">
+                            <div class="cso-field-label">zmove</div>
+                            <input class="cso-field-input" id="csoFZ" type="number" value="${mz}">
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+
+            // Live model ID preview update
+            document.getElementById('csoFModel').addEventListener('input', function() {
+                const mid = parseInt(this.value) || 0;
+                const img = document.querySelector('#csoDetailPreview img');
+                if (img) {
+                    img.src = CSO_IMG_BASE + mid + '.png';
+                    img.onerror = () => _csoDetailImgFail(img, mid);
+                }
+                document.getElementById('csoTitle').textContent = 'Model #' + mid;
+            });
+        }
+
+        function _csoDetailImgFail(img, model) {
+            const preview = document.getElementById('csoDetailPreview');
+            if (preview) preview.innerHTML = `
+                <div class="cso-detail-preview-placeholder">
+                    <div class="cso-ph-id">#${model}</div>
+                    <div class="cso-ph-label">Превью недоступно</div>
+                </div>`;
+        }
+
+        function _csoToggleMove() {
+            const enabled = document.getElementById('csoFMoveEnabled').checked;
+            const fields = document.getElementById('csoMoveFields');
+            if (fields) fields.classList.toggle('visible', enabled);
+        }
+
+        function _csoBackToList() {
+            _csoShowList();
+        }
+
+        function _csoSaveDetail() {
+            if (_csoCurrentIdx < 0) return;
+            const model = parseInt(document.getElementById('csoFModel').value) || 0;
+            const dist  = parseFloat(document.getElementById('csoFDist').value) || 0;
+            const moveEnabled = document.getElementById('csoFMoveEnabled').checked;
+            const entry = { model, dist };
+            if (moveEnabled) {
+                entry.xmove = parseFloat(document.getElementById('csoFX').value) || 0;
+                entry.ymove = parseFloat(document.getElementById('csoFY').value) || 0;
+                entry.zmove = parseFloat(document.getElementById('csoFZ').value) || 0;
+            }
+            _csoList[_csoCurrentIdx] = entry;
+            // Push to patchesData immediately
+            patchesData.CustomStaticObjects = JSON.parse(JSON.stringify(_csoList));
+            showNotification('✅ Изменения применены (сохрани настройки)', 'success');
+            _csoBackToList();
+        }
+
+        function _csoDeleteCurrent() {
+            if (_csoCurrentIdx < 0) return;
+            _csoList.splice(_csoCurrentIdx, 1);
+            patchesData.CustomStaticObjects = JSON.parse(JSON.stringify(_csoList));
+            showNotification('Запись удалена', 'success');
+            _csoBackToList();
+        }
+
+        function _csoAdd() {
+            const newEntry = { model: 0, dist: 0.0001, xmove: 20000, ymove: 20000, zmove: 20000 };
+            _csoList.push(newEntry);
+            _csoOpenDetail(_csoList.length - 1);
+        }
+
     </script>
 </body>
-</html>
+</html
+                        </div>>
