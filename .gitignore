@@ -1,9 +1,31 @@
+# Логи
 arizona_launcher.log
-/autopytoexe
-/output
-index1.html
-index copy.html
-index t.html
-ArizonaLauncher.7z
-index - Copy.html
-/.BACKUP
+*.log
+
+# Python кэш
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Неиспользуемые файлы и бэкапы
+NotUsed/
+
+# IDE
+.vscode/
+.cursor/
+.idea/
+
+# Временные файлы
+*.tmp
+*.bak
+~*
+
+# Системные файлы
+.DS_Store
+Thumbs.db
+desktop.ini
+/others
+/others
+others/arizonapatcher.zip
+/others

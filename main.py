@@ -4,6 +4,8 @@ from threading import Thread
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+# Версия лаунчера
+LAUNCHER_VERSION = "v1.0.0"
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
                     handlers=[logging.FileHandler('arizona_launcher.log'), logging.StreamHandler()])
@@ -207,7 +209,7 @@ class ArizonaLauncher:
                 raw = f.read()
             logger.info(f"read_patches: {len(raw)} байт, начало: {raw[:300]!r}")
 
-            cleaned = re.sub(r'^\s*//.*$', '', raw, flags=re.MULTILINE)
+            cleaned = re.sub(r'^\s*//.*', '', raw, flags=re.MULTILINE)
             cleaned = '\n'.join(line for line in cleaned.split('\n') if line.strip())
             logger.info(f"read_patches: после очистки: {cleaned[:300]!r}")
 
@@ -431,22 +433,73 @@ class WebViewApp:
     def get_debug_info(self):
         """Возвращает диагностическую информацию для Debug-вкладки."""
         try:
+            import platform
             profiles = self.launcher.config.get('profiles', [])
             active_id = self.launcher.config.get('active_profile_id', None)
             active_name = next((p.get('name') for p in profiles if p.get('id') == active_id), None)
+            
+            # Версия лаунчера
+            launcher_version = self.launcher.get_launcher_version()
+            
+            # Количество бэкапов
+            backups = self.launcher.list_patches_backups()
+            backups_count = len(backups) if backups else 0
+            
+            # Moonloader статус
+            ml_dir = self._get_moonloader_dir()
+            ml_status = "найдена" if ml_dir else "не найдена"
+            ml_scripts_count = 0
+            if ml_dir and os.path.isdir(ml_dir):
+                try:
+                    ml_scripts_count = len([f for f in os.listdir(ml_dir) if f.endswith(('.lua', '.luac', '.cs', '.asi'))])
+                except:
+                    pass
+            
+            # Параметры запуска
+            launch_params = self.launcher.config.get('launch_params', {})
+            params_enabled = [k for k, v in launch_params.items() if v is True]
+            
             return {
                 "success": True,
                 "data": {
+                    # Пути
                     "config_path":         self.launcher.config_path,
                     "docs_path":           self.launcher.documents_path,
                     "game_path":           self.launcher.game_path or "",
                     "launcher_path":       self.launcher.launcher_path or "",
                     "patches_path":        self.launcher.patches_path or "",
+                    
+                    # Профили
                     "profiles_count":      len(profiles),
                     "active_profile_name": active_name or "нет",
+                    
+                    # Лаунчер
+                    "app_version":         LAUNCHER_VERSION,
+                    "launcher_version":    launcher_version,
+                    "last_nickname":       self.launcher.config.get('last_nickname', ''),
+                    "last_server":         self.launcher.config.get('last_server', 15),
+                    
+                    # Параметры запуска
+                    "launch_params_count": len(params_enabled),
+                    "launch_params_list":  ', '.join(params_enabled) if params_enabled else 'нет',
+                    "memory":              launch_params.get('memory', 4096),
+                    
+                    # Бэкапы
+                    "backups_count":       backups_count,
+                    
+                    # Moonloader
+                    "moonloader_status":   ml_status,
+                    "moonloader_scripts":  ml_scripts_count,
+                    
+                    # Система
+                    "python_version":      platform.python_version(),
+                    "os_name":             platform.system(),
+                    "os_version":          platform.release(),
+                    "architecture":        platform.machine(),
                 }
             }
         except Exception as e:
+            logger.error(f"get_debug_info error: {e}")
             return {"success": False, "message": str(e)}
 
     def open_data_folder(self):
@@ -1018,7 +1071,7 @@ class WebViewApp:
                 return {"success": False, "message": "Отменено"}
             with open(file_path, 'r', encoding='utf-8') as f:
                 raw = f.read()
-            cleaned = re.sub(r'^\s*//.*$', '', raw, flags=re.MULTILINE)
+            cleaned = re.sub(r'^\s*//.*', '', raw, flags=re.MULTILINE)
             cleaned = '\n'.join(line for line in cleaned.split('\n') if line.strip())
             data = json.loads(cleaned)
             bool_count = sum(1 for v in data.values() if isinstance(v, bool))
@@ -1122,6 +1175,12 @@ class WebViewApp:
 
     def update_nickname(self, nickname):
         self.launcher.config['last_nickname'] = nickname
+        self.launcher.save_config()
+        return {"success": True}
+
+    def update_server(self, server_number):
+        """Сохраняет выбранный сервер"""
+        self.launcher.config['last_server'] = server_number
         self.launcher.save_config()
         return {"success": True}
 
@@ -1268,7 +1327,7 @@ class WebViewApp:
                 return {"success": False, "message": f"Ошибка загрузки: HTTP {resp.status_code}", "stage": "downloading"}
 
             raw = resp.text
-            cleaned = re.sub(r"^\s*//.*$", "", raw, flags=re.MULTILINE)
+            cleaned = re.sub(r"^\s*//.*", "", raw, flags=re.MULTILINE)
             cleaned = "\n".join(l for l in cleaned.split("\n") if l.strip())
             data = json.loads(cleaned)
 

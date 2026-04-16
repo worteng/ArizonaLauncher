@@ -345,6 +345,119 @@
             font-size: clamp(14px, 1.5vw, 20px);
             color: rgba(255, 255, 255, 0.7);
             text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            padding-bottom: 30px;
+        }
+
+        /* Версия с эффектами стабильности */
+        .version-stable {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, rgba(0, 180, 100, 0.15), rgba(0, 220, 120, 0.08));
+            border: 1px solid rgba(0, 200, 100, 0.3);
+            border-radius: 20px;
+            animation: versionGlow 3s ease-in-out infinite;
+            position: relative;
+            cursor: help;
+        }
+
+        .version-stable::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            background-size: 200% 200%;
+            animation: versionShine 4s ease-in-out infinite;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .version-stable-text {
+            font-weight: 600;
+            color: rgba(100, 255, 180, 0.95);
+            text-shadow: 0 0 10px rgba(0, 220, 120, 0.4);
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes versionGlow {
+            0%, 100% { 
+                box-shadow: 0 0 10px rgba(0, 200, 100, 0.3), 
+                            0 0 20px rgba(0, 220, 120, 0.15),
+                            inset 0 0 10px rgba(0, 200, 100, 0.1);
+            }
+            50% { 
+                box-shadow: 0 0 20px rgba(0, 220, 120, 0.5), 
+                            0 0 30px rgba(0, 240, 140, 0.25),
+                            inset 0 0 15px rgba(0, 220, 120, 0.15);
+            }
+        }
+
+        @keyframes versionShine {
+            0% { background-position: -200% -200%; }
+            100% { background-position: 200% 200%; }
+        }
+
+        /* Тултип для версии */
+        .version-tooltip {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: rgba(0, 0, 0, 0.95);
+            color: rgba(255, 255, 255, 0.9);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid rgba(0, 200, 100, 0.3);
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .version-stable:hover .version-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+            pointer-events: auto;
+        }
+
+        .version-tooltip::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid rgba(0, 200, 100, 0.3);
+        }
+
+        .version-tooltip::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid rgba(0, 0, 0, 0.95);
         }
 
         /* Поле ввода никнейма и выбора сервера */
@@ -1817,13 +1930,13 @@
             transform: translate(-50%, -50%);
             width: 90%;
             max-width: 400px;
-            background: rgba(30, 30, 30, 0.98);
+            background: rgba(14, 16, 24, 0.92);
             border-radius: 15px;
             padding: 25px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             z-index: 1000;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
             flex-direction: column;
             gap: 15px;
             animation: settingsIn 0.35s cubic-bezier(0.34, 1.3, 0.64, 1);
@@ -3358,7 +3471,21 @@
             font-family: 'Montserrat Alternates', sans-serif;
             font-size: 11px;
             color: rgba(var(--accent2-rgb),0.65);
-            letter-spacing: 1.5px; text-transform: uppercase;
+            letter-spacing: 1.5px; 
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .fl-welcome-ver .version-stable {
+            padding: 3px 10px;
+            font-size: 10px;
+        }
+        
+        .fl-welcome-ver .version-stable-text {
+            font-size: 11px;
         }
         .fl-welcome-desc {
             font-family: 'Montserrat Alternates', sans-serif;
@@ -3846,7 +3973,13 @@
             <div class="left-panel">
                 <div class="header">
                     <div class="title">Arizona RP</div>
-                    <div class="subtitle">Launcher v0.0.9</div>
+                    <div class="subtitle">
+                        <span>Launcher</span>
+                        <div class="version-stable">
+                            <span class="version-stable-text">v1.0.0</span>
+                            <div class="version-tooltip">✓ Стабильная версия · Без багов · 2 месяца разработки</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="nickname-section">
@@ -4223,10 +4356,28 @@
                 <!-- Debug -->
                 <div id="debugTab" class="settings-tab-content">
 
-                    <div class="debug-section-title">🖥️ Лаунчер</div>
+                    <div class="debug-section-title">🖥️ Система</div>
                     <div class="debug-row">
-                        <span class="debug-label">Версия</span>
-                        <span class="debug-value">v0.0.9</span>
+                        <span class="debug-label">ОС</span>
+                        <span class="debug-value" id="dbgOsName">—</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Версия ОС</span>
+                        <span class="debug-value" id="dbgOsVersion">—</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Архитектура</span>
+                        <span class="debug-value" id="dbgArchitecture">—</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Python</span>
+                        <span class="debug-value" id="dbgPythonVersion">—</span>
+                    </div>
+
+                    <div class="debug-section-title" style="margin-top:10px;">🖥️ Лаунчер</div>
+                    <div class="debug-row">
+                        <span class="debug-label">Версия приложения</span>
+                        <span class="debug-value" id="dbgAppVersion">v1.0.0</span>
                     </div>
                     <div class="debug-row">
                         <span class="debug-label">Конфиг</span>
@@ -4251,17 +4402,69 @@
                         <span class="debug-value" id="dbgLauncherPath">—</span>
                     </div>
                     <div class="debug-row">
+                        <span class="debug-label">Версия лаунчера</span>
+                        <span class="debug-value" id="dbgLauncherVersion">—</span>
+                    </div>
+                    <div class="debug-row">
                         <span class="debug-label">Патчи</span>
                         <span class="debug-value" id="dbgPatchesPath">—</span>
                     </div>
                     <div class="debug-row">
+                        <span class="debug-label">Бэкапы патчей</span>
+                        <span class="debug-value" id="dbgBackupsCount">—</span>
+                    </div>
+
+                    <div class="debug-section-title" style="margin-top:10px;">👤 Профили и настройки</div>
+                    <div class="debug-row">
                         <span class="debug-label">Профили</span>
                         <span class="debug-value" id="dbgProfilesCount">—</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Последний никнейм</span>
+                        <span class="debug-value" id="dbgLastNickname">—</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Последний сервер</span>
+                        <span class="debug-value" id="dbgLastServer">—</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Память (RAM)</span>
+                        <span class="debug-value" id="dbgMemory">—</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Параметры запуска</span>
+                        <span class="debug-value" id="dbgLaunchParams">—</span>
+                    </div>
+
+                    <div class="debug-section-title" style="margin-top:10px;">🌙 Moonloader</div>
+                    <div class="debug-row">
+                        <span class="debug-label">Статус папки</span>
+                        <span class="debug-value" id="dbgMoonloaderStatus">—</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Скриптов установлено</span>
+                        <span class="debug-value" id="dbgMoonloaderScripts">—</span>
                     </div>
 
                     <div class="debug-section-title" style="margin-top:10px;">🛠️ Действия</div>
                     <div style="display:flex;gap:8px;flex-shrink:0;">
                         <button class="s-btn" style="flex:1;" onclick="openFirstLaunch()">🚀 Первый запуск</button>
+                    </div>
+
+                    <div class="debug-section-title" style="margin-top:10px;">🔮 В разработке</div>
+                    <div class="debug-future-grid">
+                        <div class="debug-future-item">
+                            <span>☁️ Облачная синхронизация профилей</span>
+                            <span class="soon-badge">скоро</span>
+                        </div>
+                        <div class="debug-future-item">
+                            <span>🔄 Автообновление лаунчера через GitHub</span>
+                            <span class="soon-badge">скоро</span>
+                        </div>
+                        <div class="debug-future-item">
+                            <span>📊 Статистика игрового времени</span>
+                            <span class="soon-badge">скоро</span>
+                        </div>
                     </div>
 
                 </div>
@@ -5058,6 +5261,12 @@
             hiddenSelect.value = server.number;
 
             currentServer = String(server.number);
+            
+            // Сохраняем выбранный сервер в конфиг
+            if (!silent && window.pywebview && window.pywebview.api.update_server) {
+                window.pywebview.api.update_server(server.number);
+            }
+            
             if (!silent) closeServerDropdown();
         }
 
@@ -5227,6 +5436,10 @@
 
         function handleServerChange() {
             currentServer = serverSelect.value;
+            // Сохраняем выбранный сервер в конфиг
+            if (window.pywebview && window.pywebview.api.update_server) {
+                window.pywebview.api.update_server(parseInt(currentServer));
+            }
         }
 
         // Запуск игры
@@ -5303,10 +5516,16 @@
 
         function showLaunchScreen(serverData) {
             const leftPanel  = document.querySelector('.left-panel');
+            const rightPanel = document.querySelector('.right-panel');
+            const phTrigger  = document.getElementById('phTrigger');
             const screen     = document.getElementById('launchScreen');
 
             setLaunchStatus('Подготовка...', 5);
             leftPanel.classList.add('slide-out');
+            
+            // Скрываем панель новостей и кнопку профилей
+            if (rightPanel) rightPanel.style.display = 'none';
+            if (phTrigger) phTrigger.style.display = 'none';
 
             // Показываем оверлей чуть позже чтобы анимация началась красиво
             setTimeout(() => {
@@ -5316,11 +5535,18 @@
 
         function hideLaunchScreen() {
             const leftPanel  = document.querySelector('.left-panel');
+            const rightPanel = document.querySelector('.right-panel');
+            const phTrigger  = document.getElementById('phTrigger');
             const screen     = document.getElementById('launchScreen');
 
             screen.classList.remove('visible');
             setTimeout(() => {
                 leftPanel.classList.remove('slide-out');
+                
+                // Возвращаем панель новостей и кнопку профилей
+                if (rightPanel) rightPanel.style.display = 'flex';
+                if (phTrigger) phTrigger.style.display = 'flex';
+                
                 startBtn.disabled = false;
                 startBtn.classList.remove('start-btn-loading');
             }, 300);
@@ -7660,23 +7886,60 @@
                     const r = await window.pywebview.api.get_debug_info();
                     if (r && r.success) {
                         const d = r.data;
-                        _setDebugEl('dbgConfigPath',   d.config_path   || '—');
-                        _setDebugEl('dbgDocsPath',     d.docs_path     || '—');
-                        _setDebugEl('dbgGamePath',     d.game_path     || '(не задан)');
-                        _setDebugEl('dbgLauncherPath', d.launcher_path || '(не задан)');
-                        _setDebugEl('dbgPatchesPath',  d.patches_path  || '(не задан)');
-                        _setDebugEl('dbgProfilesCount', d.profiles_count + ' профил(ей) · активный: ' + (d.active_profile_name || 'нет'));
+                        // Система
+                        _setDebugEl('dbgOsName',         d.os_name         || '—');
+                        _setDebugEl('dbgOsVersion',      d.os_version      || '—');
+                        _setDebugEl('dbgArchitecture',   d.architecture    || '—');
+                        _setDebugEl('dbgPythonVersion',  d.python_version  || '—');
+                        
+                        // Лаунчер
+                        _setDebugEl('dbgAppVersion',     d.app_version     || 'v1.0.0');
+                        _setDebugEl('dbgConfigPath',     d.config_path     || '—');
+                        _setDebugEl('dbgDocsPath',       d.docs_path       || '—');
+                        
+                        // Игра
+                        _setDebugEl('dbgGamePath',       d.game_path       || '(не задан)');
+                        _setDebugEl('dbgLauncherPath',   d.launcher_path   || '(не задан)');
+                        _setDebugEl('dbgLauncherVersion', d.launcher_version || '—');
+                        _setDebugEl('dbgPatchesPath',    d.patches_path    || '(не задан)');
+                        _setDebugEl('dbgBackupsCount',   d.backups_count + ' бэкап(ов)');
+                        
+                        // Профили и настройки
+                        _setDebugEl('dbgProfilesCount',  d.profiles_count + ' профил(ей) · активный: ' + (d.active_profile_name || 'нет'));
+                        _setDebugEl('dbgLastNickname',   d.last_nickname   || '(не задан)');
+                        _setDebugEl('dbgLastServer',     'Сервер #' + d.last_server);
+                        _setDebugEl('dbgMemory',         d.memory + ' МБ');
+                        _setDebugEl('dbgLaunchParams',   d.launch_params_count + ' параметр(ов): ' + d.launch_params_list);
+                        
+                        // Moonloader
+                        _setDebugEl('dbgMoonloaderStatus',  d.moonloader_status);
+                        _setDebugEl('dbgMoonloaderScripts', d.moonloader_scripts + ' скрипт(ов)');
                         return;
                     }
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.error('loadDebugInfo error:', e);
+            }
             // Fallback: данные из JS
-            _setDebugEl('dbgConfigPath',   'Доступно только в приложении');
-            _setDebugEl('dbgDocsPath',     'Доступно только в приложении');
-            _setDebugEl('dbgGamePath',     'Доступно только в приложении');
-            _setDebugEl('dbgLauncherPath', 'Доступно только в приложении');
-            _setDebugEl('dbgPatchesPath',  'Доступно только в приложении');
-            _setDebugEl('dbgProfilesCount', _profiles.length + ' профил(ей)');
+            _setDebugEl('dbgOsName',            'Доступно только в приложении');
+            _setDebugEl('dbgOsVersion',         'Доступно только в приложении');
+            _setDebugEl('dbgArchitecture',      'Доступно только в приложении');
+            _setDebugEl('dbgPythonVersion',     'Доступно только в приложении');
+            _setDebugEl('dbgAppVersion',        'v1.0.0');
+            _setDebugEl('dbgConfigPath',        'Доступно только в приложении');
+            _setDebugEl('dbgDocsPath',          'Доступно только в приложении');
+            _setDebugEl('dbgGamePath',          'Доступно только в приложении');
+            _setDebugEl('dbgLauncherPath',      'Доступно только в приложении');
+            _setDebugEl('dbgLauncherVersion',   'Доступно только в приложении');
+            _setDebugEl('dbgPatchesPath',       'Доступно только в приложении');
+            _setDebugEl('dbgBackupsCount',      'Доступно только в приложении');
+            _setDebugEl('dbgProfilesCount',     _profiles.length + ' профил(ей)');
+            _setDebugEl('dbgLastNickname',      'Доступно только в приложении');
+            _setDebugEl('dbgLastServer',        'Доступно только в приложении');
+            _setDebugEl('dbgMemory',            'Доступно только в приложении');
+            _setDebugEl('dbgLaunchParams',      'Доступно только в приложении');
+            _setDebugEl('dbgMoonloaderStatus',  'Доступно только в приложении');
+            _setDebugEl('dbgMoonloaderScripts', 'Доступно только в приложении');
         }
 
         function _setDebugEl(id, val) {
@@ -7955,7 +8218,12 @@
                 <div class="fl-welcome">
                     <div class="fl-welcome-logo">🎮</div>
                     <div class="fl-welcome-title">Добро пожаловать!</div>
-                    <div class="fl-welcome-ver">Arizona RP Launcher · v0.0.9</div>
+                    <div class="fl-welcome-ver">
+                        Arizona RP Launcher · 
+                        <div class="version-stable">
+                            <span class="version-stable-text">v1.0.0</span>
+                        </div>
+                    </div>
                     <div class="fl-welcome-desc">Неофициальный лаунчер с расширенными возможностями: профили, темы, моды и многое другое. Давай быстро настроим всё для тебя.</div>
                 </div>`;
 
@@ -8338,5 +8606,4 @@
 
     </script>
 </body>
-</html
-                        </div>>
+</html>
