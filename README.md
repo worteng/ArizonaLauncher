@@ -361,6 +361,6 @@ C:\Users\[ИМЯ_ПОЛЬЗОВАТЕЛЯ]\Documents\ArizonaLauncher\
 
 ⭐ Если проект вам помог — поставьте звезду на GitHub!
 
-[🐛 Сообщить о баге](https://github.com/worteng/ArizonaLauncher/issues) • [💡 Предложить идею](https://github.com/worteng/ArizonaLauncher/issues) • [📖 Документация](https://github.com/worteng/ArizonaLauncher/wiki)
+[🐛 Сообщить о баге](https://github.com/worteng/ArizonaLauncher/issues) • [💡 Предложить идею](https://github.com/worteng/ArizonaLauncher/issues) 
 
 </div>
