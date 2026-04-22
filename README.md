@@ -1,4 +1,4 @@
-# Arizona RP Launcher v1.0.0 🎮
+# Arizona RP Launcher v1.0.0 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python Version](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
@@ -361,6 +361,6 @@ C:\Users\[ИМЯ_ПОЛЬЗОВАТЕЛЯ]\Documents\ArizonaLauncher\
 
 ⭐ Если проект вам помог — поставьте звезду на GitHub!
 
-[🐛 Сообщить о баге](https://github.com/worteng/ArizonaLauncher/issues) • [💡 Предложить идею](https://github.com/worteng/ArizonaLauncher/issues) • [📖 Документация](https://github.com/worteng/ArizonaLauncher/wiki)
+[🐛 Сообщить о баге](https://github.com/worteng/ArizonaLauncher/issues) • [💡 Предложить идею](https://github.com/worteng/ArizonaLauncher/issues) 
 
 </div>
