@@ -25,12 +25,15 @@ NotUsed/
 .DS_Store
 Thumbs.db
 desktop.ini
-/others
-/others
-others/arizonapatcher.zip
+
+# Локальные билды и скачанные архивы лаунчеров
+/dist
 /others
 /output
 updater.py
-updater.py
 others/arizonapatcher.zip
 others/arizonapatchesV2.zip
+others/ArizonaLauncher8.0_byAIR.zip
+others/ArizonaLauncher8.0_byAIR.exe
+/.claude
+/.vscode
