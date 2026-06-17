@@ -64,11 +64,6 @@ Arizona RP Launcher -- это полнофункциональное решен�
    - Если игра не найдена, укажите путь к папке с `gta_sa.exe` вручную
    - Будет предложена установка лаунчера Air v8
 
-### Портативная версия
-
-1. Скачайте `ArizonaLauncher.zip` из [Releases](https://github.com/worteng/ArizonaLauncher/releases)
-2. Распакуйте в любую папку
-3. Запустите `ArizonaLauncher.exe`
 
 ### Для разработчиков: Запуск из исходного кода
 
@@ -89,8 +84,6 @@ pip install -r requirements.txt
 python main.py
 ```
 
-**Примечание:** Для корректной работы некоторых функций (добавление в исключения Defender) может потребоваться запуск от имени администратора.
-
 ## Системные требования
 
 ### Минимальные требования
@@ -99,8 +92,8 @@ python main.py
 - **ОЗУ:** 4 GB
 - **Свободное место:** 200 MB для лаунчера
 - **Дополнительно:**
-  - Microsoft Edge WebView2 Runtime (устанавливается автоматически)
-  - Visual C++ Redistributable 2015-2022 (устанавливается автоматически)
+  - Microsoft Edge WebView2 Runtime 
+  - Visual C++ Redistributable 2015-2022
   - Подключение к интернету для загрузки новостей и каталогов
 
 ### Для запуска из исходников
@@ -211,8 +204,7 @@ ArizonaLauncher/
 
 ### Способы связи:
 - [Создать Issue на GitHub](https://github.com/worteng/ArizonaLauncher/issues/new)
-- [Написать в Telegram](https://t.me/HalfikForEveryone)
-- Email: sergeybires@gmail.com
+- [Написать в Telegram](https://t.me/halfik24)
 
 ### При сообщении о проблеме укажите:
 1. **Версию лаунчера** (отображается в интерфейсе)
@@ -244,9 +236,7 @@ ArizonaLauncher/
 - Архив v8 зашифрован (pyzipper)
 - Лаунчер не потребляет лишние ресурсы системы
 - Сборка через PyInstaller (onedir)
-- Кастомная glassmorphism иконка
 - Установщик через Inno Setup (рус/англ)
-- Отключено консольное окно
 - Запрос прав администратора при запуске
 
 ### v1.0.0 (16.04.2026) -- Стабильный релиз
@@ -285,8 +275,7 @@ ArizonaLauncher/
 
 **Halfik**
 
-- Email: sergeybires@gmail.com
-- Telegram: [@HalfikForEveryone](https://t.me/HalfikForEveryone)
+- Telegram: [@HalfikForEveryone](https://t.me/halfik24)
 - GitHub: [@worteng](https://github.com/worteng)
 
 ## Благодарности
@@ -295,7 +284,7 @@ ArizonaLauncher/
 
 - **[Black Jesus](https://www.youtube.com/@BlackJesus1337)** -- вдохновение и мотивация на создание проекта
 - **Air (Эир)** -- создатель замечательного лаунчера
-- **[Dapo Dope](https://www.youtube.com/@DapoShow)** -- идея функции импорта/экспорта настроек ArizonaPatches
+- **[Dapo Show](https://www.youtube.com/@DapoShow)** -- идея функции импорта/экспорта настроек ArizonaPatches
 - **Сообщество Arizona RP** -- за тестирование и обратную связь
 
 ## Вклад в проект
