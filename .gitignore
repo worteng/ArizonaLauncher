@@ -53,3 +53,9 @@ opencode.jsonc
 moonloader/TEST.lua
 sandbox-test.wsb
 libraries.txt
+.vscode/settings.json
+/.vscode
+/moonloader
+README.md
+wizard.bmp
+wizard_small.bmp

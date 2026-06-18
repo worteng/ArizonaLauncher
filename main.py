@@ -19,7 +19,7 @@ except ImportError:
     _HAS_QT = False
 
 # Версия лаунчера
-LAUNCHER_VERSION = "v1.8.0"
+LAUNCHER_VERSION = "v1.8.1"
 
 # Лимиты для безопасной распаковки архивов
 _MAX_ZIP_FILES    = 5000    # макс. количество файлов в архиве
@@ -516,12 +516,15 @@ class ArizonaLauncher:
     def check_patches_files(self):
         """Проверяет наличие #ArizonaPatches.json и #ArizonaPatches.dll в preloading_plugins/."""
         if not self.game_path:
-            return {"json_exists": False, "dll_exists": False, "dll_version": None, "message": "game_path не установлен"}
+            return {"json_exists": False, "dll_exists": False, "dll_version": None, "message": "game_path не установлен", "both_exist": False}
         
         plugins_dir = os.path.join(os.path.dirname(self.game_path), "preloading_plugins")
         json_path = os.path.join(plugins_dir, "#ArizonaPatches.json")
         dll_path = os.path.join(plugins_dir, "#ArizonaPatches.dll")
         
+        if not os.path.isdir(plugins_dir):
+            return {"json_exists": False, "dll_exists": False, "dll_version": None, "message": "preloading_plugins не найдена", "both_exist": False}
+
         json_exists = os.path.exists(json_path)
         dll_exists = os.path.exists(dll_path)
         dll_version = None
@@ -532,9 +535,12 @@ class ArizonaLauncher:
         if os.path.exists(dll_path):
             dll_candidates.append(dll_path)
         # Ищем бэкапы: .1, .1.1, .1.2, etc.
-        for fname in os.listdir(os.path.dirname(dll_path)):
-            if fname.startswith("#ArizonaPatches.dll") and fname != "#ArizonaPatches.dll":
-                dll_candidates.append(os.path.join(os.path.dirname(dll_path), fname))
+        try:
+            for fname in os.listdir(plugins_dir):
+                if fname.startswith("#ArizonaPatches.dll") and fname != "#ArizonaPatches.dll":
+                    dll_candidates.append(os.path.join(plugins_dir, fname))
+        except OSError:
+            pass
         
         dll_exists = False
         dll_version = None
@@ -598,7 +604,19 @@ class ArizonaLauncher:
         Возвращает: {status, version, message, can_update, download_url, message_detail}
         status: 'missing' | 'outdated_v1' | 'current'
         """
-        files = self.check_patches_files()
+        try:
+            files = self.check_patches_files()
+        except Exception as e:
+            logger.warning(f"check_patches_status: check_patches_files failed: {e}")
+            return {
+                "status": "missing",
+                "version": None,
+                "message": "Патчи недоступны",
+                "message_detail": str(e),
+                "can_update": True,
+                "download_url": self._get_patches_download_url("v2"),
+                "installed_version": None
+            }
         installed_version = self.get_installed_patches_version()
         
         # 1. Missing: нет json ИЛИ нет dll
@@ -865,11 +883,10 @@ class WebViewApp:
                             logger.info(f"[autocheck] Доступна новая версия патчей: {latest} (установлено: {installed})")
                             # Отправляем событие в JS если окно уже есть
                             try:
-                                import webview as wv
-                                wins = wv.windows
-                                if wins:
+                                w = getattr(self, '_window', None)
+                                if w:
                                     js = f"window._onPatchesUpdateAvailable && window._onPatchesUpdateAvailable({json.dumps({'version': latest})})"
-                                    wins[0].evaluate_js(js)
+                                    w.evaluate_js(js)
                             except Exception:
                                 pass
                     # Обновляем время проверки
@@ -1609,11 +1626,10 @@ class WebViewApp:
 
         def _send(stage, progress=0, message=""):
             try:
-                import webview as wv
-                wins = wv.windows
-                if wins:
+                w = getattr(self, '_window', None)
+                if w:
                     js = f"window._onLauncherInstallProgress && window._onLauncherInstallProgress({json.dumps({'stage': stage, 'progress': progress, 'message': message})})"
-                    wins[0].evaluate_js(js)
+                    w.evaluate_js(js)
             except Exception as ex:
                 logger.warning(f"_send progress error: {ex}")
 
@@ -1962,7 +1978,7 @@ class WebViewApp:
 
         Безопасность:
         • file_path/folder_path валидируются — корневой диск (C:\\) не исключается
-        • PowerShell получает пути через -Args (а не f-string), чтобы исключить injection
+        • Пути экранируются одинарными кавычками для PowerShell
         """
         try:
             folder_path = os.path.dirname(file_path)
@@ -1971,23 +1987,24 @@ class WebViewApp:
             if not tail or tail.strip('\\/') == '':
                 logger.warning(f"_add_defender_exclusion: отказ исключать корень диска '{folder_path}'")
                 return
-            # Используем here-string и -Args, чтобы пути с одинарными кавычками
-            # или другими спецсимволами не ломали команду (defence against injection)
+            # Экранируем одинарные кавычки в путях ( заменяем на '' )
+            safe_folder = folder_path.replace("'", "''")
+            safe_file = file_path.replace("'", "''")
             ps_script = (
-                "param([string]$Folder, [string]$File) "
-                "Add-MpPreference -ExclusionPath $Folder; "
-                "Add-MpPreference -ExclusionProcess $File"
+                f"Add-MpPreference -ExclusionPath '{safe_folder}'; "
+                f"Add-MpPreference -ExclusionProcess '{safe_file}'"
             )
             result = subprocess.run(
                 ["powershell", "-NonInteractive", "-WindowStyle", "Hidden",
-                 "-Command", ps_script,
-                 "-Args", folder_path, file_path],
+                 "-ExecutionPolicy", "Bypass",
+                 "-Command", ps_script],
                 capture_output=True, timeout=15
             )
             if result.returncode == 0:
                 logger.info(f"_add_defender_exclusion: OK — {file_path}")
             else:
-                logger.warning(f"_add_defender_exclusion: нет прав (code={result.returncode})")
+                stderr = result.stderr.decode("utf-8", errors="replace").strip()
+                logger.warning(f"_add_defender_exclusion: code={result.returncode} — {stderr[:200]}")
         except Exception as e:
             logger.warning(f"_add_defender_exclusion error: {e}")
 
@@ -2241,11 +2258,10 @@ class WebViewApp:
         # Коллбэк для отправки прогресса в JS
         def _send(stage, progress=0, message=""):
             try:
-                import webview as wv
-                wins = wv.windows
-                if wins:
+                w = getattr(self, '_window', None)
+                if w:
                     js = f"window._onPatchesInstallProgress && window._onPatchesInstallProgress({json.dumps({'stage': stage, 'progress': progress, 'message': message})})"
-                    wins[0].evaluate_js(js)
+                    w.evaluate_js(js)
             except Exception as e:
                 logger.warning(f"_send patches progress error: {e}")
         
@@ -3151,6 +3167,7 @@ def main():
         index_url = os.path.join(_get_app_dir(), 'index.html')
         window = webview.create_window(saved_title, index_url, js_api=app, width=init_w, height=init_h,
                                        resizable=True, fullscreen=False, min_size=(1032, 583))
+        app._window = window
         # Устанавливаем иконку лаунчера
         ico_path = os.path.join(_get_app_dir(), 'launcher.ico')
         if os.path.exists(ico_path):

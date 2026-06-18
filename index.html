@@ -1380,6 +1380,69 @@
 
         .cre-footer .s-btn { flex: 1; height: 40px; }
 
+        /* Edit Profile — секции */
+        .ep-section-title {
+            font-family: 'Montserrat Alternates';
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.45);
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ep-section-title svg { width: 14px; height: 14px; }
+        .ep-label {
+            font-family: 'Montserrat Alternates';
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            display: block;
+            margin-bottom: 4px;
+        }
+        .ep-launch-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 4px;
+        }
+        .ep-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-family: 'Montserrat Alternates';
+            font-size: 11px;
+            color: rgba(255,255,255,0.65);
+        }
+        .ep-toggle:hover { background: rgba(255,255,255,0.04); }
+        .ep-toggle .s-toggle { flex-shrink: 0; }
+        .ep-toggle input { display: none; }
+        .ep-toggle input:not(:checked) + .s-toggle { opacity: 0.4; }
+        .ep-toggle input:checked ~ .s-toggle { background: rgba(var(--accent2-rgb), 0.55); border-color: rgba(var(--accent2-rgb), 0.44); }
+        .ep-toggle input:checked ~ .s-toggle::after { background: white; transform: translateX(16px); }
+        .ep-lua-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-family: 'Montserrat Alternates';
+            font-size: 11px;
+            color: rgba(255,255,255,0.65);
+        }
+        .ep-lua-item:hover { background: rgba(255,255,255,0.04); }
+        .ep-lua-item .s-toggle { flex-shrink: 0; }
+        .ep-lua-item input { display: none; }
+        .ep-lua-item input:not(:checked) + .s-toggle { opacity: 0.4; }
+        .ep-lua-item input:checked ~ .s-toggle { background: rgba(var(--accent2-rgb), 0.55); border-color: rgba(var(--accent2-rgb), 0.44); }
+        .ep-lua-item input:checked ~ .s-toggle::after { background: white; transform: translateX(16px); }
+
         /* Переопределяем s-toggle внутри cre-row */
         .cre-row .s-toggle { flex-shrink: 0; }
 
@@ -4839,10 +4902,10 @@
                         <div class="version-stable" data-ver-badge onclick="onVersionBadgeClick(event, this)">
                             <span class="vs-prompt">$</span>
                             <span class="vs-arrow">ver</span>
-                            <span class="ver-num">v1.8.0</span>
+                            <span class="ver-num">v1.8.1</span>
                             <div class="version-tooltip">
                                 <div class="tt-header">
-                                    <span>Что нового в v1.8.0</span>
+                                    <span>Что нового в v1.8.1</span>
                                     <span>обновление</span>
                                 </div>
                                 <div class="tt-line tt-add"><i data-lucide="plus"></i>Кэширование серверов для быстрой загрузки</div>
@@ -5340,7 +5403,7 @@
                     <div class="debug-section-title" style="margin-top:10px;"><i data-lucide="monitor"></i> Лаунчер</div>
                     <div class="debug-row">
                         <span class="debug-label">Версия приложения</span>
-                        <span class="debug-value" id="dbgAppVersion">v1.8.0</span>
+                        <span class="debug-value" id="dbgAppVersion">v1.8.1</span>
                     </div>
                     <div class="debug-row">
                         <span class="debug-label">Конфиг</span>
@@ -5728,20 +5791,77 @@
 
         <!-- Edit Profile Modal -->
         <div class="cre-overlay" id="editProfileOverlay" role="dialog" aria-modal="true" aria-labelledby="editProfileTitle" onclick="if(event.target===this)closeEditProfile()">
-            <div class="cre-modal" style="width:min(380px,92vw);">
+            <div class="cre-modal" style="width:min(580px,95vw);max-height:85vh;display:flex;flex-direction:column;">
                 <div class="cre-header">
                     <div class="cre-title" id="editProfileTitle"><i data-lucide="pencil"></i> Редактировать профиль</div>
                     <button class="close-btn" onclick="closeEditProfile()" aria-label="Закрыть">×</button>
                 </div>
-                <div class="cre-body" style="padding:16px 22px;">
-                    <div style="display:flex;flex-direction:column;gap:12px;">
+                <div class="cre-body" style="padding:16px 22px;overflow-y:auto;flex:1;min-height:0;">
+                    <div style="display:flex;flex-direction:column;gap:18px;">
+                        <!-- Основное -->
                         <div>
-                            <label style="font-family:'Montserrat Alternates';font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:4px;">Название</label>
-                            <input type="text" id="editProfileName" class="cso-field-input" style="width:100%;" placeholder="Имя профиля">
+                            <div class="ep-section-title"><i data-lucide="user"></i> Основное</div>
+                            <div style="display:flex;flex-direction:column;gap:12px;">
+                                <div>
+                                    <label class="ep-label">Название</label>
+                                    <input type="text" id="editProfileName" class="cso-field-input" style="width:100%;" placeholder="Имя профиля">
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- Параметры запуска -->
                         <div>
-                            <label style="font-family:'Montserrat Alternates';font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:6px;">Иконка</label>
-                            <div id="editProfileIconGrid" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
+                            <div class="ep-section-title"><i data-lucide="settings"></i> Параметры запуска</div>
+                            <div class="ep-launch-grid" id="epLaunchGrid">
+                                <label class="ep-toggle"><input type="checkbox" id="ep_windowMode"><div class="s-toggle"></div><span>Оконный</span></label>
+                                <label class="ep-toggle"><input type="checkbox" id="ep_widescreen"><div class="s-toggle"></div><span>Широкоэкранный</span></label>
+                                <label class="ep-toggle"><input type="checkbox" id="ep_authCef"><div class="s-toggle"></div><span>CEF авторизация</span></label>
+                                <label class="ep-toggle"><input type="checkbox" id="ep_autologin"><div class="s-toggle"></div><span>Автологин</span></label>
+                                <label class="ep-toggle"><input type="checkbox" id="ep_textureMode"><div class="s-toggle"></div><span>Low PC</span></label>
+                                <label class="ep-toggle"><input type="checkbox" id="ep_colorDepth16"><div class="s-toggle"></div><span>16-бит</span></label>
+                                <label class="ep-toggle"><input type="checkbox" id="ep_allowHdr"><div class="s-toggle"></div><span>HDR</span></label>
+                                <label class="ep-toggle"><input type="checkbox" id="ep_enableGrass"><div class="s-toggle"></div><span>Старая трава</span></label>
+                                <label class="ep-toggle"><input type="checkbox" id="ep_ldo"><div class="s-toggle"></div><span>Предзагрузка ОЗУ</span></label>
+                            </div>
+                            <div style="display:flex;gap:10px;margin-top:10px;align-items:center;">
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <span class="ep-label" style="margin:0;">Память</span>
+                                    <select id="ep_memory" class="cso-field-input" style="width:80px;height:30px;font-size:11px;">
+                                        <option value="1024">1024</option>
+                                        <option value="2048">2048</option>
+                                        <option value="3072">3072</option>
+                                        <option value="4096">4096</option>
+                                        <option value="5120">5120</option>
+                                    </select>
+                                </div>
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <span class="ep-label" style="margin:0;">CDN</span>
+                                    <div style="display:flex;gap:3px;" id="epCdnBtnGroup">
+                                        <button class="cdn-btn" id="epCdnBtn0" onclick="epToggleCdn(0)" style="width:26px;height:26px;font-size:11px;">0</button>
+                                        <button class="cdn-btn" id="epCdnBtn1" onclick="epToggleCdn(1)" style="width:26px;height:26px;font-size:11px;">0</button>
+                                        <button class="cdn-btn" id="epCdnBtn2" onclick="epToggleCdn(2)" style="width:26px;height:26px;font-size:11px;">0</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lua скрипты -->
+                        <div>
+                            <div class="ep-section-title"><i data-lucide="code"></i> Lua скрипты</div>
+                            <div id="epLuaList" style="display:flex;flex-direction:column;gap:4px;">
+                                <div style="font-family:'Montserrat Alternates';font-size:11px;color:rgba(255,255,255,0.25);padding:8px 0;">Загрузка...</div>
+                            </div>
+                        </div>
+
+                        <!-- Патчи -->
+                        <div>
+                            <div class="ep-section-title"><i data-lucide="puzzle"></i> Патчи</div>
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <button class="s-btn" id="epCapturePatches" onclick="epCaptureCurrentPatches()" style="height:30px;font-size:11px;padding:0 12px;">
+                                    <i data-lucide="download"></i> Захватить из текущих
+                                </button>
+                                <span id="epPatchesStatus" style="font-family:'Montserrat Alternates';font-size:11px;color:rgba(255,255,255,0.3);"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -10428,39 +10548,102 @@
             };
 
             // ── Edit Profile ──
-            const PROFILE_ICONS = ['<i data-lucide="user"></i>','<i data-lucide="gamepad-2"></i>','<i data-lucide="target"></i>','<i data-lucide="trophy"></i>','<i data-lucide="star"></i>','<i data-lucide="flame"></i>','<i data-lucide="gem"></i>','<i data-lucide="rocket"></i>','<i data-lucide="dog"></i>','<i data-lucide="cat"></i>','<i data-lucide="dog"></i>','<i data-lucide="bear"></i>','<i data-lucide="lion"></i>','<i data-lucide="frog"></i>','<i data-lucide="star"></i>','<i data-lucide="lightbulb"></i>','<i data-lucide="palette"></i>','<i data-lucide="music"></i>','<i data-lucide="waves"></i>','<i data-lucide="bike"></i>','<i data-lucide="circle-dot"></i>','<i data-lucide="circle"></i>','<i data-lucide="circle-dot"></i>','<i data-lucide="gamepad-2"></i>'];
             let _editProfileId = null;
 
-            window.phEdit = function(id) {
+            window.phEdit = async function(id) {
                 const p = _profiles.find(x => x.id === id);
                 if (!p) return;
                 _editProfileId = id;
                 document.getElementById('editProfileName').value = p.name || '';
-                _renderIconPicker(p.icon || '<i data-lucide="user"></i>');
+
+                // Параметры запуска
+                const lp = p.launch_params || {};
+                document.getElementById('ep_windowMode').checked  = !!lp.window_mode;
+                document.getElementById('ep_widescreen').checked   = !!lp.widescreen;
+                document.getElementById('ep_authCef').checked     = !!lp.auth_cef_enable;
+                document.getElementById('ep_autologin').checked   = !!lp.autologin;
+                document.getElementById('ep_textureMode').checked = !!lp.texture_mode;
+                document.getElementById('ep_colorDepth16').checked= !!lp.color_depth_16;
+                document.getElementById('ep_allowHdr').checked    = !!lp.allow_hdr;
+                document.getElementById('ep_enableGrass').checked = !!lp.enable_grass;
+                document.getElementById('ep_ldo').checked         = !!lp.ldo;
+                document.getElementById('ep_memory').value        = String(lp.memory || 4096);
+
+                // CDN
+                const cdn = (lp.cdn || '0,0,0').split(',').map(s => s.trim() === '1' ? 1 : 0);
+                for (let i = 0; i < 3; i++) {
+                    const btn = document.getElementById('epCdnBtn' + i);
+                    const isActive = cdn[i] === 1;
+                    btn.textContent = isActive ? '1' : '0';
+                    btn.dataset.value = isActive ? '1' : '0';
+                    btn.classList.toggle('active', isActive);
+                }
+
+                // Патчи — статус
+                const patchCount = p.patches ? Object.keys(p.patches).length : 0;
+                document.getElementById('epPatchesStatus').textContent = patchCount > 0
+                    ? `${patchCount} патчей сохранено`
+                    : 'Патчи не сохранены';
+
                 document.getElementById('editProfileOverlay').classList.add('open');
                 closeMenu();
+
+                // Lua скрипты — загружаем из бэкенда
+                await _epLoadLuaScripts(p.lua_enabled || []);
             };
 
-            function _renderIconPicker(selected) {
-                const grid = document.getElementById('editProfileIconGrid');
-                grid.innerHTML = '';
-                PROFILE_ICONS.forEach(icon => {
-                    const btn = document.createElement('div');
-                    btn.style.cssText = `width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:7px;cursor:pointer;font-size:16px;border:1px solid ${icon === selected ? 'rgba(var(--accent2-rgb),0.6)' : 'rgba(255,255,255,0.08)'};background:${icon === selected ? 'rgba(var(--accent-rgb),0.2)' : 'rgba(255,255,255,0.03)'};transition:all 0.15s;`;
-                    btn.textContent = icon;
-                    btn.onclick = () => {
-                        grid.querySelectorAll('div').forEach(b => {
-                            b.style.borderColor = 'rgba(255,255,255,0.08)';
-                            b.style.background = 'rgba(255,255,255,0.03)';
-                        });
-                        btn.style.borderColor = 'rgba(var(--accent2-rgb),0.6)';
-                        btn.style.background = 'rgba(var(--accent-rgb),0.2)';
-                        grid.dataset.selected = icon;
-                    };
-                    if (icon === selected) grid.dataset.selected = icon;
-                    grid.appendChild(btn);
-                });
+            async function _epLoadLuaScripts(enabledList) {
+                const pane = document.getElementById('epLuaList');
+                pane.innerHTML = '<div style="font-family:\'Montserrat Alternates\';font-size:11px;color:rgba(255,255,255,0.25);padding:8px 0;">Загрузка...</div>';
+                if (!window.pywebview || !window.pywebview.api.get_moonloader_scripts) {
+                    pane.innerHTML = '<div style="font-family:\'Montserrat Alternates\';font-size:11px;color:rgba(255,255,255,0.25);padding:8px 0;">Только в приложении</div>';
+                    return;
+                }
+                try {
+                    const result = await window.pywebview.api.get_moonloader_scripts();
+                    if (!result.success || !result.scripts.length) {
+                        pane.innerHTML = '<div style="font-family:\'Montserrat Alternates\';font-size:11px;color:rgba(255,255,255,0.25);padding:8px 0;">Скриптов нет</div>';
+                        return;
+                    }
+                    pane.innerHTML = '';
+                    result.scripts.forEach(s => {
+                        const checked = enabledList.includes(s.name);
+                        const label = document.createElement('label');
+                        label.className = 'ep-lua-item';
+                        label.innerHTML = `<input type="checkbox" data-ep-lua="${s.name}" ${checked ? 'checked' : ''}><div class="s-toggle"></div><span>${s.name}</span>`;
+                        pane.appendChild(label);
+                    });
+                } catch {
+                    pane.innerHTML = '<div style="font-family:\'Montserrat Alternates\';font-size:11px;color:rgba(255,255,255,0.25);padding:8px 0;">Ошибка загрузки</div>';
+                }
             }
+
+            // CDN toggle для edit profile
+            window.epToggleCdn = function(idx) {
+                const btn = document.getElementById('epCdnBtn' + idx);
+                if (!btn) return;
+                const nowActive = !btn.classList.contains('active');
+                btn.classList.toggle('active', nowActive);
+                btn.textContent = nowActive ? '1' : '0';
+                btn.dataset.value = nowActive ? '1' : '0';
+            };
+
+            // Захватить текущие патчи в профиль
+            window.epCaptureCurrentPatches = async function() {
+                if (!window.pywebview || !window.pywebview.api.read_patches) return;
+                try {
+                    const pr = await window.pywebview.api.read_patches();
+                    if (pr && pr.success && _editProfileId) {
+                        const p = _profiles.find(x => x.id === _editProfileId);
+                        if (p) {
+                            p.patches = pr.data || {};
+                            const count = Object.keys(p.patches).length;
+                            document.getElementById('epPatchesStatus').textContent = `${count} патчей сохранено`;
+                            showNotification('Патчи захвачены из текущих настроек', 'success');
+                        }
+                    }
+                } catch (e) { console.error('epCapturePatches error:', e); }
+            };
 
             window.closeEditProfile = function() {
                 document.getElementById('editProfileOverlay').classList.remove('open');
@@ -10471,11 +10654,42 @@
                 if (!_editProfileId) return;
                 const p = _profiles.find(x => x.id === _editProfileId);
                 if (!p) return;
+
                 const newName = document.getElementById('editProfileName').value.trim();
-                const newIcon = document.getElementById('editProfileIconGrid').dataset.selected || '<i data-lucide="user"></i>';
                 if (!newName) { showNotification('Введите название', 'error'); return; }
+
+                // Собираем параметры запуска
+                const cdnBtns = [
+                    document.getElementById('epCdnBtn0'),
+                    document.getElementById('epCdnBtn1'),
+                    document.getElementById('epCdnBtn2')
+                ];
+                const cdnStr = cdnBtns.map(b => b.dataset.value || '0').join(',');
+
                 p.name = newName;
-                p.icon = newIcon;
+                // Сохраняем существующие v7/v8 параметры, обновляем видимые
+                const existingLp = p.launch_params || {};
+                p.launch_params = Object.assign({}, existingLp, {
+                    window_mode:     document.getElementById('ep_windowMode').checked,
+                    widescreen:      document.getElementById('ep_widescreen').checked,
+                    auth_cef_enable: document.getElementById('ep_authCef').checked,
+                    autologin:       document.getElementById('ep_autologin').checked,
+                    texture_mode:    document.getElementById('ep_textureMode').checked,
+                    color_depth_16:  document.getElementById('ep_colorDepth16').checked,
+                    allow_hdr:       document.getElementById('ep_allowHdr').checked,
+                    enable_grass:    document.getElementById('ep_enableGrass').checked,
+                    ldo:             document.getElementById('ep_ldo').checked,
+                    memory:          parseInt(document.getElementById('ep_memory').value) || 4096,
+                    cdn:             cdnStr,
+                });
+
+                // Собираем lua скрипты
+                const luaCheckboxes = document.querySelectorAll('[data-ep-lua]');
+                p.lua_enabled = [];
+                luaCheckboxes.forEach(cb => {
+                    if (cb.checked) p.lua_enabled.push(cb.dataset.epLua);
+                });
+
                 await _saveProfiles();
                 _renderHoverProfiles();
                 closeEditProfile();
@@ -10506,7 +10720,7 @@
                         _setDebugEl('dbgPythonVersion',  d.python_version  || '—');
                         
                         // Лаунчер
-                        _setDebugEl('dbgAppVersion',     d.app_version     || 'v1.8.0');
+                        _setDebugEl('dbgAppVersion',     d.app_version     || 'v1.8.1');
                         _setDebugEl('dbgConfigPath',     d.config_path     || '—');
                         _setDebugEl('dbgDocsPath',       d.docs_path       || '—');
                         
@@ -10538,7 +10752,7 @@
             _setDebugEl('dbgOsVersion',         'Доступно только в приложении');
             _setDebugEl('dbgArchitecture',      'Доступно только в приложении');
             _setDebugEl('dbgPythonVersion',     'Доступно только в приложении');
-            _setDebugEl('dbgAppVersion',        'v1.8.0');
+            _setDebugEl('dbgAppVersion',        'v1.8.1');
             _setDebugEl('dbgConfigPath',        'Доступно только в приложении');
             _setDebugEl('dbgDocsPath',          'Доступно только в приложении');
             _setDebugEl('dbgGamePath',          'Доступно только в приложении');
@@ -10706,7 +10920,7 @@
                     <div class="fl-welcome-ver">
                         Arizona RP Launcher · 
                         <div class="version-stable">
-                            <span class="version-stable-text">v1.8.0</span>
+                            <span class="version-stable-text">v1.8.1</span>
                         </div>
                     </div>
                     <div class="fl-welcome-desc">Неофициальный лаунчер с расширенными возможностями: профили, темы, моды и многое другое. Давай быстро настроим всё для тебя.</div>
@@ -11204,7 +11418,7 @@
         }
         function triggerVersionEasterEgg(outputEl, badgeEl) {
             const messages = [
-                '> ArizonaLauncher v1.8.0',
+                '> ArizonaLauncher v1.8.1',
                 '> by halfik (worteng) · 2026',
                 '> open source: github.com/worteng/ArizonaLauncher',
                 '> # передаю привет Эиру',
@@ -11308,19 +11522,16 @@
             _layoutPosition = zone;
             const container = document.querySelector('.left-panel');
             if (!container) return;
-            container.style.transition = 'margin 0.35s cubic-bezier(0.4, 0, 0.2, 1), align-self 0.35s cubic-bezier(0.4, 0, 0.2, 1)';
+            container.style.transition = 'margin 0.35s cubic-bezier(0.4, 0, 0.2, 1)';
             if (zone === 'left') {
                 container.style.marginLeft = '0';
                 container.style.marginRight = 'auto';
-                container.style.alignSelf = 'flex-start';
             } else if (zone === 'right') {
                 container.style.marginLeft = 'auto';
                 container.style.marginRight = '0';
-                container.style.alignSelf = 'flex-end';
             } else {
                 container.style.marginLeft = '';
                 container.style.marginRight = '';
-                container.style.alignSelf = '';
             }
             document.querySelectorAll('#layoutFloatBar .layout-zone-btn').forEach(b => {
                 b.classList.toggle('active', b.dataset.zone === zone);
@@ -11358,11 +11569,9 @@
                     if (pos === 'left') {
                         container.style.marginLeft = '0';
                         container.style.marginRight = 'auto';
-                        container.style.alignSelf = 'flex-start';
                     } else if (pos === 'right') {
                         container.style.marginLeft = 'auto';
                         container.style.marginRight = '0';
-                        container.style.alignSelf = 'flex-end';
                     }
                     // Re-enable transitions after a frame
                     requestAnimationFrame(() => {
