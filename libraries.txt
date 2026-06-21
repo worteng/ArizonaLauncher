@@ -1,0 +1,13 @@
+[library]
+name = mimgui
+description = Mimgui — ImGui bindings для MoonLoader (SAMP). Позволяет создавать GUI окна в игре.
+url = https://raw.githubusercontent.com/IMRLUA/mimgui/master/mimgui.zip
+version = 1.0.0
+required_by = ARZMarket Loader, Mimgui ScoreBoard
+
+[library]
+name = imgui
+description = Базовая библиотека ImGui для MoonLoader. Минимальный набор для создания интерфейсов.
+url = https://raw.githubusercontent.com/IMRLUA/mimgui/master/imgui.zip
+version = 2.0.0
+required_by = ARZMarket Loader

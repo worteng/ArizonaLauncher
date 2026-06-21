@@ -286,7 +286,7 @@
             user-select: none;
         }
 
-        .right-panel:not(.open) > *:not(.news-handle) {
+        .right-panel:not(.open) > *:not(.news-handle):not(.patch-handle) {
             visibility: hidden;
         }
 
@@ -317,6 +317,80 @@
             transform: rotate(180deg);
             letter-spacing: 1.5px;
             white-space: nowrap;
+        }
+
+        /* ── Patch handle tab (below news handle) ── */
+        .patch-handle {
+            position: absolute;
+            left: 0;
+            top: calc(50% + 78px + 12px);
+            width: 48px;
+            height: 120px;
+            background: rgba(255, 165, 0, 0.42);
+            border-radius: 10px 0 0 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            gap: 6px;
+            border: 1px solid rgba(255, 165, 0, 0.35);
+            border-right: none;
+            transition: background 0.2s, box-shadow 0.2s;
+            z-index: 10;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .patch-handle::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: var(--patch-progress, 0%);
+            background: rgba(255, 165, 0, 0.35);
+            border-radius: 0 0 0 10px;
+            transition: height 0.4s ease;
+            z-index: -1;
+        }
+
+        .patch-handle:hover {
+            background: rgba(255, 165, 0, 0.58);
+            box-shadow: -4px 0 18px rgba(255, 165, 0, 0.42);
+        }
+
+        .patch-handle-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: rgba(255, 165, 0, 0.15);
+            font-size: 15px;
+            line-height: 1;
+        }
+        .patch-handle-icon svg { width: 16px !important; height: 16px !important; }
+
+        .patch-handle-label {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(255, 200, 80, 0.95);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        @keyframes pulse-warning {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.4); }
+            50% { box-shadow: 0 0 12px 2px rgba(255, 165, 0, 0.6); }
+        }
+
+        .patch-handle.pulse {
+            animation: pulse-warning 2s ease-in-out infinite;
         }
 
         .news-unread-badge {
@@ -3960,44 +4034,6 @@
             align-items: center;
         }
 
-        /* Кнопка установки лаунчера */
-        #installLauncherBtn {
-            height: 34px;
-            padding: 0 13px;
-            background: rgba(255, 165, 0, 0.15);
-            border: 1px solid rgba(255, 165, 0, 0.35);
-            border-radius: 8px;
-            color: rgba(255, 200, 80, 0.95);
-            font-family: 'Montserrat Alternates', sans-serif;
-            font-size: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.18s;
-            user-select: none;
-            white-space: nowrap;
-            animation: pulse-warning 2s ease-in-out infinite;
-            width: 100%;
-        }
-
-        #installLauncherBtn:hover {
-            background: rgba(255, 165, 0, 0.25);
-            border-color: rgba(255, 165, 0, 0.55);
-            transform: translateY(-1px);
-        }
-
-        #installLauncherBtn:disabled {
-            opacity: 0.6;
-            cursor: default;
-            animation: none;
-        }
-
-        @keyframes pulse-warning {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.4); }
-            50% { box-shadow: 0 0 12px 2px rgba(255, 165, 0, 0.6); }
-        }
-
         .ph-trigger {
             height: 34px;
             padding: 0 13px;
@@ -4875,22 +4911,6 @@
         .dll-toast.collapsed .dll-toast-pill { display:block; }
     </style>
 
-    <!-- ── Update launcher button ── -->
-    <div id="updateLauncherWrap" style="display:none; position:fixed; top:16px; left:16px; margin-left:120px; z-index:499;">
-        <button id="installLauncherBtn" onclick="startDownloadUpdate()">
-            <span><i data-lucide="download"></i></span>
-            <span id="updateBtnText">Скачать обновление</span>
-        </button>
-        <div id="updateInlineProgress" style="display:none; margin-top:4px; width:100%;">
-            <div style="display:flex; justify-content:space-between; font-size:10px; color:rgba(255,200,80,0.8); margin-bottom:2px;">
-                <span id="updateProgressMsg">Подготовка...</span>
-                <span id="updateProgressPct">0%</span>
-            </div>
-            <div style="height:3px; background:rgba(255,165,0,0.15); border-radius:2px; overflow:hidden;">
-                <div id="updateProgressFill" style="height:100%; width:0%; background:rgba(255,165,0,0.7); border-radius:2px; transition:width 0.3s;"></div>
-            </div>
-        </div>
-    </div>
 
     <div id="container">
         <div class="interface">
@@ -4902,10 +4922,10 @@
                         <div class="version-stable" data-ver-badge onclick="onVersionBadgeClick(event, this)">
                             <span class="vs-prompt">$</span>
                             <span class="vs-arrow">ver</span>
-                            <span class="ver-num">v1.8.1</span>
+                            <span class="ver-num">v1.8.2</span>
                             <div class="version-tooltip">
                                 <div class="tt-header">
-                                    <span>Что нового в v1.8.1</span>
+                                    <span>Что нового в v1.8.2</span>
                                     <span>обновление</span>
                                 </div>
                                 <div class="tt-line tt-add"><i data-lucide="plus"></i>Кэширование серверов для быстрой загрузки</div>
@@ -4986,6 +5006,12 @@
                     <span class="news-handle-icon"><i data-lucide="newspaper"></i></span>
                     <span class="news-handle-label">Новости</span>
                     <span class="news-unread-badge" id="newsUnreadBadge">0</span>
+                </div>
+
+                <!-- ── Patch handle tab (below news handle) ── -->
+                <div id="updateLauncherWrap" class="patch-handle" style="display:none;" onclick="startDownloadUpdate()" title="Требуется установка патчей">
+                    <span class="patch-handle-icon" id="patchHandleIcon"><i data-lucide="download"></i></span>
+                    <span class="patch-handle-label" id="updateBtnText">Установка</span>
                 </div>
 
                 <div class="header">
@@ -5403,7 +5429,7 @@
                     <div class="debug-section-title" style="margin-top:10px;"><i data-lucide="monitor"></i> Лаунчер</div>
                     <div class="debug-row">
                         <span class="debug-label">Версия приложения</span>
-                        <span class="debug-value" id="dbgAppVersion">v1.8.1</span>
+                        <span class="debug-value" id="dbgAppVersion">v1.8.2</span>
                     </div>
                     <div class="debug-row">
                         <span class="debug-label">Конфиг</span>
@@ -5968,6 +5994,17 @@
         let _profiles = [];
         let _activeProfileId = null;
 
+        // Эскейп HTML для безопасной интерполяции доверенного контента (новости и т.п.)
+        function escapeHtml(s) {
+            if (s == null) return '';
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         async function _loadProfiles() {
             try {
                 if (window.pywebview && window.pywebview.api.get_profiles) {
@@ -6275,6 +6312,16 @@
             return lines.join('\n');
         }
 
+        // Единый диспетчер прогресса установки — предотвращает конфликты
+        // между patch-handle flow и legacy modal flow.
+        // Каждый flow регистрирует/снимает свой handler через глобальные переменные.
+        let _patchHandleProgressCb = null;
+        let _installModalProgressCb = null;
+        window._onLauncherInstallProgress = function(data) {
+            if (typeof _patchHandleProgressCb === 'function') _patchHandleProgressCb(data);
+            if (typeof _installModalProgressCb === 'function') _installModalProgressCb(data);
+        };
+
         async function init() {
             perfMark('init start');
 
@@ -6300,6 +6347,10 @@
             setTimeout(() => checkPatchesStatus(), 500);
 
             setInterval(loadServers, 300000);
+            // Примечание: interval ID не хранится намеренно — loadServers
+            // выполняется регулярно для обновления онлайна серверов.
+            // Внутри loadServers не затирается выбор пользователя (updateServerSelect
+            // вызывается только если data changed).
         }
 
         async function loadInitData() {
@@ -6339,20 +6390,39 @@
             if (!wrap) return;
 
             if (!pathsConfigured) {
-                wrap.style.display = 'block';
-                document.getElementById('updateBtnText').textContent = 'Установить лаунчер';
+                const icon = document.getElementById('patchHandleIcon');
+                const label = document.getElementById('updateBtnText');
+                icon.style.display = '';
+                icon.innerHTML = '<i data-lucide="download"></i>';
+                label.textContent = 'Установить';
+                label.style.display = '';
+                wrap.style.display = 'flex';
+                wrap.classList.add('pulse');
+                wrap.style.opacity = '1';
+                wrap.style.pointerEvents = '';
+                wrap.title = 'Требуется установка лаунчера';
                 if (typeof refreshLucideIcons === 'function') refreshLucideIcons();
                 return;
             }
 
             if (update && update.needs_update) {
-                wrap.style.display = 'block';
-                document.getElementById('updateBtnText').textContent = update.message || 'Скачать обновление';
+                const icon = document.getElementById('patchHandleIcon');
+                const label = document.getElementById('updateBtnText');
+                icon.style.display = '';
+                icon.innerHTML = '<i data-lucide="download"></i>';
+                label.textContent = 'Обновить';
+                label.style.display = '';
+                wrap.style.display = 'flex';
+                wrap.classList.add('pulse');
+                wrap.style.opacity = '1';
+                wrap.style.pointerEvents = '';
+                wrap.title = update.message || 'Требуется установка патчей';
                 if (typeof refreshLucideIcons === 'function') refreshLucideIcons();
                 return;
             }
 
             wrap.style.display = 'none';
+            wrap.classList.remove('pulse');
         }
 
         async function loadServersAndNews() {
@@ -6376,9 +6446,9 @@
                                     const newsId = 'news_' + idx + '_' + (news.title || '').replace(/\W/g, '').substring(0, 20);
                                     newsItem.dataset.newsId = newsId;
                                     newsItem.innerHTML = `
-                                        <div class="news-item-title">${news.title}</div>
-                                        <div class="news-item-content">${news.content}</div>
-                                        ${news.date ? `<div class="news-item-date">${news.date}</div>` : ''}
+                                        <div class="news-item-title">${escapeHtml(news.title)}</div>
+                                        <div class="news-item-content">${escapeHtml(news.content)}</div>
+                                        ${news.date ? `<div class="news-item-date">${escapeHtml(news.date)}</div>` : ''}
                                         <div class="news-item-link-hint"><i data-lucide="link"></i> Открыть релиз на GitHub</div>`;
                                     newsItem.addEventListener('click', () => {
                                         window.open('https://github.com/worteng/ArizonaLauncher/releases', '_blank');
@@ -6452,9 +6522,9 @@
                         const newsId = 'news_' + idx + '_' + (news.title || '').replace(/\W/g, '').substring(0, 20);
                         newsItem.dataset.newsId = newsId;
                         newsItem.innerHTML = `
-                            <div class="news-item-title">${news.title}</div>
-                            <div class="news-item-content">${news.content}</div>
-                            ${news.date ? `<div class="news-item-date">${news.date}</div>` : ''}
+                            <div class="news-item-title">${escapeHtml(news.title)}</div>
+                            <div class="news-item-content">${escapeHtml(news.content)}</div>
+                            ${news.date ? `<div class="news-item-date">${escapeHtml(news.date)}</div>` : ''}
                             <div class="news-item-link-hint"><i data-lucide="link"></i> Открыть релиз на GitHub</div>`;
                         newsItem.addEventListener('click', () => {
                             window.open('https://github.com/worteng/ArizonaLauncher/releases', '_blank');
@@ -6641,9 +6711,9 @@
                         const newsId = 'news_' + idx + '_' + (news.title || '').replace(/\W/g, '').substring(0, 20);
                         newsItem.dataset.newsId = newsId;
                         newsItem.innerHTML = `
-                            <div class="news-item-title">${news.title}</div>
-                            <div class="news-item-content">${news.content}</div>
-                            ${news.date ? `<div class="news-item-date">${news.date}</div>` : ''}
+                            <div class="news-item-title">${escapeHtml(news.title)}</div>
+                            <div class="news-item-content">${escapeHtml(news.content)}</div>
+                            ${news.date ? `<div class="news-item-date">${escapeHtml(news.date)}</div>` : ''}
                             <div class="news-item-link-hint"><i data-lucide="link"></i> Открыть релиз на GitHub</div>
                         `;
                         newsItem.addEventListener('click', () => {
@@ -6766,8 +6836,17 @@
             if (!wrap) return;
 
             if (!pathsConfigured) {
-                wrap.style.display = 'block';
-                document.getElementById('updateBtnText').textContent = 'Установить лаунчер';
+                const icon = document.getElementById('patchHandleIcon');
+                const label = document.getElementById('updateBtnText');
+                icon.style.display = '';
+                icon.innerHTML = '<i data-lucide="download"></i>';
+                label.textContent = 'Установить';
+                label.style.display = '';
+                wrap.style.display = 'flex';
+                wrap.classList.add('pulse');
+                wrap.style.opacity = '1';
+                wrap.style.pointerEvents = '';
+                wrap.title = 'Требуется установка лаунчера';
                 if (typeof refreshLucideIcons === 'function') refreshLucideIcons();
                 return;
             }
@@ -6776,8 +6855,17 @@
                 if (window.pywebview && window.pywebview.api.check_update_api) {
                     const result = await window.pywebview.api.check_update_api(gamePath);
                     if (result.success && result.needs_update) {
-                        wrap.style.display = 'block';
-                        document.getElementById('updateBtnText').textContent = result.message || 'Скачать обновление';
+                        const icon = document.getElementById('patchHandleIcon');
+                        const label = document.getElementById('updateBtnText');
+                        icon.style.display = '';
+                        icon.innerHTML = '<i data-lucide="download"></i>';
+                        label.textContent = 'Обновить';
+                        label.style.display = '';
+                        wrap.style.display = 'flex';
+                        wrap.classList.add('pulse');
+                        wrap.style.opacity = '1';
+                        wrap.style.pointerEvents = '';
+                        wrap.title = result.message || 'Требуется установка патчей';
                         if (typeof refreshLucideIcons === 'function') refreshLucideIcons();
                         return;
                     }
@@ -6787,6 +6875,7 @@
             }
 
             wrap.style.display = 'none';
+            wrap.classList.remove('pulse');
         }
 
         function handleServerChange() {
@@ -8783,48 +8872,80 @@
 
         // ── Inline update flow (без модалки) ──
         let _updateDownloading = false;
+
+        // Сбрасывает временные стили патч-хендла, накатанные во время загрузки.
+        // Финальное состояние (скрыть/показать) восстанавливается следующим
+        // вызовом checkLauncherInstallation().
+        function resetPatchHandle() {
+            const wrap = document.getElementById('updateLauncherWrap');
+            const icon = document.getElementById('patchHandleIcon');
+            const label = document.getElementById('updateBtnText');
+            if (wrap) {
+                wrap.style.removeProperty('--patch-progress');
+                wrap.style.removeProperty('background');
+                wrap.style.removeProperty('border-color');
+                wrap.style.removeProperty('opacity');
+                wrap.style.removeProperty('pointer-events');
+                wrap.classList.remove('pulse');
+            }
+            if (icon) {
+                icon.style.display = '';
+                icon.innerHTML = '<i data-lucide="download"></i>';
+            }
+            if (label) {
+                label.style.removeProperty('font-family');
+                label.style.removeProperty('font-size');
+                label.style.display = '';
+            }
+            if (typeof refreshLucideIcons === 'function') refreshLucideIcons();
+        }
+
         async function startDownloadUpdate() {
             if (_updateDownloading) return;
             _updateDownloading = true;
 
             const wrap = document.getElementById('updateLauncherWrap');
-            const btn = document.getElementById('installLauncherBtn');
-            const progress = document.getElementById('updateInlineProgress');
-            const fill = document.getElementById('updateProgressFill');
-            const msg = document.getElementById('updateProgressMsg');
-            const pct = document.getElementById('updateProgressPct');
-            const btnText = document.getElementById('updateBtnText');
+            const icon = document.getElementById('patchHandleIcon');
+            const label = document.getElementById('updateBtnText');
 
-            btn.disabled = true;
-            progress.style.display = 'block';
-            msg.textContent = 'Подключение...';
-            pct.textContent = '0%';
-            fill.style.width = '0%';
+            wrap.style.pointerEvents = 'none';
+            wrap.style.opacity = '0.85';
+            wrap.style.setProperty('--patch-progress', '0%');
+            icon.style.display = 'none';
+            label.style.fontFamily = "'Consolas', monospace";
+            label.style.fontSize = '12px';
+            label.textContent = '0%';
 
-            // Коллбэк прогресса для inline
-            window._onLauncherInstallProgress = function(data) {
-                msg.textContent = data.message || '';
-                pct.textContent = data.progress + '%';
-                fill.style.width = data.progress + '%';
+            // Коллбэк прогресса для inline (регистрируется в хабе)
+            _patchHandleProgressCb = function(data) {
+                const pct = data.progress || 0;
+                wrap.style.setProperty('--patch-progress', pct + '%');
+                label.textContent = pct + '%';
 
                 if (data.stage === 'done') {
-                    fill.style.background = 'rgba(130,220,150,0.8)';
-                    msg.textContent = 'Готово!';
-                    pct.textContent = '100%';
-                    fill.style.width = '100%';
-                    btnText.textContent = 'Установлено';
+                    wrap.style.setProperty('--patch-progress', '100%');
+                    wrap.style.background = 'rgba(130, 220, 150, 0.42)';
+                    wrap.style.borderColor = 'rgba(130, 220, 150, 0.55)';
+                    label.textContent = '✓';
+                    label.style.fontSize = '16px';
                     showNotification('<i data-lucide="check-circle"></i> Обновление установлено!', 'success');
                     setTimeout(() => {
                         checkLauncherInstallation(true);
+                        resetPatchHandle();
                         _updateDownloading = false;
+                        _patchHandleProgressCb = null;
                     }, 1500);
                 } else if (data.stage === 'error') {
-                    fill.style.background = 'rgba(255,80,80,0.8)';
-                    msg.textContent = 'Ошибка: ' + data.message;
-                    btn.disabled = false;
-                    btnText.textContent = 'Повторить';
+                    wrap.style.background = 'rgba(255, 80, 80, 0.42)';
+                    wrap.style.borderColor = 'rgba(255, 80, 80, 0.55)';
+                    label.textContent = '✕';
+                    label.style.fontSize = '16px';
                     showNotification('Ошибка: ' + data.message, 'error');
-                    setTimeout(() => { _updateDownloading = false; }, 2000);
+                    setTimeout(() => {
+                        resetPatchHandle();
+                        _updateDownloading = false;
+                        _patchHandleProgressCb = null;
+                    }, 2000);
                 }
             };
 
@@ -8832,20 +8953,19 @@
                 if (window.pywebview && window.pywebview.api.download_update_api) {
                     const result = await window.pywebview.api.download_update_api();
                     if (!result.success) {
-                        msg.textContent = result.message || 'Ошибка';
-                        btn.disabled = false;
-                        btnText.textContent = 'Повторить';
+                        wrap.style.background = 'rgba(255, 80, 80, 0.42)';
+                        wrap.style.borderColor = 'rgba(255, 80, 80, 0.55)';
+                        label.textContent = '✕';
+                        label.style.fontSize = '16px';
                         showNotification(result.message, 'error');
-                        _updateDownloading = false;
+                        setTimeout(() => { resetPatchHandle(); _updateDownloading = false; }, 2000);
                     }
                 } else {
-                    msg.textContent = 'pywebview недоступен';
-                    btn.disabled = false;
+                    resetPatchHandle();
                     _updateDownloading = false;
                 }
             } catch (e) {
-                msg.textContent = 'Ошибка: ' + e.message;
-                btn.disabled = false;
+                resetPatchHandle();
                 _updateDownloading = false;
             }
         }
@@ -8965,6 +9085,7 @@
         };
 
         function closeInstallModal() {
+            _installModalProgressCb = null;  // снимаем handler из хаба
             const overlay = document.getElementById('installOverlay');
             _closeWithAnim(overlay, () => {
                 overlay.classList.remove('open');
@@ -9043,7 +9164,8 @@
             _setInstallStep('dl');
 
             // Регистрируем коллбэк прогресса
-            window._onLauncherInstallProgress = function(data) {
+            // Регистрируем коллбэк прогресса для модалки установки (в хабе)
+            _installModalProgressCb = function(data) {
                 const fill = document.getElementById('installProgressFill');
                 document.getElementById('installProgressMsg').textContent = data.message || '';
                 document.getElementById('installProgressPct').textContent = data.progress + '%';
@@ -9078,6 +9200,7 @@
                     document.getElementById('installStartBtn').innerHTML = '<i data-lucide="refresh-cw"></i> Повторить';
                     document.getElementById('installCloseBtn').style.display = '';
                     showNotification('Ошибка: ' + data.message, 'error');
+                    _installModalProgressCb = null;
                 }
             };
 
@@ -10258,15 +10381,32 @@
                     return;
                 }
 
-                // Обработка .json — патчи
-                jsonFiles.forEach(function (file) {
-                    const reader = new FileReader();
-                    reader.onload = async function (evt) {
-                        const bytes = new Uint8Array(evt.target.result);
-                        let binary = '';
-                        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-                        const b64 = btoa(binary);
+                // Лимит размера: 5 МБ на файл (base64 = ~6.7 МБ в памяти)
+                const MAX_FILE_SIZE = 5 * 1024 * 1024;
+                for (const f of files) {
+                    if (f.size > MAX_FILE_SIZE) {
+                        showNotification(`Файл "${f.name}" слишком большой (${(f.size / 1024 / 1024).toFixed(1)} МБ, лимит 5 МБ)`, 'error');
+                        return;
+                    }
+                }
+
+                // Хелпер: ArrayBuffer → base64 (без O(n²) конкатенации строк)
+                function _arrayBufferToBase64(buffer) {
+                    const bytes = new Uint8Array(buffer);
+                    let binary = '';
+                    const chunkSize = 8192;
+                    for (let i = 0; i < bytes.length; i += chunkSize) {
+                        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+                    }
+                    return btoa(binary);
+                }
+
+                // Обработка .json — патчи (последовательно)
+                (async function processJsonFiles() {
+                    for (const file of jsonFiles) {
                         try {
+                            const buffer = await file.arrayBuffer();
+                            const b64 = _arrayBufferToBase64(buffer);
                             let result;
                             if (window.pywebview && window.pywebview.api.install_patches_file) {
                                 result = await window.pywebview.api.install_patches_file(file.name, b64);
@@ -10281,20 +10421,14 @@
                         } catch (err) {
                             showNotification('Ошибка установки патчей', 'error');
                         }
-                    };
-                    reader.readAsArrayBuffer(file);
-                });
+                    }
+                })();
 
                 luaFiles.forEach(function (file) {
                     const reader = new FileReader();
                     reader.onload = async function (evt) {
-                        // Преобразуем ArrayBuffer → base64
-                        const bytes = new Uint8Array(evt.target.result);
-                        let binary = '';
-                        for (let i = 0; i < bytes.byteLength; i++) {
-                            binary += String.fromCharCode(bytes[i]);
-                        }
-                        const b64 = btoa(binary);
+                        // Преобразуем ArrayBuffer → base64 (chunked)
+                        const b64 = _arrayBufferToBase64(evt.target.result);
 
                         try {
                             let result;
@@ -10720,7 +10854,7 @@
                         _setDebugEl('dbgPythonVersion',  d.python_version  || '—');
                         
                         // Лаунчер
-                        _setDebugEl('dbgAppVersion',     d.app_version     || 'v1.8.1');
+                        _setDebugEl('dbgAppVersion',     d.app_version     || 'v1.8.2');
                         _setDebugEl('dbgConfigPath',     d.config_path     || '—');
                         _setDebugEl('dbgDocsPath',       d.docs_path       || '—');
                         
@@ -10752,7 +10886,7 @@
             _setDebugEl('dbgOsVersion',         'Доступно только в приложении');
             _setDebugEl('dbgArchitecture',      'Доступно только в приложении');
             _setDebugEl('dbgPythonVersion',     'Доступно только в приложении');
-            _setDebugEl('dbgAppVersion',        'v1.8.1');
+            _setDebugEl('dbgAppVersion',        'v1.8.2');
             _setDebugEl('dbgConfigPath',        'Доступно только в приложении');
             _setDebugEl('dbgDocsPath',          'Доступно только в приложении');
             _setDebugEl('dbgGamePath',          'Доступно только в приложении');
@@ -10920,7 +11054,7 @@
                     <div class="fl-welcome-ver">
                         Arizona RP Launcher · 
                         <div class="version-stable">
-                            <span class="version-stable-text">v1.8.1</span>
+                            <span class="version-stable-text">v1.8.2</span>
                         </div>
                     </div>
                     <div class="fl-welcome-desc">Неофициальный лаунчер с расширенными возможностями: профили, темы, моды и многое другое. Давай быстро настроим всё для тебя.</div>
@@ -11418,7 +11552,7 @@
         }
         function triggerVersionEasterEgg(outputEl, badgeEl) {
             const messages = [
-                '> ArizonaLauncher v1.8.1',
+                '> ArizonaLauncher v1.8.2',
                 '> by halfik (worteng) · 2026',
                 '> open source: github.com/worteng/ArizonaLauncher',
                 '> # передаю привет Эиру',

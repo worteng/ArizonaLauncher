@@ -3,10 +3,12 @@ from pathlib import Path
 from threading import Thread
 import threading
 import urllib3
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Enable remote debugging for CDP (Chrome DevTools Protocol)
-webview.settings['REMOTE_DEBUGGING_PORT'] = 9222
+# Включаем CDP-отладку только при явном запросе через переменную окружения.
+# По умолчанию (релиз) — выключено, чтобы не открывать порт 9222 локально.
+if os.environ.get('ARIZONA_LAUNCHER_DEBUG') == '1':
+    webview.settings['REMOTE_DEBUGGING_PORT'] = 9222
 
 # PyQt5 — единый импорт для всех Qt-диалогов (избегаем дублирования внутри методов)
 try:
@@ -19,7 +21,7 @@ except ImportError:
     _HAS_QT = False
 
 # Версия лаунчера
-LAUNCHER_VERSION = "v1.8.1"
+LAUNCHER_VERSION = "v1.8.2"
 
 # Лимиты для безопасной распаковки архивов
 _MAX_ZIP_FILES    = 5000    # макс. количество файлов в архиве
@@ -88,8 +90,21 @@ def _safe_extract(zf, dest_dir):
     # Все проверки пройдены — безопасно распаковываем
     zf.extractall(dest_real)
 
+
+def _safe_basename(name: str) -> str:
+    """Очищает имя файла: оставляет только basename, затем проверяет whitelist.
+    Возвращает безопасное имя или вызывает ValueError."""
+    if not name or not name.strip():
+        raise ValueError("Пустое имя файла")
+    cleaned = os.path.basename(name)
+    if not cleaned or cleaned in ('.', '..'):
+        raise ValueError(f"Недопустимое имя файла: {name}")
+    if not re.fullmatch(r'^[A-Za-z0-9._\- ()]+$', cleaned):
+        raise ValueError(f"Недопустимые символы в имени файла: {cleaned}")
+    return cleaned
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
-                    handlers=[logging.FileHandler('arizona_launcher.log'), logging.StreamHandler()])
+                    handlers=[logging.FileHandler(os.path.join(_get_app_dir(), 'arizona_launcher.log')), logging.StreamHandler()])
 logger = logging.getLogger(__name__)
 
 class ArizonaLauncher:
@@ -97,6 +112,9 @@ class ArizonaLauncher:
         self.documents_path = str(Path.home() / "Documents" / "ArizonaLauncher")
         Path(self.documents_path).mkdir(parents=True, exist_ok=True)
         self.config_path = os.path.join(self.documents_path, "config.json")
+        # Блокировка для безопасного доступа к config из разных потоков
+        # (autocheck daemon, resize Timer, JS-API worker).
+        self._cfg_lock = threading.RLock()
         self.config = self.load_config()
         self.game_path = self.config.get('game_path', '')
         self.launcher_path = self.config.get('launcher_path', '')
@@ -118,26 +136,40 @@ class ArizonaLauncher:
                                       'show_dialog_ids': False, 'offcef': False, 'modern_scale': False,
                                       'trees_new': False},
                     'launcher_settings': {'bg_image': None}}
-        if os.path.exists(self.config_path):
-            try:
-                with open(self.config_path, 'r', encoding='utf-8') as f:
-                    cfg = json.load(f)
-                    for k, v in defaults.items():
-                        if k not in cfg: cfg[k] = v
-                    if 'launch_params' in cfg:
-                        for k, v in defaults['launch_params'].items():
-                            if k not in cfg['launch_params']: cfg['launch_params'][k] = v
-                    if 'launcher_settings' in cfg:
-                        for k, v in defaults['launcher_settings'].items():
-                            if k not in cfg['launcher_settings']: cfg['launcher_settings'][k] = v
-                    return cfg
-            except Exception as e: logger.error(f"Config load error: {e}")
-        return defaults
+        with self._cfg_lock:
+            if os.path.exists(self.config_path):
+                try:
+                    with open(self.config_path, 'r', encoding='utf-8') as f:
+                        cfg = json.load(f)
+                        for k, v in defaults.items():
+                            if k not in cfg: cfg[k] = v
+                        if 'launch_params' in cfg:
+                            for k, v in defaults['launch_params'].items():
+                                if k not in cfg['launch_params']: cfg['launch_params'][k] = v
+                        if 'launcher_settings' in cfg:
+                            for k, v in defaults['launcher_settings'].items():
+                                if k not in cfg['launcher_settings']: cfg['launcher_settings'][k] = v
+                        return cfg
+                except Exception as e: logger.error(f"Config load error: {e}")
+            return defaults
 
     def save_config(self):
-        try:
-            with open(self.config_path, 'w', encoding='utf-8') as f: json.dump(self.config, f, indent=2, ensure_ascii=False)
-        except Exception as e: logger.error(f"Config save error: {e}")
+        # Атомарная запись: пишем во временный файл и переименовываем.
+        # Блокировка исключает чередующуюся запись из разных потоков.
+        with self._cfg_lock:
+            tmp_path = self.config_path + '.tmp'
+            try:
+                with open(tmp_path, 'w', encoding='utf-8') as f:
+                    json.dump(self.config, f, indent=2, ensure_ascii=False)
+                os.replace(tmp_path, self.config_path)
+            except Exception as e:
+                logger.error(f"Config save error: {e}")
+                # Чистим temp-файл при ошибке
+                try:
+                    if os.path.exists(tmp_path):
+                        os.remove(tmp_path)
+                except Exception:
+                    pass
 
     def auto_detect_game_paths(self):
         """Быстрый поиск по известным путям установки Arizona Games Launcher."""
@@ -313,15 +345,21 @@ class ArizonaLauncher:
         try:
             self.kill_all_launchers()
             proc = subprocess.Popen(cmd, cwd=os.path.dirname(self.launcher_path), creationflags=subprocess.CREATE_NO_WINDOW)
-            # Poll до 2 секунд, чтобы убедиться, что процесс жив и не крашнулся
+            # Poll до 2 секунд, чтобы убедиться, что процесс жив и не крашнулся.
+            # ВАЖНО: stub-лаунчеры (Air v6/v7/v8) могут завершиться с кодом 0
+            # сразу после spawning дочернего процесса игры — это НЕ краш.
             deadline = time.time() + 2.0
-            alive = True
+            exit_code = None
             while time.time() < deadline:
-                if proc.poll() is not None:
-                    alive = False
+                rc = proc.poll()
+                if rc is not None:
+                    exit_code = rc
                     break
                 time.sleep(0.1)
-            if alive and proc.poll() is None:
+            rc_now = proc.poll()
+
+            # Успех: процесс либо ещё жив, либо завершился с кодом 0 (stub).
+            if (rc_now is None) or rc_now == 0:
                 self.config['last_nickname'] = nickname
                 if server_data: self.config['last_server'] = server_data.get('number')
                 self.config['launch_params'] = params
@@ -329,7 +367,7 @@ class ArizonaLauncher:
                 # Detach: пусть ОС перехватит handle, не держим зомби
                 return {"success": True, "message": f"Launching for {nickname}", "pid": proc.pid}
             else:
-                return {"success": False, "message": "Launcher crashed immediately",
+                return {"success": False, "message": f"Launcher crashed (exit code {rc_now})",
                         "code": "LAUNCHER_CRASHED"}
         except Exception as e:
             logger.error(f"launch_game: {e}")
@@ -427,8 +465,15 @@ class ArizonaLauncher:
     def restore_patches_backup(self, filename: str):
         """Восстанавливает патчи из бэкапа."""
         try:
+            # Защита от path traversal: имя файла не должно содержать разделителей/относительных путей.
+            if not filename or '/' in filename or '\\' in filename or filename in ('.', '..'):
+                return {"success": False, "message": "Недопустимое имя файла"}
             backup_dir = Path(self.documents_path) / "backups"
             backup_path = backup_dir / filename
+            # Двойная проверка: реальный путь не должен выйти за пределы backup_dir.
+            if os.path.realpath(backup_path) != os.path.realpath(os.path.join(str(backup_dir), filename)) \
+                    or os.path.commonpath([os.path.realpath(str(backup_path)), os.path.realpath(str(backup_dir))]) != os.path.realpath(str(backup_dir)):
+                return {"success": False, "message": "Недопустимое имя файла"}
             if not backup_path.exists():
                 return {"success": False, "message": f"Бэкап не найден: {filename}"}
             with open(backup_path, 'r', encoding='utf-8') as f:
@@ -448,8 +493,13 @@ class ArizonaLauncher:
     def delete_patches_backup(self, filename: str):
         """Удаляет конкретный бэкап."""
         try:
+            # Защита от path traversal
+            if not filename or '/' in filename or '\\' in filename or filename in ('.', '..'):
+                return {"success": False, "message": "Недопустимое имя файла"}
             backup_dir = Path(self.documents_path) / "backups"
             backup_path = backup_dir / filename
+            if os.path.realpath(str(backup_path)) != os.path.realpath(os.path.join(str(backup_dir), filename)):
+                return {"success": False, "message": "Недопустимое имя файла"}
             if not backup_path.exists():
                 return {"success": False, "message": "Файл не найден"}
             backup_path.unlink()
@@ -711,7 +761,7 @@ class ArizonaLauncher:
         """Проверяет доступен ли архив патчей на GitHub (HEAD-запрос)."""
         url = self._get_patches_download_url(version)
         try:
-            resp = requests.head(url, timeout=10, verify=False, allow_redirects=True, headers={"User-Agent": "Mozilla/5.0"})
+            resp = requests.head(url, timeout=10, allow_redirects=True, headers={"User-Agent": "Mozilla/5.0"})
             if resp.status_code == 200:
                 return {"success": True, "available": True, "url": url, "version": version}
             else:
@@ -728,13 +778,12 @@ class ArizonaLauncher:
         """
         url = "https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/patches/version.txt"
         try:
-            resp = requests.get(url, timeout=15, verify=False, headers={"User-Agent": "Mozilla/5.0"})
+            resp = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
             try:
                 version = resp.content.decode('utf-8').strip()
             except UnicodeDecodeError:
                 version = resp.content.decode('windows-1251', errors='replace').strip()
             if resp.status_code == 200:
-                version = resp.text.strip()
                 if version and version.startswith('v'):
                     return {
                         "success": True,
@@ -770,10 +819,13 @@ class ArizonaLauncher:
         _send("download", 0, "Подключение к GitHub...")
         
         try:
-            # 1. Скачивание
+            # 1. Скачивание (используем вычисленный URL для запрошенной версии)
+            if not download_url:
+                _send("error", 0, "Не удалось определить URL загрузки для версии")
+                return {"success": False, "message": f"Нет URL для версии {version}"}
             resp = requests.get(
-                f"https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/patches/arizonapatches_v2.zip",
-                stream=True, timeout=60, verify=False,
+                download_url,
+                stream=True, timeout=60,
                 headers={"User-Agent": "Mozilla/5.0"}
             )
             if resp.status_code != 200:
@@ -782,10 +834,11 @@ class ArizonaLauncher:
             
             total = int(resp.headers.get("content-length", 0))
             downloaded = 0
-            
             import tempfile
-            tmp_zip = os.path.join(tempfile.gettempdir(), "arizonapatches_install.zip")
-            
+            # Уникальное имя файла, чтобы исключить symlink/TOCTOU атаки
+            tmp_fd, tmp_zip = tempfile.mkstemp(suffix='.zip', prefix='arizonapatches_install_')
+            os.close(tmp_fd)
+
             with open(tmp_zip, "wb") as f:
                 for chunk in resp.iter_content(chunk_size=65536):
                     if chunk:
@@ -839,14 +892,14 @@ class ArizonaLauncher:
             self._remove_disabled_dll(dll_path)
             
             # Обновляем версию в конфиге
-            self.config['patches_version'] = "v2"
+            self.config['patches_version'] = version
             self.config['patches_last_check'] = int(time.time())
             self.save_config()
-            
+
             _send("done", 100, "Патчи успешно установлены!")
-            logger.info(f"[download_and_install_patches] Патчи v2 установлены в {plugins_real}")
-            
-            return {"success": True, "message": "Патчи успешно установлены", "version": "v2"}
+            logger.info(f"[download_and_install_patches] Патчи {version} установлены в {plugins_real}")
+
+            return {"success": True, "message": "Патчи успешно установлены", "version": version}
             
         except requests.exceptions.ConnectionError as e:
             _send("error", 0, "Нет подключения к интернету")
@@ -870,16 +923,19 @@ class WebViewApp:
         """Запускает фоновую проверку обновлений патчей каждые 3 часа."""
         def _check():
             try:
-                last_check = self.launcher.config.get('patches_last_check', 0)
+                with self.launcher._cfg_lock:
+                    last_check = self.launcher.config.get('patches_last_check', 0)
                 if time.time() - last_check > 10800:  # 3 часа = 10800 сек
                     logger.info("[autocheck] Проверка обновлений патчей...")
                     result = self.launcher.get_patches_latest_version()
                     if result.get("success"):
                         latest = result.get("version")
-                        installed = self.launcher.config.get('patches_version')
+                        with self.launcher._cfg_lock:
+                            installed = self.launcher.config.get('patches_version')
                         if latest and latest != installed:
                             # Есть новая версия
-                            self.launcher.config['patches_update_available'] = latest
+                            with self.launcher._cfg_lock:
+                                self.launcher.config['patches_update_available'] = latest
                             logger.info(f"[autocheck] Доступна новая версия патчей: {latest} (установлено: {installed})")
                             # Отправляем событие в JS если окно уже есть
                             try:
@@ -890,8 +946,9 @@ class WebViewApp:
                             except Exception:
                                 pass
                     # Обновляем время проверки
-                    self.launcher.config['patches_last_check'] = int(time.time())
-                    self.launcher.save_config()
+                    with self.launcher._cfg_lock:
+                        self.launcher.config['patches_last_check'] = int(time.time())
+                        self.launcher.save_config()
             except Exception as e:
                 logger.warning(f"autocheck patches error: {e}")
         
@@ -1616,13 +1673,6 @@ class WebViewApp:
         logger.info(f"[download_and_install_launcher] Целевые exe файлы: {TARGET_EXE_NAMES}")
         logger.info(f"[download_and_install_launcher] Архив зашифрован: {ZIP_PASSWORD is not None}")
         import zipfile, tempfile, shutil
-        if ZIP_PASSWORD is not None:
-            try:
-                import pyzipper
-            except ImportError:
-                logger.error("[download_and_install_launcher] pyzipper не установлен, требуется для v8")
-                _send("error", 0, "pyzipper не установлен (pip install pyzipper)")
-                return {"success": False, "message": "pyzipper required for encrypted archives"}
 
         def _send(stage, progress=0, message=""):
             try:
@@ -1632,6 +1682,14 @@ class WebViewApp:
                     w.evaluate_js(js)
             except Exception as ex:
                 logger.warning(f"_send progress error: {ex}")
+
+        if ZIP_PASSWORD is not None:
+            try:
+                import pyzipper
+            except ImportError:
+                logger.error("[download_and_install_launcher] pyzipper не установлен, требуется для v8")
+                _send("error", 0, "pyzipper не установлен (pip install pyzipper)")
+                return {"success": False, "message": "pyzipper required for encrypted archives"}
 
         try:
             # 0. При установке новой версии — удалить старые exe лаунчеров
@@ -1658,7 +1716,7 @@ class WebViewApp:
             _send("download", 0, "Подключение к GitHub...")
 
             # 1. Качаем архив с прогрессом
-            resp = requests.get(GITHUB_RELEASE_URL, stream=True, timeout=60, verify=False,
+            resp = requests.get(GITHUB_RELEASE_URL, stream=True, timeout=60,
                                 headers={"User-Agent": "Mozilla/5.0"})
             if resp.status_code != 200:
                 logger.error(f"[download_and_install_launcher] Ошибка HTTP: {resp.status_code}")
@@ -1669,7 +1727,8 @@ class WebViewApp:
             downloaded = 0
             logger.info(f"[download_and_install_launcher] Размер архива: {total / 1024 / 1024:.2f} МБ")
 
-            tmp_zip = os.path.join(tempfile.gettempdir(), "arizona_launcher_install.zip")
+            tmp_fd, tmp_zip = tempfile.mkstemp(suffix='.zip', prefix='arizona_launcher_install_')
+            os.close(tmp_fd)
             logger.info(f"[download_and_install_launcher] Временный файл: {tmp_zip}")
             
             with open(tmp_zip, "wb") as f:
@@ -2103,7 +2162,7 @@ class WebViewApp:
                     local_path = cache_dir / f"server_{server_id}{ext}"
                     if local_path.exists() and local_path.stat().st_size > 0:
                         continue
-                    resp = requests.get(icon_url, timeout=10, verify=False)
+                    resp = requests.get(icon_url, timeout=10)
                     if resp.status_code == 200 and resp.content:
                         with open(local_path, 'wb') as f:
                             f.write(resp.content)
@@ -2138,8 +2197,7 @@ class WebViewApp:
         try:
             resp = requests.get(
                 "https://arizona-ping.react.group/desktop/ping/Arizona/ping.json",
-                timeout=10, headers=headers, verify=False
-            )
+                timeout=10, headers=headers            )
             # 304 Not Modified — отдаём кэшированные данные
             if resp.status_code == 304 and cached:
                 cached['ts'] = now
@@ -2211,8 +2269,7 @@ class WebViewApp:
                         "Cache-Control": "no-cache",
                         "Pragma": "no-cache",
                         "User-Agent": "Mozilla/5.0"
-                    },
-                    verify=False  # отключаем SSL проверку (частая проблема)
+                    }
                 )
                 try:
                     text = response.content.decode('utf-8')
@@ -2324,7 +2381,7 @@ class WebViewApp:
         CONFIGS_URL = "https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/configs.txt"
         try:
             logger.info(f"fetch_patch_presets: запрос {CONFIGS_URL}")
-            resp = requests.get(CONFIGS_URL, timeout=10, headers={"Cache-Control": "no-cache"}, verify=False)
+            resp = requests.get(CONFIGS_URL, timeout=10, headers={"Cache-Control": "no-cache"})
             try:
                 text = resp.content.decode('utf-8')
             except UnicodeDecodeError:
@@ -2378,7 +2435,7 @@ class WebViewApp:
         if not self.launcher.patches_path:
             return {"success": False, "message": "Путь к патчам не установлен. Сначала укажи путь к игре."}
         try:
-            resp = requests.get(url, timeout=15, verify=False)
+            resp = requests.get(url, timeout=15)
             resp.encoding = 'utf-8'
             if resp.status_code != 200:
                 return {"success": False, "message": f"Ошибка загрузки: HTTP {resp.status_code}", "stage": "downloading"}
@@ -2496,7 +2553,7 @@ class WebViewApp:
         for url in (MOONLOADER_URL, FALLBACK_URL):
             try:
                 logger.info(f"fetch_moonloader_catalog: запрос {url}")
-                resp = requests.get(url, timeout=10, headers={"Cache-Control": "no-cache"}, verify=False)
+                resp = requests.get(url, timeout=10, headers={"Cache-Control": "no-cache"})
                 try:
                     text = resp.content.decode('utf-8')
                 except UnicodeDecodeError:
@@ -2516,8 +2573,18 @@ class WebViewApp:
 
     @staticmethod
     def _fix_mojibake(text):
-        """Исправляет двойное кодирование: UTF-8 → CP1251 → UTF-8"""
+        """Исправляет двойное кодирование: UTF-8 → CP1251 → UTF-8.
+
+        Применяется ТОЛЬКО когда вход содержит явные маркеры mojibake —
+        символы Ð/Ñ (0xC3 0x90/0xC3 0x91 в UTF-8, показанные как Latin-1).
+        Если вход уже валидный UTF-8 с кириллицей — возвращаем как есть,
+        чтобы не испортить корректный текст."""
         if not text:
+            return text
+        # Маркер mojibake: латинские Ð (U+00D0) или Ñ (U+00D1), за которыми
+        # идёт другой символ из диапазона 0x80-0xBF. Эти последовательности
+        # не встречаются в нормальном русском тексте.
+        if not re.search(r'[\u00C0-\u00DF][\u0080-\u00BF]', text):
             return text
         try:
             fixed = text.encode('cp1251').decode('utf-8')
@@ -2548,10 +2615,11 @@ class WebViewApp:
         if not ml_dir:
             return {"success": False, "message": "Папка moonloader не найдена. Сначала укажи путь к игре."}
         try:
-            resp = requests.get(url, timeout=30, verify=False)
+            resp = requests.get(url, timeout=30)
             if resp.status_code != 200:
                 return {"success": False, "message": f"Ошибка загрузки: HTTP {resp.status_code}"}
-            dest = os.path.join(ml_dir, filename)
+            safe_name = _safe_basename(filename)
+            dest = os.path.join(ml_dir, safe_name)
             with open(dest, 'wb') as f:
                 f.write(resp.content)
             return {"success": True, "message": f"Установлен: {filename}"}
@@ -2566,7 +2634,7 @@ class WebViewApp:
         LIBRARIES_URL = "https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/libraries.txt"
         try:
             resp = requests.get(LIBRARIES_URL, timeout=10,
-                                headers={"Cache-Control": "no-cache"}, verify=False)
+                                headers={"Cache-Control": "no-cache"})
             try:
                 text = resp.content.decode('utf-8')
             except UnicodeDecodeError:
@@ -2616,12 +2684,14 @@ class WebViewApp:
             if any(l["name"] == name for l in installed):
                 logger.info(f"install_library: {name} уже установлена, пропускаю")
                 return {"success": True, "skipped": True, "message": f"Библиотека {name} уже установлена"}
-            resp = requests.get(url, timeout=30, verify=False)
+            resp = requests.get(url, timeout=30)
             if resp.status_code != 200:
                 return {"success": False, "message": f"Ошибка загрузки: HTTP {resp.status_code}"}
             # Сохраняем во временный файл
             import tempfile, zipfile, io
-            tmp = os.path.join(tempfile.gettempdir(), f'{name}_lib.zip')
+            safe_name = _safe_basename(name)
+            tmp_fd, tmp = tempfile.mkstemp(suffix='.zip', prefix=f'{safe_name}_lib_')
+            os.close(tmp_fd)
             with open(tmp, 'wb') as f:
                 f.write(resp.content)
             # Распаковываем если это zip
@@ -2630,7 +2700,7 @@ class WebViewApp:
                     _safe_extract(z, lib_dir)
             else:
                 # Просто копируем файл
-                dest = os.path.join(lib_dir, name)
+                dest = os.path.join(lib_dir, safe_name)
                 with open(tmp, 'rb') as src, open(dest, 'wb') as dst:
                     dst.write(src.read())
             os.remove(tmp)
@@ -2748,7 +2818,7 @@ class WebViewApp:
         OTHERS_URL = "https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/others.txt"
         try:
             resp = requests.get(OTHERS_URL, timeout=10,
-                                headers={"Cache-Control": "no-cache"}, verify=False)
+                                headers={"Cache-Control": "no-cache"})
             try:
                 text = resp.content.decode('utf-8')
             except UnicodeDecodeError:
@@ -2775,10 +2845,11 @@ class WebViewApp:
         if err:
             return {"success": False, "message": err}
         try:
-            resp = requests.get(url, timeout=30, verify=False)
+            resp = requests.get(url, timeout=30)
             if resp.status_code != 200:
                 return {"success": False, "message": f"Ошибка загрузки: HTTP {resp.status_code}"}
-            out_path = os.path.join(dest_dir, filename)
+            safe_name = _safe_basename(filename)
+            out_path = os.path.join(dest_dir, safe_name)
             with open(out_path, 'wb') as f:
                 f.write(resp.content)
             logger.info(f"install_other_file: {out_path}")
@@ -2793,7 +2864,8 @@ class WebViewApp:
         if err:
             return {"success": False, "message": err}
         try:
-            file_path = os.path.join(dest_dir, filename)
+            safe_name = _safe_basename(filename)
+            file_path = os.path.join(dest_dir, safe_name)
             if not os.path.exists(file_path):
                 return {"success": False, "message": f"Файл не найден: {file_path}"}
             os.remove(file_path)
@@ -2856,7 +2928,8 @@ class WebViewApp:
             return {"success": False, "message": "Папка moonloader не найдена. Сначала укажи путь к игре."}
         try:
             content = _b64.b64decode(content_b64)
-            dest = os.path.join(ml_dir, filename)
+            safe_name = _safe_basename(filename)
+            dest = os.path.join(ml_dir, safe_name)
             with open(dest, 'wb') as f:
                 f.write(content)
             logger.info(f"install_lua_file: {dest}")
@@ -2892,10 +2965,16 @@ def _check_vcredist() -> bool:
                     if installed == 1:
                         return True
             except OSError:
+                # Ключ отсутствует — продолжаем поиск
                 continue
         return False
-    except Exception:
-        return True  # если не Windows или ошибка — не блокируем
+    except ImportError:
+        # winreg недоступен (не Windows) — не блокируем
+        return True
+    except Exception as e:
+        # Неожиданная ошибка — логируем и не блокируем
+        logger.warning(f"_check_vcredist unexpected error: {e}")
+        return True
 
 
 def _check_webview2() -> bool:
@@ -2920,8 +2999,13 @@ def _check_webview2() -> bool:
                     except OSError:
                         continue
         return False
-    except Exception:
-        return True  # не блокируем при ошибке
+    except ImportError:
+        # winreg недоступен (не Windows) — не блокируем
+        return True
+    except Exception as e:
+        # Неожиданная ошибка — логируем и не блокируем
+        logger.warning(f"_check_webview2 unexpected error: {e}")
+        return True
 
 
 def _show_dependency_dialog(missing: list):
@@ -3169,7 +3253,7 @@ def main():
                                        resizable=True, fullscreen=False, min_size=(1032, 583))
         app._window = window
         # Устанавливаем иконку лаунчера
-        ico_path = os.path.join(_get_app_dir(), 'launcher.ico')
+        ico_path = os.path.join(_get_app_dir(), 'icon.ico')
         if os.path.exists(ico_path):
             try:
                 window.configure(icon=ico_path)
@@ -3181,11 +3265,12 @@ def main():
         def _on_resized(width, height):
             def _save():
                 try:
-                    if not app.launcher.config.get('launcher_settings'):
-                        app.launcher.config['launcher_settings'] = {}
-                    app.launcher.config['launcher_settings']['window_size'] = [int(width), int(height)]
-                    app.launcher.save_config()
-                    logger.debug(f"window size saved: {width}x{height}")
+                    with app.launcher._cfg_lock:
+                        if not app.launcher.config.get('launcher_settings'):
+                            app.launcher.config['launcher_settings'] = {}
+                        app.launcher.config['launcher_settings']['window_size'] = [int(width), int(height)]
+                        app.launcher.save_config()
+                        logger.debug(f"window size saved: {width}x{height}")
                 except Exception as ex:
                     logger.warning(f"save window size failed: {ex}")
             # Дебаунс: 400ms после последнего resize-события
@@ -3202,7 +3287,8 @@ def main():
         if is_first_run or force_first:
             window.events.loaded += _on_loaded
         gui = os.environ.get('ARIZONA_LAUNCHER_GUI', 'edgechromium')
-        webview.start(debug=False, gui=gui)
+        _debug = os.environ.get('ARIZONA_LAUNCHER_DEBUG') == '1'
+        webview.start(debug=_debug, gui=gui)
     except Exception as e:
         logger.error(f"Error: {e}")
         if sys.stdin and sys.stdin.isatty():

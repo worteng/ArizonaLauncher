@@ -8,7 +8,7 @@ __pycache__/
 *$py.class
 *.so
 
-# Неиспользуемые файлы и бэкапы
+# Неиспользуемые файлы
 NotUsed/
 
 # IDE
@@ -16,46 +16,32 @@ NotUsed/
 .cursor/
 .idea/
 
-# Временные файлы
+# Временные и бэкапы
 *.tmp
 *.bak
 ~*
+*.backup.*
 
 # Системные файлы
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# Локальные билды и скачанные архивы лаунчеров
+# Локальные билды и скачанные архивы
 /dist
 /others
 /output
-updater.py
 others/arizonapatcher.zip
 others/arizonapatchesV2.zip
 others/ArizonaLauncher8.0_byAIR.zip
 others/ArizonaLauncher8.0_byAIR.exe
-/.claude
-/.vscode
-/.vscode
-/.vscode
-.vscode/settings.json
-ArizonaLauncher.manifest
-ArizonaLauncher.spec
+
+# Build-артефакты
 /build
-icon.ico
-index.html.backup.20260616_195140
-installer.iss
 /installer
-main.py.backup.20260616_195140
-/moonloader
+
+# Dev/test
+.claude
 opencode.jsonc
-moonloader/TEST.lua
 sandbox-test.wsb
-libraries.txt
-.vscode/settings.json
-/.vscode
-/moonloader
-README.md
-wizard.bmp
-wizard_small.bmp
+updater.py
