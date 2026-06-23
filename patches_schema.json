@@ -1,0 +1,136 @@
+{
+  "_comment": "Схема метаданных настроек ArizonaPatches V2. Data-driven: UI лаунчера строится из этого файла. Когда список реальных настроек будет раскрыт — просто заполни categories и settings. Формат версии 1.",
+  "version": 1,
+
+  "categories": [
+    { "id": "camera", "name": "Камера", "icon": "camera", "order": 1 },
+    { "id": "render", "name": "Графика", "icon": "image", "order": 2 },
+    { "id": "gameplay", "name": "Геймплей", "icon": "gamepad-2", "order": 3 },
+    { "id": "advanced", "name": "Расширенные", "icon": "sliders-horizontal", "order": 4 }
+  ],
+
+  "settings": [
+    {
+      "id": "CCamInteriorFix",
+      "title": "Коррекция камеры в интерьере",
+      "description": "Исправляет поведение камеры в замкнутых пространствах (интерьерах).",
+      "category": "camera",
+      "type": "bool",
+      "default": true,
+      "conflicts": [],
+      "requires": []
+    },
+    {
+      "id": "DontUseFirstPerson",
+      "title": "Отключить вид от первого лица",
+      "description": "Убирает возможность переключения в вид от первого лица.",
+      "category": "camera",
+      "type": "bool",
+      "default": false,
+      "conflicts": ["UseFirstPersonExtended"],
+      "requires": []
+    },
+    {
+      "id": "UseFirstPersonExtended",
+      "title": "Расширенный вид от первого лица",
+      "description": "Улучшенная модель вида от первого лица с коррекцией моделей. Конфликтует с отключением первого лица.",
+      "category": "camera",
+      "type": "bool",
+      "default": false,
+      "conflicts": ["DontUseFirstPerson"],
+      "requires": []
+    },
+
+    {
+      "id": "UseCustomRenderEffects",
+      "title": "Кастомные эффекты рендера",
+      "description": "Включает набор эффектов рендера. Настройка битовой маски — кнопкой справа.",
+      "category": "render",
+      "type": "bool",
+      "default": false,
+      "conflicts": [],
+      "requires": []
+    },
+    {
+      "id": "CustomRenderEffects",
+      "title": "Маска эффектов рендера",
+      "description": "Битовая маска: каждый бит включает отдельный эффект. Нажми «Изменить», чтобы выбрать эффекты галочками.",
+      "category": "render",
+      "type": "bits",
+      "default": 63,
+      "bits_options": [
+        { "bit": 0, "label": "Эффект 1" },
+        { "bit": 1, "label": "Эффект 2" },
+        { "bit": 2, "label": "Эффект 3" },
+        { "bit": 3, "label": "Эффект 4" },
+        { "bit": 4, "label": "Эффект 5" },
+        { "bit": 5, "label": "Эффект 6" }
+      ],
+      "conflicts": [],
+      "requires": ["UseCustomRenderEffects"]
+    },
+    {
+      "id": "CustomObjectScaleDistance",
+      "title": "Дистанция масштабирования объектов",
+      "description": "Расстояние, на котором объекты начинают масштабироваться (в игровых единицах).",
+      "category": "render",
+      "type": "slider",
+      "default": 80.0,
+      "min": 0,
+      "max": 500,
+      "step": 1,
+      "conflicts": [],
+      "requires": []
+    },
+
+    {
+      "id": "DontUseGreenZone",
+      "title": "Отключить зелёную зону",
+      "description": "Убирает отображение зелёной зоны безопасного района на карте.",
+      "category": "gameplay",
+      "type": "bool",
+      "default": true,
+      "conflicts": [],
+      "requires": []
+    },
+    {
+      "id": "RadarMode",
+      "title": "Режим радара",
+      "description": "Способ отображения радара в углу экрана.",
+      "category": "gameplay",
+      "type": "select",
+      "default": "default",
+      "options": [
+        { "value": "default", "label": "По умолчанию" },
+        { "value": "compact", "label": "Компактный" },
+        { "value": "hidden", "label": "Скрытый" }
+      ],
+      "conflicts": [],
+      "requires": []
+    },
+
+    {
+      "id": "CustomStaticObjects",
+      "title": "Кастомные статические объекты",
+      "description": "Список объектов с принудительным размещением. Нажми «Редактировать», чтобы открыть редактор.",
+      "category": "advanced",
+      "type": "cso",
+      "default": [],
+      "conflicts": [],
+      "requires": []
+    },
+    {
+      "id": "ServerObjectForceDistance",
+      "title": "Дистанция форсирования серверных объектов",
+      "description": "Дистанция, на которой серверные объекты принудительно появляются (метры).",
+      "category": "advanced",
+      "type": "number",
+      "default": 200,
+      "min": 0,
+      "max": 5000,
+      "step": 10,
+      "conflicts": [],
+      "requires": []
+    }
+  ]
+}

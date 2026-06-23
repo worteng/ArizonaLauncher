@@ -1940,6 +1940,337 @@
             margin-top: 1px;
         }
 
+        /* ════════════════════════════════════════════════════════════
+           ARIZONA PATCHES V2 — data-driven UI
+           Категории-аккордеоны + контролы по типам + конфликты
+           ════════════════════════════════════════════════════════════ */
+
+        /* Тулбар: поиск + чипы категорий */
+        .patches-toolbar {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-shrink: 0;
+        }
+        .patches-search-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .patches-search-wrap > i,
+        .patches-search-wrap > svg {
+            position: absolute;
+            left: 12px;
+            color: rgba(255,255,255,0.4);
+            width: 14px; height: 14px;
+            pointer-events: none;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            stroke: rgba(255,255,255,0.4);
+        }
+        .patches-search-wrap > svg { width: 14px !important; height: 14px !important; }
+        .patches-search-wrap .patches-search-clear {
+            position: absolute;
+            right: 8px;
+            background: none;
+            border: none;
+            color: rgba(255,255,255,0.4);
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: none;
+        }
+        .patches-search-wrap .patches-search-clear:hover { color: rgba(255,255,255,0.85); }
+        .patches-search-wrap.has-value .patches-search-clear { display: block; }
+        .patches-search {
+            width: 100%;
+            height: 36px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: white;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            padding: 0 34px 0 34px;
+            outline: none;
+            transition: border-color 0.18s;
+        }
+        .patches-search:focus { border-color: rgba(var(--accent2-rgb), 0.55); }
+        .patches-search::placeholder { color: rgba(255,255,255,0.35); }
+
+        .patches-chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .patch-chip {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 5px 12px;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 11px;
+            color: rgba(255,255,255,0.65);
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            user-select: none;
+        }
+        .patch-chip:hover { background: rgba(255,255,255,0.1); color: white; }
+        .patch-chip.active {
+            background: rgba(var(--accent2-rgb), 0.3);
+            border-color: rgba(var(--accent2-rgb), 0.5);
+            color: white;
+        }
+        .patch-chip svg { width: 12px !important; height: 12px !important; }
+
+        /* Баннер конфликтов */
+        .patches-conflicts-banner {
+            display: none;
+            background: rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.35);
+            border-left: 3px solid rgba(255, 165, 0, 0.7);
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            color: rgba(255, 200, 80, 0.95);
+            line-height: 1.5;
+            flex-shrink: 0;
+        }
+        .patches-conflicts-banner.show { display: block; }
+        .patches-conflicts-banner .pc-title { font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+        .patches-conflicts-banner .pc-title svg { width: 14px !important; height: 14px !important; }
+        .patches-conflicts-banner .pc-actions { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .patches-conflicts-banner .pc-btn {
+            background: rgba(255, 165, 0, 0.25);
+            border: 1px solid rgba(255, 165, 0, 0.4);
+            color: rgba(255, 220, 150, 0.95);
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 11px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.15s;
+        }
+        .patches-conflicts-banner .pc-btn:hover { background: rgba(255, 165, 0, 0.4); }
+
+        /* Категория-аккордеон */
+        .patch-category {
+            margin-bottom: 8px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .patch-category-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+        }
+        .patch-category-header:hover { background: rgba(255,255,255,0.03); }
+        .patch-category-icon {
+            width: 26px; height: 26px;
+            border-radius: 6px;
+            background: rgba(var(--accent2-rgb), 0.18);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .patch-category-icon svg { width: 14px !important; height: 14px !important; color: rgba(var(--accent2-rgb), 0.9); }
+        .patch-category-name {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            flex: 1;
+        }
+        .patch-category-count {
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.05);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .patch-category-chevron {
+            color: rgba(255,255,255,0.4);
+            transition: transform 0.2s;
+        }
+        .patch-category-chevron svg { width: 14px !important; height: 14px !important; }
+        .patch-category.collapsed .patch-category-chevron { transform: rotate(-90deg); }
+        .patch-category-body {
+            display: flex;
+            flex-direction: column;
+            max-height: 9999px;
+            transition: max-height 0.3s ease, opacity 0.2s;
+            opacity: 1;
+        }
+        .patch-category.collapsed .patch-category-body {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        /* Строка настройки (любого типа) */
+        .patch-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 11px 14px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            transition: background 0.12s;
+        }
+        .patch-row:hover { background: rgba(255,255,255,0.025); }
+        .patch-row-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .patch-row-title {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.88);
+        }
+        .patch-row-desc {
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 10.5px;
+            color: rgba(255,255,255,0.4);
+            line-height: 1.45;
+        }
+        .patch-row-code {
+            font-family: 'Consolas', monospace;
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+        }
+        .patch-row-control {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        /* Подсветка конфликтов */
+        .patch-row.conflict {
+            background: rgba(255, 80, 80, 0.06);
+            border-left: 2px solid rgba(255, 100, 100, 0.6);
+        }
+        .patch-row.unsatisfied {
+            background: rgba(255, 165, 0, 0.05);
+            border-left: 2px solid rgba(255, 165, 0, 0.5);
+        }
+
+        /* Маленькая кнопка-действие (для bits/cso) */
+        .patch-action-btn {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.8);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-family: 'Montserrat Alternates', sans-serif;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .patch-action-btn:hover { background: rgba(255,255,255,0.14); color: white; }
+        .patch-action-btn svg { width: 12px !important; height: 12px !important; }
+
+        /* number / slider контролы */
+        .patch-number-input {
+            width: 80px;
+            height: 28px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 6px;
+            color: white;
+            font-family: 'Consolas', monospace;
+            font-size: 12px;
+            padding: 0 8px;
+            outline: none;
+            text-align: right;
+        }
+        .patch-number-input:focus { border-color: rgba(var(--accent2-rgb), 0.55); }
+        .patch-slider-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 160px;
+        }
+        .patch-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 2px;
+            outline: none;
+        }
+        .patch-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px; height: 14px;
+            background: rgba(var(--accent2-rgb), 0.9);
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+        .patch-slider::-moz-range-thumb {
+            width: 14px; height: 14px;
+            background: rgba(var(--accent2-rgb), 0.9);
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+        .patch-slider-value {
+            font-family: 'Consolas', monospace;
+            font-size: 11px;
+            color: rgba(255,255,255,0.8);
+            min-width: 38px;
+            text-align: right;
+        }
+        /* select */
+        .patch-select {
+            height: 28px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 6px;
+            color: white;
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 12px;
+            padding: 0 8px;
+            outline: none;
+            cursor: pointer;
+            min-width: 100px;
+        }
+        .patch-select option { background: #1a1a2e; }
+
+        /* Пустое состояние (нет настроек / схема не загружена) */
+        .patches-empty {
+            padding: 40px 20px;
+            text-align: center;
+            color: rgba(255,255,255,0.35);
+            font-family: 'Montserrat Alternates', sans-serif;
+            font-size: 13px;
+        }
+        .patches-empty svg { width: 32px !important; height: 32px !important; margin-bottom: 10px; opacity: 0.5; }
+
         /* Поля ввода в настройках */
         .s-input-row {
             display: flex;
@@ -2231,15 +2562,11 @@
             gap: 6px;
         }
 
+        /* #checkboxGroup теперь содержит тулбар + категории патчей V2
+           (раньше тут был grid 1fr 1fr для плоского списка чекбоксов V1). */
         #checkboxGroup {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0;
-        }
-
-        #checkboxGroup .checkbox-item {
-            border-radius: 0;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
+            display: flex;
+            flex-direction: column;
         }
 
         /* Карточки import/export */
@@ -5086,11 +5413,22 @@
                             </div>
                         </div>
                     </div>
-                    <div id="checkboxGroup"></div>
-                    <div style="margin-top:10px;">
-                        <button class="s-btn" style="width:100%;" onclick="openCsoEditor()">
-                            <i data-lucide="package"></i> Редактировать CustomStaticObjects
-                        </button>
+                    <div id="checkboxGroup">
+                        <!-- Тулбар: поиск + чипы категорий -->
+                        <div class="patches-toolbar">
+                            <div class="patches-search-wrap" id="patchesSearchWrap">
+                                <i data-lucide="search"></i>
+                                <input type="text" class="patches-search" id="patchesSearch"
+                                       placeholder="Поиск по настройкам..." autocomplete="off"
+                                       oninput="onPatchesSearchInput()">
+                                <button class="patches-search-clear" onclick="clearPatchesSearch()" title="Очистить">×</button>
+                            </div>
+                            <div class="patches-chips" id="patchesChips"></div>
+                        </div>
+                        <!-- Баннер конфликтов -->
+                        <div class="patches-conflicts-banner" id="patchesConflictsBanner"></div>
+                        <!-- Контейнер категорий (рендерится data-driven) -->
+                        <div id="patchesCategories"></div>
                     </div>
                     <!-- Прогресс установки (скрыт до начала) -->
                     <div id="patchInstallProgress" style="display:none; margin-top:16px; padding:12px; background:rgba(255,255,255,0.02); border-radius:8px;">
@@ -5960,33 +6298,54 @@
         window._installedScriptFiles = new Set(); // имена файлов установленных скриптов
 
 
-        // Переводы для патчей
-        const translations = {
-            "UseCustomRenderEffects": "Использовать кастомные эффекты рендеринга",
-            "CCamInteriorFix": "Исправление интовой стрельбы",
-            "COcclusionFix": "Исправление просадки фпс в центре карты",
-            "DontDefaultWindowMode": "Возвращение полноэкранного режима (по дефолту оконный без рамок)",
-            "DontInterfereAntiAFK": "(Не) мешать работе AntiAFK",
-            "DontUseGreenZone": "Удалить зеленые зоны (для LocalDM)",
-            "DontUseScaleRadarMapIcons": "Не использовать увеличенные иконки радара",
-            "DontUseCustomAttachObject": "Использовать стандартное прикрепление объектов",
-            "DontUseCustomChat": "Использовать стандартный чат и 3D текст",
-            "DontUseCustomCarRender": "Использовать стандартный рендеринг машин",
-            "DontUseCustomSync": "Использовать оригинальную синхронизацию SAMP",
-            "DontUseCustomFastConnect": "Использовать FastConnect от AIR (если есть)",
-            "DontUseCustomShadow": "Использовать стандартные тени",
-            "DontUseVoiceChat": "Не использовать голосовой чат",
-            "DontUseSoundSystem": "Не использовать окружающие звуки",
-            "DontUseCustomMarker": "Не рисовать 3D иконки (например в цг сундук)",
-            "DontUseCustomNumberPlate": "Не использовать номерные знаки",
-            "DontUseFadeScreen": "Убрать затемнение экрана",
-            "DontUseFirstPerson": "Не использовать камеру от первого лица",
-            "DontUseCustomVehicleLightsColor": "Использовать стандартный свет фар",
-            "DontPressWOnBike": "Убрать авто W на велосипеде",
-            "CustomObjectForceDistance": "Принудительная дистанция для объектов лаунчера (настройте сами)",
-            "ServerObjectForceDistance": "Принудительная дистанция для серверных объектов (настройте сами)",
-            "ServerAttachObjectForceDistance": "Принудительная дистанция для прикрепленных серверных объектов (настройте сами)"
+        // ════════════════════════════════════════════════════════════
+        //  ARIZONA PATCHES V2 — data-driven UI
+        //  Схема метаданных (categories + settings с типами/конфликтами)
+        //  тянется с GitHub (fetch_patches_schema). Этот fallback — страховка
+        //  на случай офлайна/404. Когда разраб раскроет список V2 —
+        //  заполним patches_schema.json на GitHub, и UI обновится без
+        //  перевыпуска лаунчера.
+        // ════════════════════════════════════════════════════════════
+        const FALLBACK_PATCHES_SCHEMA = {
+            version: 1,
+            categories: [
+                { id: 'camera', name: 'Камера', icon: 'camera', order: 1 },
+                { id: 'render', name: 'Графика', icon: 'image', order: 2 },
+                { id: 'gameplay', name: 'Геймплей', icon: 'gamepad-2', order: 3 },
+                { id: 'advanced', name: 'Расширенные', icon: 'sliders-horizontal', order: 4 }
+            ],
+            settings: [
+                { id: 'CCamInteriorFix', title: 'Коррекция камеры в интерьере', description: 'Исправляет поведение камеры в замкнутых пространствах (интерьерах).', category: 'camera', type: 'bool', default: true, conflicts: [], requires: [] },
+                { id: 'DontUseFirstPerson', title: 'Отключить вид от первого лица', description: 'Убирает возможность переключения в вид от первого лица.', category: 'camera', type: 'bool', default: false, conflicts: ['UseFirstPersonExtended'], requires: [] },
+                { id: 'UseFirstPersonExtended', title: 'Расширенный вид от первого лица', description: 'Улучшенная модель вида от первого лица. Конфликтует с отключением первого лица.', category: 'camera', type: 'bool', default: false, conflicts: ['DontUseFirstPerson'], requires: [] },
+                { id: 'UseCustomRenderEffects', title: 'Кастомные эффекты рендера', description: 'Включает набор эффектов рендера. Настройка битовой маски — кнопкой справа.', category: 'render', type: 'bool', default: false, conflicts: [], requires: [] },
+                { id: 'CustomRenderEffects', title: 'Маска эффектов рендера', description: 'Битовая маска эффектов. Нажми «Изменить», чтобы выбрать галочками.', category: 'render', type: 'bits', default: 63, bits_options: [{bit:0,label:'Эффект 1'},{bit:1,label:'Эффект 2'},{bit:2,label:'Эффект 3'},{bit:3,label:'Эффект 4'},{bit:4,label:'Эффект 5'},{bit:5,label:'Эффект 6'}], conflicts: [], requires: ['UseCustomRenderEffects'] },
+                { id: 'CustomObjectScaleDistance', title: 'Дистанция масштабирования объектов', description: 'Расстояние, на котором объекты начинают масштабироваться.', category: 'render', type: 'slider', default: 80.0, min: 0, max: 500, step: 1, conflicts: [], requires: [] },
+                { id: 'DontUseGreenZone', title: 'Отключить зелёную зону', description: 'Убирает отображение зелёной зоны безопасного района на карте.', category: 'gameplay', type: 'bool', default: true, conflicts: [], requires: [] },
+                { id: 'RadarMode', title: 'Режим радара', description: 'Способ отображения радара в углу экрана.', category: 'gameplay', type: 'select', default: 'default', options: [{value:'default',label:'По умолчанию'},{value:'compact',label:'Компактный'},{value:'hidden',label:'Скрытый'}], conflicts: [], requires: [] },
+                { id: 'CustomStaticObjects', title: 'Кастомные статические объекты', description: 'Список объектов с принудительным размещением. Нажми «Редактировать».', category: 'advanced', type: 'cso', default: [], conflicts: [], requires: [] },
+                { id: 'ServerObjectForceDistance', title: 'Дистанция форсирования серверных объектов', description: 'Дистанция принудительного появления серверных объектов (метры).', category: 'advanced', type: 'number', default: 200, min: 0, max: 5000, step: 10, conflicts: [], requires: [] }
+            ]
         };
+
+        let _patchesSchema = null;          // активная схема (с GitHub или fallback)
+        let _patchesActiveCategories = new Set();  // выбранные чипы категорий (пусто = все)
+        let _patchesSearchQuery = '';
+
+        /**
+         * Применяет дефолты схемы к patchesData: для каждой настройки из схемы,
+         * если её нет в patchesData — добавляет с default-значением.
+         * Возвращает обновлённый patchesData (in-place).
+         */
+        function applySchemaDefaults(schema, data) {
+            if (!schema || !schema.settings) return data;
+            schema.settings.forEach(s => {
+                if (!(s.id in data) || data[s.id] === undefined || data[s.id] === null) {
+                    data[s.id] = s.default;
+                }
+            });
+            return data;
+        }
 
         // ══════════════════════════════════════════════
         //  PROFILES — сохранение/загрузка наборов настроек
@@ -8468,36 +8827,10 @@
                     const result = await window.pywebview.api.check_patches_status();
                     if (result) {
                         renderPatchStatusUI(result);
-                        const checkboxGroup = document.getElementById('checkboxGroup');
-                        const csoBtn = document.querySelector('#patchesTab button[onclick="openCsoEditor()"]');
-                        const saveBtn = document.querySelector('.save-btn');
-                        const toastContainer = document.getElementById('toastContainer');
-                        if (result.status === 'outdated_dll_v1') {
-                            if (checkboxGroup) checkboxGroup.style.display = 'none';
-                            if (csoBtn) csoBtn.style.display = 'none';
-                            if (saveBtn) saveBtn.style.display = 'none';
-                            if (toastContainer && !document.getElementById('dllWarningToast')) {
-                                const toast = document.createElement('div');
-                                toast.id = 'dllWarningToast';
-                                toast.className = 'dll-toast';
-                                toast.innerHTML = '<div class="dll-toast-full" style="display:flex;align-items:flex-start;gap:10px;width:100%;"><i data-lucide="shield-alert" style="width:20px;height:20px;color:#ff4444;flex-shrink:0;margin-top:2px;"></i><div style="flex:1;min-width:0;"><div style="font-family:\'Montserrat Alternates\';font-size:12px;font-weight:600;color:#ff6666;margin-bottom:2px;">Патчи недоступны: устаревший ArizonaPatches.dll</div><div style="font-family:\'Montserrat Alternates\';font-size:10.5px;color:rgba(255,200,200,0.85);line-height:1.4;margin-bottom:8px;">Установлен старый ArizonaPatches.dll (1.0.0.0), он вызывает краши игры. Ждите выхода v2 от EIR.</div><div style="display:flex;gap:6px;align-items:center;"><button class="s-btn" style="width:auto;padding:0 12px;height:28px;font-size:10px;" onclick="event.stopPropagation();openSettings();setTimeout(()=>switchTab(\'patches\'),100);this.closest(\'#dllWarningToast\').remove();"><i data-lucide="shield" style="width:12px;height:12px;"></i> Открыть настройки</button><button class="s-btn" style="width:28px;height:28px;padding:0;display:flex;align-items:center;justify-content:center;font-size:12px;border-radius:50%;" onclick="event.stopPropagation();this.closest(\'#dllWarningToast\').classList.add(\'collapsed\');"><i data-lucide="chevron-right" style="width:12px;height:12px;"></i></button></div></div></div><svg class="dll-toast-pill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9.5 12.5-2 2"/><path d="m14.5 12.5-2 2"/><path d="m12 17-2 2"/></svg>';
-                                toastContainer.appendChild(toast);
-                                if (typeof refreshLucideIcons === 'function') refreshLucideIcons();
-                                toast.addEventListener('click', function(e) { if (toast.classList.contains('collapsed')) { e.stopPropagation(); openSettings(); setTimeout(function() { switchTab('patches'); }, 100); toast.remove(); } });
-                            }
-                        } else {
-                            const existingToast = document.getElementById('dllWarningToast');
-                            if (existingToast) existingToast.remove();
-                        }
-                        if (result.status === 'outdated_dll_v1') {
-                            if (checkboxGroup) checkboxGroup.style.display = 'none';
-                            if (csoBtn) csoBtn.style.display = 'none';
-                            if (saveBtn) saveBtn.style.display = 'none';
-                        } else {
-                            if (checkboxGroup) checkboxGroup.style.display = '';
-                            if (csoBtn) csoBtn.style.display = '';
-                            if (saveBtn) saveBtn.style.display = '';
-                        }
+                        // Раньше здесь показывался toast «Патчи недоступны» и скрывался
+                        // UI настроек при outdated_dll_v1. Убрано: UI патчей теперь
+                        // data-driven и должен быть доступен всегда (патчер V2 ожидается
+                        // в релизе, конфиг можно редактировать заранее).
                     }
                 }
             } catch (e) {
@@ -8513,60 +8846,20 @@
 
         function renderPatchStatusUI(status) {
             try {
-                var alert = document.getElementById('patchStatusAlert');
-                var container = document.getElementById('patchPresetsContainer');
-                var icon = document.getElementById('patchStatusLucide');
-                var title = document.getElementById('patchStatusTitle');
-                var detail = document.getElementById('patchStatusDetail');
-                var actionBtn = document.getElementById('patchActionBtn');
-                var actionText = document.getElementById('patchActionText');
-                var actionIcon = document.getElementById('patchActionIcon');
-                var checkBtn = document.getElementById('patchCheckUpdateBtn');
-
+                // Баннер статуса патчей V1 больше не показываем — UI патчей теперь
+                // data-driven (patches_schema.json), а сам патчер ждём в релизе V2.
+                // Прогресс установки по-прежнему используется (download_and_install_patches).
                 document.getElementById('patchInstallProgress').style.display = 'none';
+                var alert = document.getElementById('patchStatusAlert');
+                if (alert) alert.style.display = 'none';
 
-                if (status.status === 'current') {
-                    alert.style.display = 'none';
-                } else {
-                    alert.style.display = 'block';
-                    if (status.status === 'missing') {
-                        alert.style.borderLeftColor = '#ff6b6b';
-                        icon.innerHTML = '<i data-lucide="alert-circle" style="width:20px;height:20px;color:#ff6b6b;"></i>';
-                        title.textContent = 'Патчи недоступны';
-                        detail.textContent = status.message_detail || 'Файлы патчей не найдены в папке preloading_plugins. Необходимо скачать патчи.';
-                        actionBtn.style.display = 'inline-flex';
-                        actionBtn.onclick = function() { downloadPatches(); };
-                        if (actionIcon) actionIcon.setAttribute('data-lucide', 'download');
-                        actionText.textContent = 'Скачать патчи v2';
-                        checkBtn.style.display = 'none';
-                    } else if (status.status === 'outdated_v1') {
-                        alert.style.borderLeftColor = '#ffaa44';
-                        icon.innerHTML = '<i data-lucide="alert-triangle" style="width:20px;height:20px;color:#ffaa44;"></i>';
-                        title.textContent = 'Патчи устарели (v1)';
-                        detail.textContent = status.message_detail || 'У вас установлены патчи v1 — они не работают после глобальной обновы игры. Доступна версия v2.';
-                        actionBtn.style.display = 'inline-flex';
-                        actionBtn.onclick = function() { downloadPatches(); };
-                        if (actionIcon) actionIcon.setAttribute('data-lucide', 'arrow-up-circle');
-                        actionText.textContent = 'Обновить до v2';
-                        checkBtn.style.display = 'inline-flex';
-                    } else if (status.status === 'outdated_dll_v1') {
-                        alert.style.borderLeftColor = '#ff4444';
-                        icon.innerHTML = '<i data-lucide="shield-alert" style="width:20px;height:20px;color:#ff4444;"></i>';
-                        title.textContent = 'Патчи недоступны: устаревший ArizonaPatches.dll';
-                        detail.textContent = status.message_detail || 'Установлен старый ArizonaPatches.dll (1.0.0.0), он вызывает краши игры. Ждите выхода v2 от EIR — тогда кнопка «Скачать» станет активной.';
-                        actionBtn.style.display = 'none';
-                        checkBtn.style.display = 'inline-flex';
-                        checkBtn.onclick = function() { checkPatchesUpdate(); };
-                        checkBtn.innerHTML = '<i data-lucide="refresh-cw" style="width:14px;height:14px;"></i> Проверить обновления';
-                    }
-                }
-
+                var container = document.getElementById('patchPresetsContainer');
                 container.style.display = 'block';
                 loadPatchPresets();
 
                 if (typeof refreshLucideIcons === 'function') refreshLucideIcons();
             } catch(e) {
-                console.error('renderPatchStatusUI error:', e);
+                console.error('renderPatchStatusUI error: e', e);
                 document.getElementById('patchPresetsContainer').style.display = 'block';
                 loadPatchPresets();
             }
@@ -8926,7 +9219,9 @@
                     wrap.style.setProperty('--patch-progress', '100%');
                     wrap.style.background = 'rgba(130, 220, 150, 0.42)';
                     wrap.style.borderColor = 'rgba(130, 220, 150, 0.55)';
-                    label.textContent = '✓';
+                    // Контр-вращаем галочку: у .patch-handle-label стоит
+                    // transform: rotate(180deg), из-за чего «✓» рисуется вверх ногами.
+                    label.innerHTML = '<span style="display:inline-block;writing-mode:horizontal-tb;transform:rotate(180deg);">✓</span>';
                     label.style.fontSize = '16px';
                     showNotification('<i data-lucide="check-circle"></i> Обновление установлено!', 'success');
                     setTimeout(() => {
@@ -9358,36 +9653,6 @@
                 if (typeof refreshLucideIcons === 'function') refreshLucideIcons();
             }
         }
-
-
-        // Дефолтные данные патчей (используются как fallback)
-        const defaultPatchesData = {
-                        "UseCustomRenderEffects": false,
-                        "CCamInteriorFix": true,
-                        "COcclusionFix": true,
-                        "DontDefaultWindowMode": true,
-                        "DontInterfereAntiAFK": false,
-                        "DontUseGreenZone": true,
-                        "DontUseScaleRadarMapIcons": true,
-                        "DontUseCustomAttachObject": true,
-                        "DontUseCustomChat": true,
-                        "DontUseCustomCarRender": true,
-                        "DontUseCustomSync": true,
-                        "DontUseCustomFastConnect": true,
-                        "DontUseCustomShadow": true,
-                        "DontUseVoiceChat": false,
-                        "DontUseSoundSystem": true,
-                        "DontUseCustomMarker": true,
-                        "DontUseCustomNumberPlate": true,
-                        "DontUseFadeScreen": true,
-                        "DontUseFirstPerson": true,
-                        "DontUseCustomVehicleLightsColor": true,
-                        "DontPressWOnBike": false,
-                        "CustomObjectForceDistance": false,
-                        "ServerObjectForceDistance": false,
-                        "ServerAttachObjectForceDistance": false
-                    };
-
 
         // ---- НАСТРОЙКИ ----
 
@@ -10086,48 +10351,462 @@
         }
 
         // Отрисовка чекбоксов патчей
-        function renderCheckboxes() {
-            _lucidePaused = true;
-            checkboxGroup.innerHTML = '';
-            const keys = Object.keys(patchesData).filter(k => typeof patchesData[k] === 'boolean');
-            keys.forEach(key => {
-                const item = document.createElement('label');
-                item.className = 'checkbox-item';
+        // ════════════════════════════════════════════════════════════
+        //  ARIZONA PATCHES V2 — data-driven рендерер
+        // ════════════════════════════════════════════════════════════
 
-                const cb = document.createElement('input');
-                cb.type = 'checkbox';
-                cb.id = 'patch_' + key;
-                cb.checked = patchesData[key];
-
-                const toggle = document.createElement('div');
-                toggle.className = 's-toggle' + (cb.checked ? ' on' : '');
-                cb.addEventListener('change', () => {
-                    toggle.classList.toggle('on', cb.checked);
-                });
-
-                const lbl = document.createElement('span');
-                lbl.className = 'checkbox-label';
-                lbl.style.fontSize = '11px';
-                lbl.textContent = translations[key] || key.replace(/([A-Z])/g, ' $1').trim();
-
-                item.appendChild(cb);
-                item.appendChild(toggle);
-                item.appendChild(lbl);
-
-                if (key === 'UseCustomRenderEffects' && 'CustomRenderEffects' in patchesData) {
-                    const creBtn = document.createElement('button');
-                    creBtn.type = 'button';
-                    creBtn.className = 'patch-cre-btn';
-                    creBtn.innerHTML = '<i data-lucide="settings"></i> Эффекты';
-                    creBtn.title = 'Настроить CustomRenderEffects';
-                    creBtn.onclick = function(e) { e.preventDefault(); e.stopPropagation(); openCRE(); };
-                    item.appendChild(creBtn);
+        /** Загружает схему: пробует backend (GitHub), при ошибке — fallback. */
+        async function loadPatchesSchema() {
+            if (_patchesSchema) return _patchesSchema;
+            try {
+                if (window.pywebview?.api?.fetch_patches_schema) {
+                    const r = await window.pywebview.api.fetch_patches_schema();
+                    if (r.success && r.data) {
+                        _patchesSchema = r.data;
+                        return _patchesSchema;
+                    }
+                    console.warn('[patches] схема не загружена с GitHub, fallback:', r.message);
                 }
+            } catch (e) {
+                console.warn('[patches] ошибка загрузки схемы:', e);
+            }
+            _patchesSchema = FALLBACK_PATCHES_SCHEMA;
+            return _patchesSchema;
+        }
 
-                checkboxGroup.appendChild(item);
+        function renderCheckboxes() {
+            // Точка входа для совместимости со старыми вызовами.
+            // Реальный рендер — в renderPatchesUI после загрузки схемы.
+            if (!_patchesSchema) {
+                loadPatchesSchema().then(() => {
+                    patchesData = applySchemaDefaults(_patchesSchema, patchesData);
+                    renderPatchChips();
+                    renderPatchesUI();
+                    checkPatchesConflicts();
+                });
+                return;
+            }
+            patchesData = applySchemaDefaults(_patchesSchema, patchesData);
+            renderPatchChips();
+            renderPatchesUI();
+            checkPatchesConflicts();
+        }
+
+        /** Чипы категорий сверху. */
+        function renderPatchChips() {
+            const wrap = document.getElementById('patchesChips');
+            if (!wrap || !_patchesSchema) return;
+            const cats = [...(_patchesSchema.categories || [])].sort((a, b) => (a.order || 0) - (b.order || 0));
+            wrap.innerHTML = '';
+            // Чип "Все"
+            const allChip = document.createElement('span');
+            allChip.className = 'patch-chip' + (_patchesActiveCategories.size === 0 ? ' active' : '');
+            allChip.innerHTML = '<i data-lucide="layers"></i> Все';
+            allChip.onclick = () => {
+                _patchesActiveCategories.clear();
+                renderPatchChips();
+                renderPatchesUI();
+            };
+            wrap.appendChild(allChip);
+            cats.forEach(c => {
+                const chip = document.createElement('span');
+                const active = _patchesActiveCategories.has(c.id);
+                chip.className = 'patch-chip' + (active ? ' active' : '');
+                chip.innerHTML = c.icon ? `<i data-lucide="${escapeHtml(c.icon)}"></i> ${escapeHtml(c.name)}` : escapeHtml(c.name);
+                chip.onclick = () => {
+                    if (active) _patchesActiveCategories.delete(c.id);
+                    else _patchesActiveCategories.add(c.id);
+                    renderPatchChips();
+                    renderPatchesUI();
+                };
+                wrap.appendChild(chip);
             });
+            if (typeof refreshLucideIcons === 'function') refreshLucideIcons();
+        }
+
+        /** Главный рендер: группы по категориям + контролы по типам. */
+        function renderPatchesUI() {
+            _lucidePaused = true;
+            const container = document.getElementById('patchesCategories');
+            if (!container || !_patchesSchema) { _lucidePaused = false; return; }
+            container.innerHTML = '';
+
+            const settings = _patchesSchema.settings || [];
+            const cats = [...(_patchesSchema.categories || [])].sort((a, b) => (a.order || 0) - (b.order || 0));
+            const q = _patchesSearchQuery.toLowerCase().trim();
+
+            // Фильтр по поиску + выбранным чипам
+            const filterFn = s => {
+                if (_patchesActiveCategories.size > 0 && !_patchesActiveCategories.has(s.category)) return false;
+                if (!q) return true;
+                return (s.id || '').toLowerCase().includes(q)
+                    || (s.title || '').toLowerCase().includes(q)
+                    || (s.description || '').toLowerCase().includes(q);
+            };
+            const visibleSettings = settings.filter(filterFn);
+
+            if (visibleSettings.length === 0) {
+                container.innerHTML = `<div class="patches-empty"><i data-lucide="search-x"></i><div>Ничего не найдено</div></div>`;
+                _lucidePaused = false;
+                if (typeof refreshLucideIcons === 'function') refreshLucideIcons();
+                return;
+            }
+
+            // Группировка по категориям (только те, где есть видимые настройки)
+            cats.forEach(cat => {
+                const catSettings = visibleSettings.filter(s => s.category === cat.id);
+                if (catSettings.length === 0) return;
+
+                const catEl = document.createElement('div');
+                catEl.className = 'patch-category collapsed';
+                // При активном поиске — раскрываем автоматически,
+                // чтобы пользователь сразу видел совпадения.
+                if (q) catEl.classList.remove('collapsed');
+
+                const header = document.createElement('div');
+                header.className = 'patch-category-header';
+                header.innerHTML = `
+                    <span class="patch-category-icon"><i data-lucide="${escapeHtml(cat.icon || 'folder')}"></i></span>
+                    <span class="patch-category-name">${escapeHtml(cat.name || cat.id)}</span>
+                    <span class="patch-category-count">${catSettings.length}</span>
+                    <span class="patch-category-chevron"><i data-lucide="chevron-down"></i></span>`;
+                header.onclick = () => catEl.classList.toggle('collapsed');
+                catEl.appendChild(header);
+
+                const body = document.createElement('div');
+                body.className = 'patch-category-body';
+                catSettings.forEach(s => body.appendChild(renderPatchRow(s)));
+                catEl.appendChild(body);
+
+                container.appendChild(catEl);
+            });
+
             _lucidePaused = false;
-            refreshLucideIcons();
+            if (typeof refreshLucideIcons === 'function') refreshLucideIcons();
+            checkPatchesConflicts();
+        }
+
+        /** Рендер одной строки настройки по типу. */
+        function renderPatchRow(s) {
+            const row = document.createElement('div');
+            row.className = 'patch-row';
+            row.dataset.id = s.id;
+
+            const info = document.createElement('div');
+            info.className = 'patch-row-info';
+            info.innerHTML = `
+                <div class="patch-row-title">${escapeHtml(s.title || s.id)}</div>
+                ${s.description ? `<div class="patch-row-desc">${escapeHtml(s.description)}</div>` : ''}
+                <div class="patch-row-code">${escapeHtml(s.id)}</div>`;
+            row.appendChild(info);
+
+            const control = document.createElement('div');
+            control.className = 'patch-row-control';
+            const val = patchesData[s.id];
+
+            switch (s.type) {
+                case 'bool': {
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.id = 'patch_' + s.id;
+                    cb.checked = !!val;
+                    cb.style.display = 'none';
+                    const toggle = document.createElement('div');
+                    toggle.className = 's-toggle' + (cb.checked ? ' on' : '');
+                    cb.addEventListener('change', () => {
+                        toggle.classList.toggle('on', cb.checked);
+                        patchesData[s.id] = cb.checked;
+                        checkPatchesConflicts();
+                    });
+                    toggle.onclick = () => { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); };
+                    control.appendChild(cb);
+                    control.appendChild(toggle);
+                    break;
+                }
+                case 'number': {
+                    const inp = document.createElement('input');
+                    inp.type = 'number';
+                    inp.className = 'patch-number-input';
+                    inp.id = 'patch_' + s.id;
+                    inp.value = val ?? s.default ?? 0;
+                    if (s.min !== undefined) inp.min = s.min;
+                    if (s.max !== undefined) inp.max = s.max;
+                    if (s.step !== undefined) inp.step = s.step;
+                    inp.onchange = () => {
+                        let v = parseFloat(inp.value);
+                        if (isNaN(v)) v = s.default ?? 0;
+                        if (s.min !== undefined) v = Math.max(s.min, v);
+                        if (s.max !== undefined) v = Math.min(s.max, v);
+                        inp.value = v;
+                        patchesData[s.id] = v;
+                    };
+                    control.appendChild(inp);
+                    break;
+                }
+                case 'slider': {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'patch-slider-wrap';
+                    const slider = document.createElement('input');
+                    slider.type = 'range';
+                    slider.className = 'patch-slider';
+                    slider.id = 'patch_' + s.id;
+                    slider.value = val ?? s.default ?? 0;
+                    if (s.min !== undefined) slider.min = s.min;
+                    if (s.max !== undefined) slider.max = s.max;
+                    if (s.step !== undefined) slider.step = s.step;
+                    const valLabel = document.createElement('span');
+                    valLabel.className = 'patch-slider-value';
+                    valLabel.textContent = slider.value;
+                    slider.oninput = () => {
+                        valLabel.textContent = slider.value;
+                        patchesData[s.id] = parseFloat(slider.value);
+                    };
+                    wrap.appendChild(slider);
+                    wrap.appendChild(valLabel);
+                    control.appendChild(wrap);
+                    break;
+                }
+                case 'select': {
+                    const sel = document.createElement('select');
+                    sel.className = 'patch-select';
+                    sel.id = 'patch_' + s.id;
+                    (s.options || []).forEach(o => {
+                        const opt = document.createElement('option');
+                        opt.value = o.value;
+                        opt.textContent = o.label;
+                        if (String(val) === String(o.value) || (val === undefined && String(s.default) === String(o.value))) {
+                            opt.selected = true;
+                        }
+                        sel.appendChild(opt);
+                    });
+                    sel.onchange = () => { patchesData[s.id] = sel.value; };
+                    control.appendChild(sel);
+                    break;
+                }
+                case 'bits': {
+                    // Битовая маска. Кнопка «Изменить» открывает редактор галочек.
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'patch-action-btn';
+                    btn.innerHTML = '<i data-lucide="sliders-horizontal"></i> Изменить';
+                    btn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); openBitsEditor(s); };
+                    const valSpan = document.createElement('span');
+                    valSpan.className = 'patch-row-code';
+                    valSpan.textContent = String(val ?? s.default ?? 0);
+                    control.appendChild(valSpan);
+                    control.appendChild(btn);
+                    break;
+                }
+                case 'cso': {
+                    // Массив объектов — открывает существующий CSO Editor.
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'patch-action-btn';
+                    const count = Array.isArray(val) ? val.length : 0;
+                    btn.innerHTML = `<i data-lucide="package"></i> Редактировать (${count})`;
+                    btn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); openCsoEditor(); };
+                    control.appendChild(btn);
+                    break;
+                }
+                default: {
+                    // Неизвестный тип — простое текстовое поле (на вырост)
+                    const inp = document.createElement('input');
+                    inp.type = 'text';
+                    inp.className = 'patch-number-input';
+                    inp.id = 'patch_' + s.id;
+                    inp.value = val ?? s.default ?? '';
+                    inp.onchange = () => { patchesData[s.id] = inp.value; };
+                    control.appendChild(inp);
+                }
+            }
+            row.appendChild(control);
+            return row;
+        }
+
+        // ── Поиск ──────────────────────────────────────────
+        function onPatchesSearchInput() {
+            const inp = document.getElementById('patchesSearch');
+            _patchesSearchQuery = inp ? inp.value : '';
+            const wrap = document.getElementById('patchesSearchWrap');
+            if (wrap) wrap.classList.toggle('has-value', !!_patchesSearchQuery);
+            renderPatchesUI();
+        }
+        function clearPatchesSearch() {
+            const inp = document.getElementById('patchesSearch');
+            if (inp) inp.value = '';
+            _patchesSearchQuery = '';
+            const wrap = document.getElementById('patchesSearchWrap');
+            if (wrap) wrap.classList.remove('has-value');
+            renderPatchesUI();
+        }
+
+        // ── Детектор конфликтов ────────────────────────────
+        /** Возвращает массив {setting, other, type} где type='conflict'|'requires'. */
+        function findPatchesConflicts() {
+            if (!_patchesSchema) return [];
+            const out = [];
+            (_patchesSchema.settings || []).forEach(s => {
+                const v = patchesData[s.id];
+                // «Активна ли настройка» — влияет на то, проверять ли её conflicts/requires:
+                // • bool  → активна когда true
+                // • прочие → активна только если значение ОТЛИЧАЕТСЯ от дефолта схемы.
+                //   Иначе любой дефолтный CustomRenderEffects=63 «требовал бы» UseCustomRenderEffects
+                //   и порождал ложный баннер при открытии, хотя пользователь ничего не трогал.
+                let isActive;
+                if (s.type === 'bool') {
+                    isActive = (v === true);
+                } else {
+                    const dflt = s.default;
+                    isActive = (v !== undefined && v !== null && v !== dflt);
+                }
+                if (!isActive) return;
+                (s.conflicts || []).forEach(otherId => {
+                    const os = (_patchesSchema.settings || []).find(x => x.id === otherId);
+                    const ov = patchesData[otherId];
+                    // Конфликтующая тоже должна быть «активна» по тем же правилам
+                    let oActive;
+                    if (!os || os.type === 'bool') oActive = (ov === true);
+                    else oActive = (ov !== undefined && ov !== null && ov !== os.default);
+                    if (oActive) out.push({ setting: s.id, other: otherId, type: 'conflict' });
+                });
+                (s.requires || []).forEach(reqId => {
+                    const rs = (_patchesSchema.settings || []).find(x => x.id === reqId);
+                    const rv = patchesData[reqId];
+                    // requires: требуемая настройка должна быть активна (bool→true, прочие→отлична от дефолта)
+                    let rOk;
+                    if (!rs || rs.type === 'bool') rOk = (rv === true);
+                    else rOk = (rv !== undefined && rv !== null && rv !== rs.default);
+                    if (!rOk) out.push({ setting: s.id, other: reqId, type: 'requires' });
+                });
+            });
+            return out;
+        }
+
+        function checkPatchesConflicts() {
+            const banner = document.getElementById('patchesConflictsBanner');
+            if (!banner) return;
+            const conflicts = findPatchesConflicts();
+            // Снимаем старую подсветку
+            document.querySelectorAll('.patch-row.conflict, .patch-row.unsatisfied').forEach(r => {
+                r.classList.remove('conflict', 'unsatisfied');
+            });
+
+            if (conflicts.length === 0) {
+                banner.classList.remove('show');
+                return;
+            }
+            const conflictPairs = conflicts.filter(c => c.type === 'conflict');
+            const reqMissing = conflicts.filter(c => c.type === 'requires');
+            const ids = new Set();
+            conflictPairs.forEach(c => { ids.add(c.setting); ids.add(c.other); });
+
+            // Подсветка
+            ids.forEach(id => { const r = document.querySelector(`.patch-row[data-id="${CSS.escape(id)}"]`); if (r) r.classList.add('conflict'); });
+            reqMissing.forEach(c => {
+                const r = document.querySelector(`.patch-row[data-id="${CSS.escape(c.setting)}"]`);
+                if (r) r.classList.add('unsatisfied');
+            });
+
+            let html = '<div class="pc-title"><i data-lucide="alert-triangle"></i> Обнаружены конфликты настроек</div>';
+            if (conflictPairs.length > 0) {
+                const names = [...ids].map(id => getSettingTitle(id)).join(', ');
+                html += `<div>Конфликтуют: ${escapeHtml(names)}. Одновременное включение может привести к вылету игры.</div>`;
+                html += '<div class="pc-actions"><button class="pc-btn" onclick="disableConflictingPatches()">Отключить конфликтующие</button></div>';
+            }
+            if (reqMissing.length > 0) {
+                const names = reqMissing.map(c => `${getSettingTitle(c.setting)} → ${getSettingTitle(c.other)}`).join('; ');
+                html += `<div style="margin-top:6px">Требуют включения: ${escapeHtml(names)}</div>`;
+            }
+            banner.innerHTML = html;
+            banner.classList.add('show');
+            if (typeof refreshLucideIcons === 'function') refreshLucideIcons();
+        }
+
+        function getSettingTitle(id) {
+            const s = (_patchesSchema?.settings || []).find(x => x.id === id);
+            return s ? (s.title || s.id) : id;
+        }
+
+        /** Отключает все bool-настройки, участвующие в конфликте (кроме текущей). */
+        function disableConflictingPatches() {
+            const conflicts = findPatchesConflicts().filter(c => c.type === 'conflict');
+            const toDisable = new Set();
+            conflicts.forEach(c => {
+                // Отключаем "другую" сторону конфликта (текущую оставляем)
+                toDisable.add(c.other);
+            });
+            toDisable.forEach(id => {
+                const s = (_patchesSchema.settings || []).find(x => x.id === id);
+                if (s && s.type === 'bool') {
+                    patchesData[id] = false;
+                    const cb = document.getElementById('patch_' + id);
+                    if (cb) { cb.checked = false; cb.dispatchEvent(new Event('change')); }
+                }
+            });
+            checkPatchesConflicts();
+            showNotification('Конфликтующие настройки отключены', 'success');
+        }
+
+        // ── Редактор битовой маски (для type=bits) ─────────
+        function openBitsEditor(setting) {
+            // Простой модал: галочки по bit → пересчёт значения.
+            const existing = document.getElementById('bitsEditorOverlay');
+            if (existing) existing.remove();
+
+            const overlay = document.createElement('div');
+            overlay.id = 'bitsEditorOverlay';
+            overlay.className = 'script-detail-overlay';
+            overlay.style.zIndex = '1000';
+            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+
+            const panel = document.createElement('div');
+            panel.className = 'script-detail-panel';
+            panel.style.maxWidth = '420px';
+            panel.innerHTML = `
+                <div class="script-detail-header">
+                    <div class="script-detail-header-title"><i data-lucide="sliders-horizontal"></i> ${escapeHtml(setting.title || setting.id)}</div>
+                    <button class="close-btn" onclick="document.getElementById('bitsEditorOverlay').remove()">×</button>
+                </div>
+                <div style="padding:16px; display:flex; flex-direction:column; gap:8px;" id="bitsList"></div>
+                <div style="padding:0 16px 16px; display:flex; justify-content:flex-end; gap:8px;">
+                    <button class="s-btn" style="width:auto; padding:0 16px; height:34px;" onclick="document.getElementById('bitsEditorOverlay').remove()">Отмена</button>
+                    <button class="s-btn primary" style="width:auto; padding:0 16px; height:34px;" id="bitsApplyBtn">Применить</button>
+                </div>`;
+            overlay.appendChild(panel);
+            document.body.appendChild(overlay);
+
+            const list = panel.querySelector('#bitsList');
+            let currentVal = Number(patchesData[setting.id] ?? setting.default ?? 0);
+            (setting.bits_options || []).forEach(opt => {
+                const mask = 1 << opt.bit;
+                const checked = (currentVal & mask) !== 0;
+                const row = document.createElement('label');
+                row.className = 'checkbox-item';
+                row.style.padding = '8px 10px';
+                row.style.borderRadius = '6px';
+                row.style.background = 'rgba(255,255,255,0.03)';
+                row.innerHTML = `
+                    <input type="checkbox" data-bit="${opt.bit}" ${checked ? 'checked' : ''}>
+                    <div class="s-toggle${checked ? ' on' : ''}"></div>
+                    <span class="checkbox-label" style="font-size:12px;">${escapeHtml(opt.label || ('Бит ' + opt.bit))}</span>`;
+                const cb = row.querySelector('input');
+                const tog = row.querySelector('.s-toggle');
+                cb.addEventListener('change', () => tog.classList.toggle('on', cb.checked));
+                list.appendChild(row);
+            });
+
+            panel.querySelector('#bitsApplyBtn').onclick = () => {
+                let v = 0;
+                list.querySelectorAll('input[data-bit]').forEach(cb => {
+                    if (cb.checked) v |= (1 << parseInt(cb.dataset.bit, 10));
+                });
+                patchesData[setting.id] = v;
+                // Обновим отображение в строке
+                renderPatchesUI();
+                overlay.remove();
+                showNotification('Маска применена: ' + v, 'success');
+            };
+            if (typeof refreshLucideIcons === 'function') refreshLucideIcons();
         }
 
         // Открыть настройки
@@ -10138,8 +10817,10 @@
             settingsPanel.style.display = 'flex';
             switchTab('patches');
 
-            // 1. Дефолтные данные
-            patchesData = Object.assign({}, defaultPatchesData);
+            // 1. Загружаем схему метаданных (с GitHub, fallback при ошибке)
+            //    и применяем дефолты к patchesData.
+            _patchesSchema = await loadPatchesSchema();
+            patchesData = {};  // начнём с чистого листа, дефолты добавит applySchemaDefaults
             let launchParams = null;
             let launcherVer = 'v8';
 
@@ -10150,9 +10831,11 @@
                 (window.pywebview?.api?.get_launcher_version?.()) || Promise.resolve(null)
             ]);
 
+            // 3. Читаем сохранённые настройки, дополняем дефолтами схемы
             if (patchesResult && patchesResult.success === true) {
                 patchesData = patchesResult.data;
             }
+            patchesData = applySchemaDefaults(_patchesSchema, patchesData);
 
             if (params && typeof params === 'object') {
                 launchParams = params;
@@ -10217,20 +10900,26 @@
         function closeSettings() {
             _closeWithAnim(settingsPanel, () => {
                 settingsPanel.style.display = 'none';
-                checkboxGroup.innerHTML = '';
+                // Очищаем только динамический контент категорий патчей,
+                // не трогая тулбар (поиск + чипы) — он статический HTML.
+                const cats = document.getElementById('patchesCategories');
+                if (cats) cats.innerHTML = '';
                 _lucideObserver.observe(document.body, { childList: true, subtree: true });
             });
         }
 
         async function saveSettings() {
-            // Читаем значения чекбоксов патчей (id = 'patch_' + key)
-            const boolKeys = Object.keys(patchesData).filter(key => typeof patchesData[key] === 'boolean');
-            boolKeys.forEach(key => {
-                const checkbox = document.getElementById('patch_' + key);
-                if (checkbox) {
-                    patchesData[key] = checkbox.checked;
-                }
-            });
+            // Синхронизируем bool-чекбоксы патчей в patchesData.
+            // Не-bool контролы (number/slider/select/bits) уже пишут значения
+            // в patchesData через свои onchange/oninput-обработчики.
+            if (_patchesSchema) {
+                _patchesSchema.settings.forEach(s => {
+                    if (s.type === 'bool') {
+                        const cb = document.getElementById('patch_' + s.id);
+                        if (cb) patchesData[s.id] = cb.checked;
+                    }
+                });
+            }
 
             // Собираем параметры запуска игры
             const isModern = document.getElementById('v7SectionDivider').style.display !== 'none';

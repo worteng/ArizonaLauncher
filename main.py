@@ -4,10 +4,13 @@ from threading import Thread
 import threading
 import urllib3
 
-# Enable remote debugging for CDP (Chrome DevTools Protocol)
-# Включаем CDP-отладку только при явном запросе через переменную окружения.
-# По умолчанию (релиз) — выключено, чтобы не открывать порт 9222 локально.
-if os.environ.get('ARIZONA_LAUNCHER_DEBUG') == '1':
+# ── DEBUG ──────────────────────────────────────────────────────────
+# Если True — запускается HTTP debug-сервер на 127.0.0.1:8765
+# и CDP-отладка на порту 9222. Перед релизом поставить False.
+DEBUG = True
+
+# Включаем CDP-отладку (Chrome DevTools Protocol) на порту 9222 в debug-режиме.
+if DEBUG:
     webview.settings['REMOTE_DEBUGGING_PORT'] = 9222
 
 # PyQt5 — единый импорт для всех Qt-диалогов (избегаем дублирования внутри методов)
@@ -795,6 +798,36 @@ class ArizonaLauncher:
             logger.warning(f"get_patches_latest_version error: {e}")
             return {"success": False, "message": str(e)}
 
+    def check_patches_update_status(self):
+        """
+        Проверяет статус обновления патчей через удалённый манифест updates/patches.json на GitHub.
+        Это единый источник правды для показа оранжевого язычка «Обновить» при установленном v8.
+        Возвращает: {"success": True, "released": bool, "latest_version": str, "notes": str}
+        или {"success": False, "message": "..."} (в этом случае язычок не показывается — безопасное поведение).
+        """
+        import json as _json
+        url = "https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/updates/patches.json"
+        try:
+            resp = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+            if resp.status_code != 200:
+                logger.warning(f"[check_patches_update_status] HTTP {resp.status_code}")
+                return {"success": False, "message": f"HTTP {resp.status_code}"}
+            try:
+                data = _json.loads(resp.content.decode('utf-8').strip())
+            except (ValueError, UnicodeDecodeError) as e:
+                logger.warning(f"[check_patches_update_status] parse error: {e}")
+                return {"success": False, "message": "Некорректный манифест"}
+            logger.info(f"[check_patches_update_status] released={data.get('released')}, version={data.get('latest_version')}")
+            return {
+                "success": True,
+                "released": bool(data.get("released", False)),
+                "latest_version": str(data.get("latest_version", "")),
+                "notes": str(data.get("notes", "")),
+            }
+        except Exception as e:
+            logger.warning(f"[check_patches_update_status] error: {e}")
+            return {"success": False, "message": str(e)}
+
     def download_and_install_patches(self, version="v2", progress_callback=None):
         """
         Скачивает архив патчей с GitHub и устанавливает в preloading_plugins/.
@@ -1490,7 +1523,20 @@ class WebViewApp:
             }
 
         # 4. Нет preloading + есть лаунчер (v6/v7/v8) -> установить только preloading
+        # НО: для v8 установка preloading управляется удалённым флагом released в updates/patches.json
+        # (патчер сознательно убран из архива, т.к. сломан до выхода 2.0.0.0).
+        # Поэтому пустая/отсутствующая preloading_plugins при установленном v8 НЕ считается поводом
+        # для бесконечного показа язычка «Обновить».
         if not has_preloading and has_launcher:
+            if has_v8:
+                logger.info("[get_install_action] Результат: v8 установлен, preloading отсутствует — проверяется удалённым флагом released (action: none)")
+                return {
+                    "action": "none",
+                    "message": "Лаунчер v8 уже установлен",
+                    "has_launcher": True,
+                    "has_preloading": False,
+                    "launcher_version": "v8"
+                }
             logger.info(f"[get_install_action] Результат: Требуется установка preloading_plugins (action: install_preloading_only, launcher: {launcher_version})")
             return {
                 "action": "install_preloading_only",
@@ -1593,6 +1639,16 @@ class WebViewApp:
             action = install_info.get('action', 'none')
 
             if action == 'none':
+                # v8 уже установлен локально. Но показ язычка управляется удалённым флагом
+                # released в updates/patches.json — это нужно для авторелиза нового патчера (2.0.0.0).
+                if install_info.get('launcher_version') == 'v8':
+                    status = self.check_patches_update_status()
+                    if status.get('success') and status.get('released'):
+                        ver = status.get('latest_version') or ''
+                        msg = f"Доступно обновление патчей" + (f" до v{ver}" if ver else "")
+                        logger.info(f"[check_update_api] {msg} (удалённый флаг released=true)")
+                        return {"success": True, "needs_update": True, "message": msg,
+                                "folder": folder_path, "action": "update_patches"}
                 return {"success": True, "needs_update": False, "message": "Лаунчер v8 уже установлен", "folder": folder_path}
 
             messages = {
@@ -1627,10 +1683,17 @@ class WebViewApp:
             install_info = self.get_install_action(folder_path)
             action = install_info.get('action', 'none')
 
+            # Если локально всё на месте (action: none) — проверяем удалённый флаг released.
+            # Это случай авторелиза нового патчера (2.0.0.0): конфиг updates/patches.json
+            # переключается в released: true, и пользователи получают обновление автоматически.
             if action == 'none':
-                return {"success": False, "message": "Обновление не требуется"}
-
-            if action == 'install_preloading_only':
+                status = self.check_patches_update_status()
+                if not (status.get('success') and status.get('released')):
+                    return {"success": False, "message": "Обновление не требуется"}
+                # Удалённый флаг сработал — скачиваем только preloading_plugins (патчер)
+                logger.info("[download_update_api] Удалённый флаг released=true — скачиваем патчи")
+                install_type = 'install_preloading_only'
+            elif action == 'install_preloading_only':
                 install_type = 'install_preloading_only'
             else:
                 install_type = 'choose_version'
@@ -2403,6 +2466,49 @@ class WebViewApp:
             return {"success": False, "message": "Превышено время ожидания (GitHub не отвечает)"}
         except Exception as e:
             logger.error(f"fetch_patch_presets error: {e}")
+            return {"success": False, "message": str(e)}
+
+    def fetch_patches_schema(self):
+        """Загружает patches_schema.json с GitHub — схему метаданных настроек патчей V2.
+
+        Это data-driven описание UI: категории, настройки (id/title/description/category/type/default/conflicts).
+        При ошибке/404 фронтенд падает на зашитый fallback в index.html.
+
+        Возвращает: {"success": True, "data": {"version", "categories", "settings"}} или {"success": False, "message"}
+        """
+        # Кэш в памяти — не дёргаем GitHub при каждом открытии вкладки
+        if getattr(self, '_patches_schema_cache', None):
+            return {"success": True, "data": self._patches_schema_cache, "cached": True}
+
+        SCHEMA_URL = "https://raw.githubusercontent.com/worteng/ArizonaLauncher/main/patches_schema.json"
+        try:
+            logger.info(f"fetch_patches_schema: запрос {SCHEMA_URL}")
+            resp = requests.get(SCHEMA_URL, timeout=10, headers={"Cache-Control": "no-cache"})
+            if resp.status_code == 404:
+                return {"success": False, "message": "patches_schema.json не найден на GitHub (404)"}
+            if resp.status_code != 200:
+                return {"success": False, "message": f"GitHub вернул HTTP {resp.status_code}"}
+            try:
+                data = resp.json()
+            except ValueError as e:
+                logger.warning(f"fetch_patches_schema: некорректный JSON: {e}")
+                return {"success": False, "message": "Некорректный JSON в patches_schema.json"}
+
+            # Минимальная валидация структуры
+            if not isinstance(data, dict) or 'settings' not in data or 'categories' not in data:
+                return {"success": False, "message": "Схема должна содержать 'categories' и 'settings'"}
+            if not isinstance(data['settings'], list) or not isinstance(data['categories'], list):
+                return {"success": False, "message": "'categories' и 'settings' должны быть массивами"}
+
+            logger.info(f"fetch_patches_schema: загружено категорий={len(data['categories'])}, настроек={len(data['settings'])}")
+            self._patches_schema_cache = data
+            return {"success": True, "data": data}
+        except requests.exceptions.ConnectionError:
+            return {"success": False, "message": "Нет подключения к интернету"}
+        except requests.exceptions.Timeout:
+            return {"success": False, "message": "Превышено время ожидания (GitHub не отвечает)"}
+        except Exception as e:
+            logger.error(f"fetch_patches_schema error: {e}")
             return {"success": False, "message": str(e)}
 
     def _parse_catalog_txt(self, text):
@@ -3198,6 +3304,25 @@ def main():
     # ── Запуск основного окна ─────────────────────────────
     app = WebViewApp()
 
+    # ── Debug-сервер (только при явном запросе) ───────────────────
+    # Локальный HTTP-сервер на 127.0.0.1:8765 для дёрганья backend-функций
+    # без GUI. Полезно для тестирования логики обновлений/патчей.
+    # Запускается при: флаг --debug ИЛИ env ARIZONA_LAUNCHER_DEBUG=1.
+    if DEBUG:
+        try:
+            _app_dir = _get_app_dir()
+            if _app_dir not in sys.path:
+                sys.path.insert(0, _app_dir)
+            import debug_server
+            port = int(os.environ.get('ARIZONA_DEBUG_PORT', '8765'))
+            debug_server.start_debug_server(app, port=port)
+            logger.info(f"[debug] Сервер запущен на http://127.0.0.1:{port}")
+        except Exception as e:
+            print(f"[DEBUG-SERVER ERROR] {e}")
+            import traceback
+            traceback.print_exc()
+            logger.warning(f"Не удалось запустить debug-сервер: {e}", exc_info=True)
+
     # При первом запуске — пробуем найти игру автоматически
     auto_found = False
     if (is_first_run or force_first) and not force_deps:
@@ -3287,8 +3412,7 @@ def main():
         if is_first_run or force_first:
             window.events.loaded += _on_loaded
         gui = os.environ.get('ARIZONA_LAUNCHER_GUI', 'edgechromium')
-        _debug = os.environ.get('ARIZONA_LAUNCHER_DEBUG') == '1'
-        webview.start(debug=_debug, gui=gui)
+        webview.start(debug=DEBUG, gui=gui)
     except Exception as e:
         logger.error(f"Error: {e}")
         if sys.stdin and sys.stdin.isatty():
