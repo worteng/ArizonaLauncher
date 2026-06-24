@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arizona Launcher by Halfik — лаунчер для Arizona RP с расширенными возможностями</title>
+    <meta name="description" content="Arizona Launcher by Halfik — неофициальный лаунчер для Arizona RP (GTA San Andreas) с расширенными возможностями: профили, темы Monet, моды из репозитория сообщества и актуальные новости.">
+    <meta property="og:title" content="Arizona Launcher by Halfik">
+    <meta property="og:description" content="Неофициальный лаунчер для Arizona RP с расширенными возможностями.">
+    <meta property="og:type" content="website">
+
+    <!-- Favicon (заглушка — замени на свой) -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2300B4FF'/%3E%3Cpath d='M9 11h14M9 16h14M9 21h8' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Lucide icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<!-- ====================== HEADER ====================== -->
+<header class="header" id="header">
+    <div class="container">
+        <a href="#hero" class="logo" aria-label="Arizona Launcher by Halfik">
+            <span class="logo-mark"><i data-lucide="gamepad-2"></i></span>
+            <span>
+                Arizona Launcher
+                <span class="logo-by">by Halfik</span>
+            </span>
+        </a>
+
+        <nav class="nav" id="nav" aria-label="Основная навигация">
+            <a href="#features">Возможности</a>
+            <a href="#install">Установка</a>
+            <a href="#news">Новости</a>
+            <a href="#faq">FAQ</a>
+        </nav>
+
+        <div class="header-cta">
+                <a href="https://github.com/worteng/ArizonaLauncher/releases/download/V1.8.1/ArizonaLauncher-v1.8.1-setup.exe" class="btn btn-primary btn-download">
+                    <i data-lucide="download"></i> Скачать
+                </a>
+            <button class="burger" id="burger" aria-label="Меню" aria-expanded="false">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- Мобильное меню -->
+<div class="mobile-menu" id="mobileMenu">
+    <a href="#features">Возможности</a>
+    <a href="#install">Установка</a>
+    <a href="#news">Новости</a>
+    <a href="#faq">FAQ</a>
+    <a href="https://github.com/worteng/ArizonaLauncher/releases/download/V1.8.1/ArizonaLauncher-v1.8.1-setup.exe" class="btn btn-primary"><i data-lucide="download"></i> Скачать</a>
+</div>
+
+<main>
+<!-- ====================== HERO ====================== -->
+<section class="hero" id="hero">
+    <div class="container">
+        <div class="hero-copy">
+            <span class="hero-badge reveal">
+                <span class="dot"></span>
+                Версия <span class="ver">v1.8.1</span> · стабильная
+            </span>
+
+            <h1 class="reveal d1">
+                Лаунчер для <span class="nowrap">Arizona RP</span><br>
+                <span class="grad">с расширенными возможностями</span>
+            </h1>
+
+            <p class="lead reveal d2">
+                Arizona Launcher by Halfik — неофициальный клиент, дополняющий базовый лаунчер
+                удобными функциями: профилями скриптов, темами Monet, модами из репозитория
+                сообщества и лентой новостей прямо в главном экране.
+            </p>
+
+            <div class="hero-actions reveal d3">
+                <a href="https://github.com/worteng/ArizonaLauncher/releases/download/V1.8.1/ArizonaLauncher-v1.8.1-setup.exe" class="btn btn-primary"><i data-lucide="download"></i> Скачать бесплатно</a>
+                <a href="https://www.youtube.com/watch?v=uUCwnjfvzhA" class="btn btn-ghost"><i data-lucide="play-circle"></i> Обзор</a>
+                <a href="#install" class="btn btn-ghost"><i data-lucide="book-open"></i> Как установить</a>
+            </div>
+
+            <div class="hero-stats reveal d4">
+                <div class="stat">
+                    <div class="num grad">5+</div>
+                    <div class="label">ключевых функций</div>
+                </div>
+                <div class="stat">
+                    <div class="num">Arizona RP</div>
+                    <div class="label">полная поддержка</div>
+                </div>
+                <div class="stat">
+                    <div class="num">Monet</div>
+                    <div class="label">адаптивные темы</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Превью интерфейса: упрощённая копия лаунчера (центральная панель + язычок новостей) -->
+        <div class="hero-preview reveal d2">
+            <div class="hero-frame">
+                <div class="hero-screen">
+                    <!-- Левая (основная) панель -->
+                    <div class="hp-left">
+                        <div class="hp-head">
+                            <div class="hp-title">Arizona RP</div>
+                            <div class="hp-sub"><span>Launcher</span><span class="hp-ver">v1.8.1</span></div>
+                        </div>
+
+                        <div class="hp-field">
+                            <span class="hp-label">Ваш никнейм</span>
+                            <span class="hp-input">Dmitri_Sokolov</span>
+                        </div>
+
+                        <div class="hp-field">
+                            <span class="hp-label">Выбор сервера</span>
+                            <span class="hp-select">
+                                <span class="hp-dot"></span> Phoenix <span class="hp-online">12 480</span>
+                                <i data-lucide="chevron-down"></i>
+                            </span>
+                        </div>
+
+                        <button class="hp-start">Начать игру</button>
+
+                        <div class="hp-bottom">
+                            <span class="hp-ic"><i data-lucide="settings"></i></span>
+                            <span class="hp-ic"><i data-lucide="folder"></i></span>
+                            <span class="hp-ic"><i data-lucide="puzzle"></i></span>
+                        </div>
+                    </div>
+
+                    <!-- Язычок новостей (закрытое состояние: только ручка) -->
+                    <div class="hp-tab">
+                        <span class="hp-tab-ic"><i data-lucide="newspaper"></i></span>
+                        <span class="hp-tab-label">Новости</span>
+                        <span class="hp-tab-badge">3</span>
+                    </div>
+                </div>
+            </div>
+            <div class="h-floats">
+                <span class="chip c1"><i data-lucide="sparkles"></i> Тема Monet</span>
+                <span class="chip c2"><i data-lucide="puzzle"></i> Lua-моды</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== FEATURES ====================== -->
+<section class="section" id="features">
+    <div class="container">
+        <div class="section-head reveal">
+            <span class="eyebrow"><i data-lucide="sparkles"></i> Возможности</span>
+            <h2 class="section-title">Всё, что нужно для <span class="grad">удобной игры</span></h2>
+            <p class="section-sub">Расширенный набор функций поверх базового клиента — чтобы скрипты, темы и обновления были под рукой.</p>
+        </div>
+
+        <div class="features-grid">
+            <article class="feature-card reveal d1">
+                <div class="feature-ic"><i data-lucide="user"></i></div>
+                <h3>Профили</h3>
+                <p>Создайте свой профиль, который запоминает включённые скрипты. Переключайтесь между наборами модов в один клик.</p>
+            </article>
+
+            <article class="feature-card reveal d2">
+                <div class="feature-ic"><i data-lucide="palette"></i></div>
+                <h3>Темы Monet</h3>
+                <p>Автопостроение цветовой схемы под цвета выбранных обоев. Интерфейс подстраивается под твой стиль.</p>
+            </article>
+
+            <article class="feature-card reveal d3">
+                <div class="feature-ic"><i data-lucide="newspaper"></i></div>
+                <h3>Новости</h3>
+                <p>Актуальные новости о лаунчере прямо на главном экране. Не пропусти обновления и важные анонсы.</p>
+            </article>
+
+            <article class="feature-card reveal d1">
+                <div class="feature-ic"><i data-lucide="settings"></i></div>
+                <h3>Параметры</h3>
+                <p>Настройка ArizonaPatches, параметров запуска и других опций — тонкая доводка под твою систему.</p>
+            </article>
+
+            <article class="feature-card reveal d2">
+                <div class="feature-ic"><i data-lucide="puzzle"></i></div>
+                <h3>Моды</h3>
+                <p>Lua-скрипты и моды прямо из репозитория сообщества. Установка и обновление в пару кликов.</p>
+            </article>
+
+            <article class="feature-card reveal d3">
+                <div class="feature-ic"><i data-lucide="shield-check"></i></div>
+                <h3>Безопасность</h3>
+                <p>Прозрачные обновления, контроль за устанавливаемыми библиотеками и понятные уведомления о статусе.</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== INSTALL ====================== -->
+<section class="section" id="install">
+    <div class="container">
+        <div class="section-head reveal">
+            <span class="eyebrow"><i data-lucide="download"></i> Установка</span>
+            <h2 class="section-title">Запуск за <span class="grad">4 шага</span></h2>
+            <p class="section-sub">Понятный мастер первого запуска сам обнаружит игру и поможет всё настроить.</p>
+        </div>
+
+        <div class="install-grid">
+            <div class="steps">
+                <div class="step reveal d1">
+                    <span class="num">1</span>
+                    <div class="body">
+                        <h4>Скачай лаунчер</h4>
+                        <p>Загрузи установщик по кнопке «Скачать» и запусти его. Лаунчер не требует сложной настройки.</p>
+                    </div>
+                </div>
+                <div class="step reveal d2">
+                    <span class="num">2</span>
+                    <div class="body">
+                        <h4>Укажи путь к игре</h4>
+                        <p>Мастер попытается найти игру автоматически. Если не нашёл — укажи папку с <code>gta_sa.exe</code> вручную.</p>
+                    </div>
+                </div>
+                <div class="step reveal d3">
+                    <span class="num">3</span>
+                    <div class="body">
+                        <h4>Выбери обои</h4>
+                        <p>Подбери обои под себя — Monet автоматически построит цветовую схему. Можно оставить и без обоев.</p>
+                    </div>
+                </div>
+                <div class="step reveal d4">
+                    <span class="num">4</span>
+                    <div class="body">
+                        <h4>Готово к игре</h4>
+                        <p>Включай нужные моды и скрипты, создавай профили — и заходи на сервер. Приятной игры!</p>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="req-card glass reveal d2">
+                <h4><i data-lucide="monitor"></i> Системные требования</h4>
+                <ul class="req-list">
+                    <li><span class="k">ОС</span><span class="v">Windows 10 / 11 (64-bit)</span></li>
+                    <li><span class="k">Игра</span><span class="v">Сборка или игра с лаунчера для Arizona RP</span></li>
+                    <li><span class="k">Место на диске</span><span class="v">~150 МБ</span></li>
+                    <li><span class="k">Подключение</span><span class="v">Интернет для загрузки модов</span></li>
+                </ul>
+                <div class="req-note">
+                    <i data-lucide="info"></i>
+                    <span>Лаунчер неофициальный и не заменяет игровой клиент. Для работы нужна совместимая сборка для Arizona RP или сама игра с официального лаунчера.</span>
+                </div>
+            </aside>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== NEWS ====================== -->
+<section class="section" id="news">
+    <div class="container">
+        <div class="section-head reveal">
+            <span class="eyebrow"><i data-lucide="newspaper"></i> Новости</span>
+            <h2 class="section-title">Что нового в <span class="grad">лаунчере</span></h2>
+            <p class="section-sub">Обновления, исправления и анонсы версий.</p>
+        </div>
+
+        <div class="news-grid">
+            <article class="news-card reveal d1">
+                <div class="news-thumb"><i data-lucide="wrench"></i><span class="news-tag">v1.8.1</span></div>
+                <div class="news-body">
+                    <span class="news-date"><i data-lucide="calendar"></i> Текущая версия</span>
+                    <h3>ArizonaLauncher v1.8.1</h3>
+                    <p>Исправлен прогресс загрузки V8, центрирование панелей, метод исключений Defender и ряд крашей. Добавлено редактирование параметров запуска и Lua-скриптов прямо в профиле, а также захват патчей из текущих настроек.</p>
+                    <a href="https://github.com/worteng/ArizonaLauncher/releases" class="news-more">Подробнее <i data-lucide="arrow-right"></i></a>
+                </div>
+            </article>
+
+            <article class="news-card reveal d2">
+                <div class="news-thumb"><i data-lucide="zap"></i><span class="news-tag">v1.8.0</span></div>
+                <div class="news-body">
+                    <span class="news-date"><i data-lucide="calendar"></i> Предыдущая версия</span>
+                    <h3>Переход только на V8</h3>
+                    <p>Убрана поддержка Air v6 и v7 — теперь только v8. При обнаружении старых версий лаунчер предложит обновление, а старые .exe удаляются автоматически. Архив V8 зашифрован (pyzipper), оптимизирован bytecode и снижено потребление ресурсов.</p>
+                    <a href="https://github.com/worteng/ArizonaLauncher/releases" class="news-more">Подробнее <i data-lucide="arrow-right"></i></a>
+                </div>
+            </article>
+
+            <article class="news-card reveal d3">
+                <div class="news-thumb"><i data-lucide="party-popper"></i><span class="news-tag">v1.0.0</span></div>
+                <div class="news-body">
+                    <span class="news-date"><i data-lucide="calendar"></i> 16 апреля 2026</span>
+                    <h3>Стабильный релиз v1.0.0</h3>
+                    <p>Первый стабильный релиз после двух месяцев разработки. Многофункциональный лаунчер для Arizona RP, объединяющий лучшие возможности существующих решений с современным интерфейсом. Исправлены критические баги и улучшена стабильность.</p>
+                    <a href="https://github.com/worteng/ArizonaLauncher/releases" class="news-more">Подробнее <i data-lucide="arrow-right"></i></a>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== FAQ ====================== -->
+<section class="section" id="faq">
+    <div class="container">
+        <div class="section-head reveal" style="margin-inline:auto; text-align:center;">
+            <span class="eyebrow"><i data-lucide="help-circle"></i> Вопросы</span>
+            <h2 class="section-title">Частые <span class="grad">вопросы</span></h2>
+            <p class="section-sub" style="margin-inline:auto;">Не нашли ответ? Напишите в Telegram или задайте вопрос в теме на BlastHack.</p>
+        </div>
+
+        <div class="faq-wrap">
+            <div class="faq-item reveal d1">
+                <button class="faq-q" aria-expanded="false">
+                    Лаунчер официальный?
+                    <span class="ic"><i data-lucide="plus"></i></span>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner">
+                    Нет, лаунчер <strong>неофициальный</strong> и создаётся энтузиастом (Halfik). Он дополняет лаунчер Эира
+                    удобными функциями и не заменяет игровую сборку. Скачивайте установщик только из проверенных источников —
+                    по ссылке на этом сайте или в официальном Telegram-канале.
+                </div></div>
+            </div>
+
+            <div class="faq-item reveal d2">
+                <button class="faq-q" aria-expanded="false">
+                    Совместим ли лаунчер с другими модами и сборками?
+                    <span class="ic"><i data-lucide="plus"></i></span>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner">
+                    Лаунчер заточен под сборку Arizona RP. Некоторые сторонние моды могут быть несовместимы —
+                    при обнаружении конфликта лаунчер предупредит и предложит отключить проблемный мод.
+                </div></div>
+            </div>
+
+            <div class="faq-item reveal d3">
+                <button class="faq-q" aria-expanded="false">
+                    Что нужно для работы лаунчера?
+                    <span class="ic"><i data-lucide="plus"></i></span>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner">
+                    Для работы нужна <strong>совместимая сборка для Arizona RP</strong> или сама игра, установленная через официальный лаунчер.
+                    При первом запуске мастер попросит указать путь к папке с игрой (<code>gta_sa.exe</code>).
+                </div></div>
+            </div>
+
+            <div class="faq-item reveal d4">
+                <button class="faq-q" aria-expanded="false">
+                    Как узнать о новых версиях лаунчера?
+                    <span class="ic"><i data-lucide="plus"></i></span>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner">
+                    Автоматического обновления нет, но когда выходит новая версия — об этом сообщается в новостях прямо
+                    в лаунчере (можно нажать и перейти на страницу GitHub для скачивания).
+                    Также следите за уведомлениями в Telegram-канале.
+                </div></div>
+            </div>
+
+            <div class="faq-item reveal d4">
+                <button class="faq-q" aria-expanded="false">
+                    Безопасны ли мои данные и настройки?
+                    <span class="ic"><i data-lucide="plus"></i></span>
+                </button>
+                <div class="faq-a"><div class="faq-a-inner">
+                    Да, все данные, которые вы оставляете в лаунчере, остаются у вас — лаунчер не собирает аналитику.
+                    Кроме того, <strong>исходный код открыт</strong> и его можно проверить в любой момент на GitHub.
+                </div></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ====================== CTA ====================== -->
+<section class="section" style="padding-top:0;">
+    <div class="container">
+        <div class="cta-band reveal">
+            <h2>Готов попробовать <span class="grad">расширенный лаунчер?</span></h2>
+            <p>Скачай Arizona Launcher by Halfik и настрой игру под себя за пару минут.</p>
+            <div class="cta-actions">
+                <a href="https://github.com/worteng/ArizonaLauncher/releases/download/V1.8.1/ArizonaLauncher-v1.8.1-setup.exe" class="btn btn-primary"><i data-lucide="download"></i> Скачать v1.8.1</a>
+                <a href="https://t.me/HalfikChannel" class="btn btn-ghost"><i data-lucide="send"></i> Telegram-канал</a>
+            </div>
+        </div>
+    </div>
+</section>
+</main>
+
+<!-- ====================== FOOTER ====================== -->
+<footer class="footer">
+    <div class="container">
+        <div class="col-about">
+            <a href="#hero" class="logo">
+                <span class="logo-mark"><i data-lucide="gamepad-2"></i></span>
+                <span>Arizona Launcher <span class="logo-by">by Halfik</span></span>
+            </a>
+            <p class="about">
+                Неофициальный лаунчер для Arizona RP с расширенными возможностями. Дополняет базовый клиент
+                профилями, темами Monet, модами и лентой новостей.
+            </p>
+            <div class="socials">
+                <a href="https://t.me/HalfikChannel" aria-label="Telegram"><i data-lucide="send"></i></a>
+                <a href="https://www.blast.hk/threads/253608/" aria-label="BlastHack"><i data-lucide="globe"></i></a>
+                <a href="https://www.youtube.com/watch?v=uUCwnjfvzhA" aria-label="YouTube"><i data-lucide="play-circle"></i></a>
+                <a href="https://github.com/worteng/ArizonaLauncher" aria-label="GitHub"><i data-lucide="code-2"></i></a>
+            </div>
+        </div>
+
+        <div>
+            <h5>Навигация</h5>
+            <ul class="links">
+                <li><a href="#features"><i data-lucide="sparkles"></i> Возможности</a></li>
+                <li><a href="#install"><i data-lucide="download"></i> Установка</a></li>
+                <li><a href="#news"><i data-lucide="newspaper"></i> Новости</a></li>
+                <li><a href="#faq"><i data-lucide="help-circle"></i> FAQ</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <h5>Сообщество</h5>
+            <ul class="links">
+                <li><a href="https://t.me/HalfikChannel"><i data-lucide="send"></i> Telegram</a></li>
+                <li><a href="https://www.blast.hk/threads/253608/"><i data-lucide="globe"></i> BlastHack (пост)</a></li>
+                <li><a href="https://www.youtube.com/watch?v=uUCwnjfvzhA"><i data-lucide="play-circle"></i> Обзор на YouTube</a></li>
+                <li><a href="https://github.com/worteng/ArizonaLauncher"><i data-lucide="code-2"></i> GitHub</a></li>
+                <li><a href="https://github.com/worteng/ArizonaLauncher/releases/download/V1.8.1/ArizonaLauncher-v1.8.1-setup.exe"><i data-lucide="download"></i> Скачать</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container footer-bottom">
+        <span class="disc">
+            © 2026 Arizona Launcher by Halfik. Неофициальный проект, не связан с Arizona RP и Rockstar Games.
+            GTA San Andreas — товарный знак Take-Two Interactive.
+        </span>
+        <span>Сделано с <i data-lucide="heart" style="width:0.9em;height:0.9em;color:rgba(var(--accent2-rgb),1);vertical-align:-1px;"></i> для сообщества</span>
+    </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
