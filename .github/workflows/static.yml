@@ -5,7 +5,6 @@
 # Этот workflow деплоит ТОЛЬКО содержимое папки site/, поэтому главной страницей
 # Pages становится наш промо-сайт, а корневой мокап остаётся доступен в репо.
 #
-# НАСТРОЙКА (один раз): Settings → Pages → Source → GitHub Actions.
 
 name: Deploy site to GitHub Pages
 
